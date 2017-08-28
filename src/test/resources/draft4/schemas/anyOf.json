@@ -1,0 +1,14 @@
+{
+  "id": "https://www.elixir-europe.org/json-schemas/test/anyOf",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of 'anyOf'",
+  "type": "object",
+  "properties": {
+    "A": { 
+       "anyOf": [ 
+         { "type": "string", "maxLength": 5 },
+         { "type": "string", "minLength": 7 } 
+       ]
+    }
+  }
+}
