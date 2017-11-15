@@ -1,5 +1,22 @@
 The library is based on JSONP v1.1 Json parser.
 
+import via maven:
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>es.elixir.bsc.json.schema</groupId>
+    <artifactId>jaronuinga</artifactId>
+    <version>0.4</version>
+  </dependency>
+...
+<repositories>
+  <repository>
+    <id>jaronuinga</id>
+    <url>https://raw.github.com/inab/jaronuinga/maven/</url>
+  </repository>
+```
+
 The simplest usage:
 ```java
 JsonSchema schema = JsonSchemaReader.getReader().read(url); // parse JsonSchema from the URL location
