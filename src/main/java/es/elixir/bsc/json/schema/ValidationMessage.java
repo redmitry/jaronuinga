@@ -45,7 +45,7 @@ public enum ValidationMessage {
     STRING_MIN_LENGTH_CONSTRAINT(9, "string.length %d < minLength = %d"),
     STRING_MAX_LENGTH_CONSTRAINT(10, "string.length %d < minLength = %d"),
     
-    STRING_PATTERN_CONSTRAINT(11, "string.pattern constraint '%d' %d"),
+    STRING_PATTERN_CONSTRAINT(11, "string.pattern constraint '%s' %s"),
     STRING_DATE_TIME_FORMAT_CONSTRAINT(12, "invalid datetime format: '%s'"),
     STRING_EMAIL_FORMAT_CONSTRAINT(13, "invalid email format: '%s'"),
     STRING_HOSTNAME_FORMAT_CONSTRAINT(14, "invalid hostname format: '%s'"),
