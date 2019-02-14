@@ -171,9 +171,13 @@ public class JsonArraySchemaImpl extends PrimitiveSchema
 
         if (maxItems != null && array.size() > maxItems) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.ARRAY_MAX_ITEMS_CONSTRAINT, maxItems, items.size()));
+                    ValidationMessage.ARRAY_MAX_ITEMS_CONSTRAINT, maxItems, items == null ? 0 : items.size()));
         }
 
+        if (items == null) {
+            return;
+        }
+        
         if (additionalItemsSchema == null &&
             additionalItems == null) {
 
