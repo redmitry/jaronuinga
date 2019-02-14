@@ -171,6 +171,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchema
     public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
 
         if (value.getValueType() != JsonValue.ValueType.OBJECT) {
+            errors.add(new ValidationError(getId(), getJsonPointer(),
+                    ValidationMessage.OBJECT_EXPECTED, value.getValueType().name()));
             return;
         }
         
