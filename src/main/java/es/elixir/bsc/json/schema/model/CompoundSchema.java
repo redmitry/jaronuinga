@@ -35,7 +35,7 @@ import java.net.URI;
  * @author Dmitry Repchevsky
  */
 
-public class CompoundSchema extends JsonAnyOfImpl implements JsonSchema {
+public class CompoundSchema extends JsonAnyOfImpl {
 
     @Override
     public URI getId() {

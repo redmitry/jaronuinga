@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import java.net.URI;
 
 /**
  * @author Dmitry Repchevsky
@@ -41,6 +42,7 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 public class JsonAnyOfImpl extends SchemaArrayImpl 
                            implements JsonAnyOf {
     
+    @Override
     public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
         
         List<ValidationError> err = new ArrayList<>();

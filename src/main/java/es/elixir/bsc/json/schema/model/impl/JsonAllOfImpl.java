@@ -32,6 +32,7 @@ import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.List;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import java.net.URI;
 
 /**
  * @author Dmitry Repchevsky
@@ -41,6 +42,7 @@ public class JsonAllOfImpl extends SchemaArrayImpl
                            implements JsonAllOf {
     
 
+    @Override
     public void validate(JsonValue object, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
         final int nerrors = errors.size();
         for (JsonSchema schema : this) {

@@ -41,6 +41,7 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 public class JsonOneOfImpl extends SchemaArrayImpl 
                            implements JsonOneOf {
 
+    @Override
     public void validate(JsonValue object, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
 
         int matches = 0;

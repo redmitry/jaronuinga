@@ -49,6 +49,10 @@ public abstract class SchemaArrayImpl extends HashSet<JsonSchema>
     public URI getId() {
         return id;
     }
+
+    public void setId(URI id) {
+        this.id = id;
+    }
     
     public String getJsonPointer() {
         return jsonPointer;

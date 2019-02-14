@@ -68,6 +68,7 @@ public class PrimitiveSchema implements JsonSchema {
      * 
      * @return Json Pointer to this schema
      */
+    @Override
     public String getJsonPointer() {
         return jsonPointer;
     }
