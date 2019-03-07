@@ -33,17 +33,20 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ext.ExtendedJsonSchemaLocatorInterface;
 import es.elixir.bsc.json.schema.model.CompoundSchema;
+import static es.elixir.bsc.json.schema.model.JsonEnum.ENUM;
 import es.elixir.bsc.json.schema.model.JsonObjectSchema;
 import static es.elixir.bsc.json.schema.model.JsonObjectSchema.ALL_OF;
 import static es.elixir.bsc.json.schema.model.JsonObjectSchema.ANY_OF;
 import static es.elixir.bsc.json.schema.model.JsonObjectSchema.NOT;
 import static es.elixir.bsc.json.schema.model.JsonObjectSchema.ONE_OF;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import static es.elixir.bsc.json.schema.model.JsonSchema.TYPE;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.impl.JsonAllOfImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonAnyOfImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonArraySchemaImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonBooleanSchemaImpl;
+import es.elixir.bsc.json.schema.model.impl.JsonEnumImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonIntegerSchemaImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonNotImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonNullSchemaImpl;
@@ -132,7 +135,15 @@ public class DefaultJsonSchemaParser implements JsonSchemaParser {
             locator.getSchemas().put(jsonPointer, object);
         }
         
-        JsonValue value = object.get("type");
+        final JsonArray _enum = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
+        if (_enum != null) {
+            if (_enum.isEmpty()) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.EMPTY_ENUM));
+            }
+            return new JsonEnumImpl().read(this, locator, jsonPointer, object);
+        }
+
+        JsonValue value = object.get(TYPE);
         if (value == null) {
             
             final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
@@ -176,11 +187,11 @@ public class DefaultJsonSchemaParser implements JsonSchemaParser {
             }
             return schema;
         }
-        
+            
         switch(value.getValueType()) {
             case STRING: return parse(locator, jsonPointer, object, getType(value));
             case ARRAY: CompoundSchema schema = new CompoundSchema();
-                        for (JsonValue val : (JsonArray)value) {
+                        for (JsonValue val : value.asJsonArray()) {
                             schema.add(parse(locator, jsonPointer, object, getType(val)));
                         }
                         return schema;
