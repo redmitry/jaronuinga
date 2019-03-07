@@ -38,7 +38,8 @@ public enum ParsingMessage {
     UNKNOWN_OBJECT_TYPE(5, "unknown object type: '%s'."),
     INVALID_REFERENCE(6, "invalid reference: '$ref': '%s'."),
     UNRESOLVABLE_REFERENCE(7, "unable to resolve reference. '$ref': '%s'."),
-    CONSTRAINT_ERROR(8, "%s constraint: '%s' '%s.");
+    CONSTRAINT_ERROR(8, "%s constraint: '%s' '%s."),
+    EMPTY_ENUM(9, "empty enum.");
     
     public final int CODE;
     public final String VALUE;

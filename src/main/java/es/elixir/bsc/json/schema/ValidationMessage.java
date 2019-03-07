@@ -58,7 +58,10 @@ public enum ValidationMessage {
     NUMBER_MAX_CONSTRAINT(20, "value = %s %s number.maximum = %s"),
 
     INTEGER_MIN_CONSTRAINT(21, "value = %d %s integer.minimum = %d"),
-    INTEGER_MAX_CONSTRAINT(22, "value = %d %s integer.maximum = %d");
+    INTEGER_MAX_CONSTRAINT(22, "value = %d %s integer.maximum = %d"),
+    
+    ENUM_INVALID_VALUE_TYPE(23, "invalid value type for enum: %s"),
+    ENUM_INVALID_VALUE(24, "value = %s enum.values = %s");
     
     public final int CODE;
     public final String VALUE;
