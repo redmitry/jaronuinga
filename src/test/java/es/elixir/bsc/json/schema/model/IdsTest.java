@@ -44,6 +44,7 @@ public class IdsTest {
 
     private final static String JSON_SCHEMA_FILE = "draft4/schemas/ids.json";
     private final static String JSON_OTHER_SCHEMA_ID = "other.json";
+
     @Test
     public void test_01() {
         

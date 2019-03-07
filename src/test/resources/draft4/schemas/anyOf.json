@@ -9,6 +9,14 @@
          { "type": "string", "maxLength": 5 },
          { "type": "string", "minLength": 7 } 
        ]
+    },
+    "B": { 
+       "type": "string",
+       "anyOf": [ 
+         { "maxLength": 5 },
+         { "minLength": 7 } 
+       ]
     }
+
   }
 }

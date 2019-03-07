@@ -1,0 +1,15 @@
+{
+  "id": "https://www.elixir-europe.org/json-schemas/test/anyOf",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of 'anyOf'",
+  "type": "object",
+  "properties": {
+    "A": { 
+       "enum": ["Barcelona", 2019, null]
+    },
+    "B": { 
+       "type": "string",
+       "enum": ["Barcelona", "St.Petersburg"]
+    }
+  }
+}
