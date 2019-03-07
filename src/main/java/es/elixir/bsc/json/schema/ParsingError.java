@@ -38,6 +38,11 @@ public class ParsingError {
         this.message = message;
     }
     
+    public ParsingError(final ParsingMessage message) {
+        this.code = message.CODE;
+        this.message = message.VALUE;
+    }
+    
     public ParsingError(final ParsingMessage message, Object[] args) {
         this.code = message.CODE;
         this.message = String.format(message.VALUE, args);
