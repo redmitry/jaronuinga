@@ -27,14 +27,15 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.model.JsonBooleanSchema;
 import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -44,8 +45,13 @@ public class JsonBooleanSchemaImpl extends PrimitiveSchema
                                    implements JsonBooleanSchema {
 
     @Override
-    public JsonBooleanSchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonBooleanSchemaImpl read(final JsonSubschemaParser parser, 
+                                      final JsonSchemaLocator locator, 
+                                      final String jsonPointer, 
+                                      final JsonObject object,
+                                      final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, locator, jsonPointer, object, type);
 
         return this;
     }

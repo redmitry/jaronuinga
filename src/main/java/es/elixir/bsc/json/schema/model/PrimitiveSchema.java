@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
@@ -37,6 +36,7 @@ import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * Primitive empty Json Schema of any type ("object", "array", "string", etc.)
@@ -89,7 +89,12 @@ public class PrimitiveSchema implements JsonSchema {
         this.description = description;
     }
 
-    public PrimitiveSchema read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
+    public PrimitiveSchema read(final JsonSubschemaParser parser, 
+                                final JsonSchemaLocator locator, 
+                                final String jsonPointer, 
+                                final JsonObject object, 
+                                final JsonType type) throws JsonSchemaException {
+
         this.jsonPointer = jsonPointer;
         
         id = locator.uri;

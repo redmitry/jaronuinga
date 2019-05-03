@@ -7,11 +7,13 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonEnum;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.util.List;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -32,8 +34,13 @@ public class JsonEnumImpl extends PrimitiveSchema implements JsonEnum {
     }
     
     @Override
-    public JsonEnumImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonEnumImpl read(final JsonSubschemaParser parser, 
+                             final JsonSchemaLocator locator, 
+                             final String jsonPointer, 
+                             final JsonObject object,
+                             final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, locator, jsonPointer, object, type);
         
         values = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
         

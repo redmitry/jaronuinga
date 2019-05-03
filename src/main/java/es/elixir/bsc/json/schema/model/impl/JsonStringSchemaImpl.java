@@ -42,7 +42,10 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.DefaultJsonStringFormatValidator;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import java.util.regex.Pattern;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -55,7 +58,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchema
     private Long maxLength;
     
     private String format;
-    private String pattern;
+    private Pattern pattern;
     
     @Override
     public Long getMinLength() {
@@ -84,12 +87,13 @@ public class JsonStringSchemaImpl extends PrimitiveSchema
     
     @Override
     public String getPattern() {
-        return pattern;
+        return pattern == null ? null : pattern.pattern();
     }
 
     @Override
     public void setPattern(String pattern) {
-        this.pattern = pattern;
+        this.pattern = pattern == null ? null : Pattern.compile(pattern);
+        
     }
     
     @Override
@@ -98,8 +102,13 @@ public class JsonStringSchemaImpl extends PrimitiveSchema
     }
     
     @Override
-    public JsonStringSchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonStringSchemaImpl read(final JsonSubschemaParser parser, 
+                                     final JsonSchemaLocator locator, 
+                                     final String jsonPointer, 
+                                     final JsonObject object,
+                                     final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, locator, jsonPointer, object, type);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_LENGTH), JsonValue.ValueType.NUMBER);
         final JsonNumber max = JsonSchemaUtil.check(object.getJsonNumber(MAX_LENGTH), JsonValue.ValueType.NUMBER);
@@ -162,7 +171,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchema
 
         }
         
-        if (pattern != null && !str.matches(pattern)) {
+        if (pattern != null && !pattern.matcher(str).find()) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
                     ValidationMessage.STRING_PATTERN_CONSTRAINT, pattern, str));
             

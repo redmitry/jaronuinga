@@ -67,7 +67,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     }
     
     @Override
-    public JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException {
+    public JsonSchema read(final JsonSchemaLocator locator) throws JsonSchemaException {
         JsonSchema schema = schemas.get(locator.uri);
         if (schema == null) {
             JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);

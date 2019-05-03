@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2019 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -23,27 +23,35 @@
  *****************************************************************************
  */
 
-package es.elixir.bsc.json.schema;
+package es.elixir.bsc.json.schema.impl;
 
+import es.elixir.bsc.json.schema.JsonSchemaException;
+import es.elixir.bsc.json.schema.JsonSchemaLocator;
+import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonObject;
 
 /**
- * @author Dmitry Rechevsky
+ * <p>
+ * JSON Subschema parser interface with optional JsonType parameter.
+ * <`p>
+ * 
+ * The parse() method allows to pass an optional JSON Type which may be used by the parser 
+ * to parse schema elements with no type defined (as in 'oneOf' or 'anyOf').
+ * 
+ * @author Dmitry Repchevsky
  */
 
-public interface JsonSchemaParser {
+public interface JsonSubschemaParser extends JsonSchemaParser {
     
-    /**
-     * 
-     * @param locator current Json Schema locator that holds current ID (URI).
-     * @param jsonPointer Json Pointer to the current object positions.
-     * @param object Json object that represents Json Schema.
-     * 
-     * @return Json Schema model object.
-     * 
-     * @throws JsonSchemaException 
-     */
-    JsonSchema parse(JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException;
+    @Override
+    default JsonSchema parse(final JsonSchemaLocator locator, 
+                             final String jsonPointer, 
+                             final JsonObject object) throws JsonSchemaException {
+
+        return parse(locator, jsonPointer, object, null);
+    }
+    
+    JsonSchema parse(JsonSchemaLocator locator, String jsonPointer, JsonObject object, JsonType type) throws JsonSchemaException;
 }

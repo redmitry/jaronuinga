@@ -27,14 +27,15 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.model.SchemaArray;
 import java.net.URI;
 import java.util.HashSet;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -68,10 +69,11 @@ public abstract class SchemaArrayImpl extends HashSet<JsonSchema>
         return super.contains(schema);
     }
 
-    public SchemaArrayImpl read(JsonSchemaParser parser, 
-                                JsonSchemaLocator locator, 
-                                String jsonPointer, 
-                                JsonArray array) throws JsonSchemaException {
+    public SchemaArrayImpl read(final JsonSubschemaParser parser, 
+                                final JsonSchemaLocator locator, 
+                                final String jsonPointer, 
+                                final JsonArray array,
+                                final JsonType type) throws JsonSchemaException {
 
         this.id = locator.uri;
         this.jsonPointer = jsonPointer;
@@ -79,7 +81,7 @@ public abstract class SchemaArrayImpl extends HashSet<JsonSchema>
         for (int i = 0, n = array.size(); i < n; i++) {
             final JsonValue value = array.get(i);
             final JsonObject object = JsonSchemaUtil.check(value, JsonValue.ValueType.OBJECT);
-            final JsonSchema schema = parser.parse(locator, jsonPointer + "/" + Integer.toString(i) + "/", object);
+            final JsonSchema schema = parser.parse(locator, jsonPointer + "/" + Integer.toString(i) + "/", object, type);
             add(schema);
         }
 

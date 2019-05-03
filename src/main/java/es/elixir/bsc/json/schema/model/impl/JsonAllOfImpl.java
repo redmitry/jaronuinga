@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.List;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import java.net.URI;
 
 /**
  * @author Dmitry Repchevsky

@@ -27,14 +27,15 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.model.JsonNullSchema;
 import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -44,14 +45,21 @@ public class JsonNullSchemaImpl extends PrimitiveSchema
                                 implements JsonNullSchema {
 
     @Override
-    public JsonNullSchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonNullSchemaImpl read(final JsonSubschemaParser parser, 
+                                   final JsonSchemaLocator locator, 
+                                   final String jsonPointer, 
+                                   final JsonObject object,
+                                   final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, locator, jsonPointer, object, type);
 
         return this;
     }
+
     @Override
-    public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
-        //
+    public void validate(final JsonValue value, 
+                         final List<ValidationError> errors, 
+                         final JsonSchemaValidationCallback callback) {
         
         if (callback != null) {
             callback.validated(this, value, errors);

@@ -27,10 +27,11 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import javax.json.JsonObject;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -86,8 +87,13 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     }
 
     @Override
-    public NumericSchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public NumericSchemaImpl read(final JsonSubschemaParser parser, 
+                                  final JsonSchemaLocator locator, 
+                                  final String jsonPointer, 
+                                  final JsonObject object, 
+                                  final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, locator, jsonPointer, object, type);
         
         if (object.getBoolean(EXCLUSIVE_MINIMUM, false)) {
             exclusiveMinimum = true;

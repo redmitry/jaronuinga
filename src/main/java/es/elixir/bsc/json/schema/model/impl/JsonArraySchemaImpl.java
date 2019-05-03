@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonArraySchema;
@@ -38,10 +37,12 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonNumber;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -104,8 +105,13 @@ public class JsonArraySchemaImpl extends PrimitiveSchema
     }
     
     @Override
-    public JsonArraySchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonArraySchemaImpl read(final JsonSubschemaParser parser, 
+                                    final JsonSchemaLocator locator, 
+                                    final String jsonPointer, 
+                                    final JsonObject object,
+                                    final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, locator, jsonPointer, object, type);
         
         JsonValue jitems = object.get(ITEMS);
         if (jitems == null) {
@@ -114,14 +120,14 @@ public class JsonArraySchemaImpl extends PrimitiveSchema
         }
         
         if (jitems instanceof JsonObject) {
-            final JsonSchema schema = parser.parse(locator, jsonPointer + ITEMS + "/", jitems.asJsonObject());
+            final JsonSchema schema = parser.parse(locator, jsonPointer + ITEMS + "/", jitems.asJsonObject(), type);
             getItems().add(schema);
         } else if (jitems instanceof JsonArray) {
             additionalItems = false;
             for (int i = 0, n = jitems.asJsonArray().size(); i < n; i++) {
                 final JsonValue value = jitems.asJsonArray().get(i);
                 final JsonObject o = JsonSchemaUtil.check(value, JsonValue.ValueType.OBJECT);
-                final JsonSchema schema = parser.parse(locator, jsonPointer + Integer.toString(i) + "/", o);
+                final JsonSchema schema = parser.parse(locator, jsonPointer + Integer.toString(i) + "/", o, type);
                 getItems().add(schema);                
             }
         } else {
@@ -133,7 +139,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchema
         if (jadditionalItems != null) {
             switch(jadditionalItems.getValueType()) {
                 case OBJECT: additionalItems = null;
-                             additionalItemsSchema = parser.parse(locator, jsonPointer + ADDITIONAL_ITEMS + "/", jadditionalItems.asJsonObject());
+                             additionalItemsSchema = parser.parse(locator, jsonPointer + ADDITIONAL_ITEMS + "/", jadditionalItems.asJsonObject(), type);
                              break;
                 case TRUE:   additionalItems = true; break;
                 case FALSE:  additionalItems = false; break;

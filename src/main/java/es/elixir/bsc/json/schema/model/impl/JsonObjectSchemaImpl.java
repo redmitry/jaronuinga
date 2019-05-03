@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
@@ -47,7 +46,9 @@ import es.elixir.bsc.json.schema.model.StringArray;
 import javax.json.JsonArray;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonNot;
+import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
@@ -122,8 +123,13 @@ public class JsonObjectSchemaImpl extends PrimitiveSchema
     }
 
     @Override
-    public JsonObjectSchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonObjectSchemaImpl read(final JsonSubschemaParser parser, 
+                                     final JsonSchemaLocator locator, 
+                                     final String jsonPointer, 
+                                     final JsonObject object,
+                                     final JsonType type) throws JsonSchemaException {
+        
+        super.read(parser, locator, jsonPointer, object, type);
 
         final JsonObject jdefinitions = JsonSchemaUtil.check(object.get(DEFINITIONS), ValueType.OBJECT);
         if (jdefinitions != null) {
@@ -143,19 +149,19 @@ public class JsonObjectSchemaImpl extends PrimitiveSchema
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), ValueType.ARRAY);
         if (jallOf != null) {
             allOf = new JsonAllOfImpl();
-            allOf.read(parser, locator, jsonPointer + ALL_OF + "/", jallOf);
+            allOf.read(parser, locator, jsonPointer + ALL_OF + "/", jallOf, type);
         }
         
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), ValueType.ARRAY);
         if (janyOf != null) {
             anyOf = new JsonAnyOfImpl();
-            anyOf.read(parser, locator, jsonPointer + ANY_OF + "/", janyOf);
+            anyOf.read(parser, locator, jsonPointer + ANY_OF + "/", janyOf, type);
         }
         
         final JsonArray joneOf = JsonSchemaUtil.check(object.get(ONE_OF), ValueType.ARRAY);
         if (joneOf != null) {
             oneOf = new JsonOneOfImpl();
-            oneOf.read(parser, locator, jsonPointer + ONE_OF + "/", joneOf);
+            oneOf.read(parser, locator, jsonPointer + ONE_OF + "/", joneOf, type);
         }
 
         final JsonObject jnot = JsonSchemaUtil.check(object.get(NOT), ValueType.OBJECT);

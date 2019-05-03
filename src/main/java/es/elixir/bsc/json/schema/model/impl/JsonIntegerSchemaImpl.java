@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonIntegerSchema;
@@ -39,6 +38,8 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.model.JsonType;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * Json Schema implementation for the Json Integer type.
@@ -50,8 +51,13 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
                                    implements JsonIntegerSchema {
     
     @Override
-    public JsonIntegerSchemaImpl read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        super.read(parser, locator, jsonPointer, object);
+    public JsonIntegerSchemaImpl read(final JsonSubschemaParser parser, 
+                                      final JsonSchemaLocator locator, 
+                                      final String jsonPointer, 
+                                      final JsonObject object,
+                                      final JsonType type) throws JsonSchemaException {
+        
+        super.read(parser, locator, jsonPointer, object, type);
 
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MINIMUM), JsonValue.ValueType.NUMBER);
         if (min != null) {
