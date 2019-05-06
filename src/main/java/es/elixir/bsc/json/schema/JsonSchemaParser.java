@@ -26,7 +26,6 @@
 package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonObject;
 
 /**
