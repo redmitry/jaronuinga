@@ -81,7 +81,7 @@ public abstract class SchemaArrayImpl extends HashSet<JsonSchema>
         for (int i = 0, n = array.size(); i < n; i++) {
             final JsonValue value = array.get(i);
             final JsonObject object = JsonSchemaUtil.check(value, JsonValue.ValueType.OBJECT);
-            final JsonSchema schema = parser.parse(locator, jsonPointer + "/" + Integer.toString(i) + "/", object, type);
+            final JsonSchema schema = parser.parse(locator, jsonPointer + Integer.toString(i) + "/", object, type);
             add(schema);
         }
 
