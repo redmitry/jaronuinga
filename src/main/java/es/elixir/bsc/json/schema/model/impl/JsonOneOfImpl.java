@@ -48,8 +48,7 @@ public class JsonOneOfImpl extends SchemaArrayImpl
         
         final List<ValidationError> err = new ArrayList<>();
         for (JsonSchema schema : this) {
-            err.clear();
-            final int nerrors = errors.size();
+            final int nerrors = err.size();
             schema.validate(object, err, callback);
             if (nerrors == err.size()) {
                 matches++;
