@@ -46,7 +46,7 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
         
         List<ValidationError> err = new ArrayList<>();
         for (JsonSchema schema : this) {
-            final int nerrors = errors.size();
+            final int nerrors = err.size();
             schema.validate(value, err, callback);
             if (nerrors == err.size()) {
                 return; // found the schema that matches
