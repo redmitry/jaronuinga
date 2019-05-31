@@ -39,7 +39,7 @@ public abstract class JsonSchemaLocator {
    
     public final URI uri;
     
-    public JsonSchemaLocator(URI uri) {
+    public JsonSchemaLocator(final URI uri) {
         this.uri = uri;
     }
 
