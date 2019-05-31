@@ -70,7 +70,7 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
     
     public final JsonSchemaLocator locator;
     
-    public DefaultJsonSchemaParser(JsonSchemaLocator locator) {
+    public DefaultJsonSchemaParser(final JsonSchemaLocator locator) {
         this.locator = locator;
     }
 
@@ -87,25 +87,30 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                        new Object[] {"$ref", ref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
             }
 
-            final String value = ((JsonString)ref).getString();
+            String value = ((JsonString)ref).getString();
 
             try {
-                final URI uri = URI.create(value);
-                if (value.startsWith("#/" + JsonObjectSchema.DEFINITIONS + "/")) {
-                    Map<String, JsonObject> jsubschemas = locator.getSchemas();
-                    if (jsubschemas == null) {
-                        throw new JsonSchemaException(new ParsingError(ParsingMessage.CRITICAL_PARSING_ERROR, null));
-                    }
-                    
-                    final JsonObject jsubschema = jsubschemas.get(value);
-                    if (jsubschema != null) {
-                            return parse(locator, value, jsubschema, type);
-                    }
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE,
-                                                  new Object[] {value}));
-                } else {
-                    return JsonSchemaReader.getReader().read(locator.resolve(uri));
+                final int idx_fragment = value.indexOf("#/" + JsonObjectSchema.DEFINITIONS + "/");
+                if (idx_fragment > 0) {
+                    final URI uri = URI.create(value);
+                    locator = locator.resolve(uri);
+                    JsonSchemaReader.getReader().read(locator);
+                    value = value.substring(idx_fragment);
+                } else if (idx_fragment < 0) {
+                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
+                                                  new Object[] {value}));                    
                 }
+                final Map<String, JsonObject> jsubschemas = locator.getSchemas();
+                if (jsubschemas == null) {
+                    throw new JsonSchemaException(new ParsingError(ParsingMessage.CRITICAL_PARSING_ERROR, null));
+                }
+
+                final JsonObject jsubschema = jsubschemas.get(value);
+                if (jsubschema != null) {
+                    return parse(locator, value, jsubschema, type);
+                }
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE,
+                                              new Object[] {value}));
             } catch(IllegalArgumentException ex) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
                                               new Object[] {value}));
