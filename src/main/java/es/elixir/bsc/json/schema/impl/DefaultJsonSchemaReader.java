@@ -57,7 +57,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     }
     
     @Override
-    public JsonSchema read(URL url) throws JsonSchemaException {
+    public JsonSchema read(final URL url) throws JsonSchemaException {
         try {
             return read(new DefaultJsonSchemaLocator(url.toURI()));
         } catch (URISyntaxException ex) {
@@ -73,8 +73,8 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
             JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);
 
             try (InputStream in = locator.getInputStream()){
-                JsonReader reader = factory.createReader(in);
-                JsonValue val = reader.readValue();
+                final JsonReader reader = factory.createReader(in);
+                final JsonValue val = reader.readValue();
 
                 if (JsonValue.ValueType.OBJECT != val.getValueType()) {
                     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_OBJECT_TYPE, 

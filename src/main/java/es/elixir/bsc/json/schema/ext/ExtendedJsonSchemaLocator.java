@@ -25,8 +25,11 @@
 
 package es.elixir.bsc.json.schema.ext;
 
+import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
 import java.net.URI;
+import java.util.Map;
+import javax.json.JsonObject;
 
 /**
  * @author Dmitry Repchevsky
@@ -37,5 +40,15 @@ public class ExtendedJsonSchemaLocator extends DefaultJsonSchemaLocator
     
     public ExtendedJsonSchemaLocator(URI uri) {
         super(uri);
+    }
+    
+    protected ExtendedJsonSchemaLocator(final URI uri, 
+                                        final Map<URI, Map<String, JsonObject>> schemas) {
+        super(uri, schemas);
+    }
+
+    @Override
+    public JsonSchemaLocator resolve(final URI uri) {
+        return new ExtendedJsonSchemaLocator(super.uri.resolve(uri), schemas);
     }
 }

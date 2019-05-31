@@ -40,19 +40,20 @@ import javax.json.JsonObject;
 public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
     // there could be many schemas with the same ID
-    private final Map<URI, Map<String, JsonObject>> schemas;
+    protected final Map<URI, Map<String, JsonObject>> schemas;
 
-    public DefaultJsonSchemaLocator(URI uri) {
+    public DefaultJsonSchemaLocator(final URI uri) {
         this(uri, new HashMap<>());
     }
     
-    private DefaultJsonSchemaLocator(URI uri, Map<URI, Map<String, JsonObject>> schemas) {
+    protected DefaultJsonSchemaLocator(final URI uri, 
+                                       final Map<URI, Map<String, JsonObject>> schemas) {
         super(uri);
         this.schemas = schemas;
     }
 
     @Override
-    public Map<String, JsonObject> getSchemas(URI uri) {
+    public Map<String, JsonObject> getSchemas(final URI uri) {
         Map<String, JsonObject> map = schemas.get(uri);
         if (map == null) {
             schemas.put(uri, map = new HashMap<>());
@@ -61,7 +62,7 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
     }
 
     @Override
-    public JsonSchemaLocator resolve(URI uri) {
+    public JsonSchemaLocator resolve(final URI uri) {
         return new DefaultJsonSchemaLocator(super.uri.resolve(uri), schemas);
     }
 
