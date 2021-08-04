@@ -1,0 +1,10 @@
+{
+  "$comment": "Taken from https://json-schema.org/understanding-json-schema/reference/array.html#tuple-validation",
+  "type": "array",
+  "items": [
+    { "type": "number" },
+    { "type": "string" },
+    { "enum": ["Street", "Avenue", "Boulevard"] },
+    { "enum": ["NW", "NE", "SW", "SE"] }
+  ]
+}

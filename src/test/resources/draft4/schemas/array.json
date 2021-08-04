@@ -1,0 +1,4 @@
+{
+  "$comment": "Taken from https://json-schema.org/understanding-json-schema/reference/array.html#array",
+  "type": "array"
+}

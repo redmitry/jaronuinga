@@ -1,0 +1,14 @@
+{
+  "id": "https://www.elixir-europe.org/excelerate/WP2/json-schemas/test#oneof-number",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of oneOf number constraints",
+  "type": "object",
+  "properties": {
+    "A": { "type": "number",
+      "oneOf": [
+        { "minimum": 3 },
+        { "maximum": 5 }
+      ]
+    }
+  }
+}

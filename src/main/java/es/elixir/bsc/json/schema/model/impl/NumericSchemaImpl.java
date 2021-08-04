@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -29,7 +29,6 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
-import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import javax.json.JsonObject;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
@@ -38,7 +37,7 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
  * @param <T>
  */
 
-public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchema
+public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchemaImpl
                                         implements NumericSchema<T> {
     protected T minimum;
     protected T maximum;

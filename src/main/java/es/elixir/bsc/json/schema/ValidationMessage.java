@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,36 +32,42 @@ package es.elixir.bsc.json.schema;
 public enum ValidationMessage {
     
     OBJECT_EXPECTED(1, "object expected, found: %s"),
-    OBJECT_REQUIRED_PROPERTY_CONSTRAINT(2, "object missed required property: %s"),
+    ARRAY_EXPECTED(2, "array expected, found: %s"),
+    STRING_EXPECTED(3, "string expected, found: %s"),
+    NUMBER_EXPECTED(4, "number expected, found: %s"),
+    BOOLEAN_EXPECTED(5, "boolean expected, found: %s"),
     
-    OBJECT_ALL_OF_CONSTRAINT(3, "object allOf constraint failed"),
-    OBJECT_ANY_OF_CONSTRAINT(4, "object anyOf constraint failed"),
-    OBJECT_ONE_OF_CONSTRAINT(5, "object oneOf constraint failed"),
-    OBJECT_NOT_CONSTRAINT(6, "object not constraint failed"),
+    OBJECT_REQUIRED_PROPERTY_CONSTRAINT(6, "object missed required property: %s"),
+    OBJECT_DEPENDENT_REQUIRED_CONSTRAINT(7, "object missed required dependent property: %s"),
+    
+    OBJECT_ALL_OF_CONSTRAINT(8, "object allOf constraint failed"),
+    OBJECT_ANY_OF_CONSTRAINT(9, "object anyOf constraint failed"),
+    OBJECT_ONE_OF_CONSTRAINT(10, "object oneOf constraint failed"),
+    OBJECT_NOT_CONSTRAINT(11, "object not constraint failed"),
 
-    ARRAY_MIN_ITEMS_CONSTRAINT(7, "minItems = %d > array.items.size = %d"),
-    ARRAY_MAX_ITEMS_CONSTRAINT(8, "maxItems = %d < array.items.size = %d"),
-    ARRAY_LENGTH_MISMATCH(9, "array.length = %d not equals items.length = %d"),
+    ARRAY_MIN_ITEMS_CONSTRAINT(12, "minItems = %d > array.items.size = %d"),
+    ARRAY_MAX_ITEMS_CONSTRAINT(13, "maxItems = %d < array.items.size = %d"),
+    ARRAY_LENGTH_MISMATCH(14, "array.length = %d not equals items.length = %d"),
 
-    STRING_MIN_LENGTH_CONSTRAINT(10, "string.length %d < minLength = %d"),
-    STRING_MAX_LENGTH_CONSTRAINT(11, "string.length %d < minLength = %d"),
+    STRING_MIN_LENGTH_CONSTRAINT(15, "string.length %d < minLength = %d"),
+    STRING_MAX_LENGTH_CONSTRAINT(16, "string.length %d > maxLength = %d"),
     
-    STRING_PATTERN_CONSTRAINT(12, "string.pattern constraint '%s' %s"),
-    STRING_DATE_TIME_FORMAT_CONSTRAINT(13, "invalid datetime format: '%s'"),
-    STRING_EMAIL_FORMAT_CONSTRAINT(14, "invalid email format: '%s'"),
-    STRING_HOSTNAME_FORMAT_CONSTRAINT(15, "invalid hostname format: '%s'"),
-    STRING_IP4_FORMAT_CONSTRAINT(16, "invalid IPv4 format: '%s'"),
-    STRING_IP6_FORMAT_CONSTRAINT(17, "invalid IPv6 format: '%s'"),
-    STRING_URI_FORMAT_CONSTRAINT(18, "invalid URI format: '%s'"),
+    STRING_PATTERN_CONSTRAINT(17, "string.pattern constraint '%s' %s"),
+    STRING_DATE_TIME_FORMAT_CONSTRAINT(18, "invalid datetime format: '%s'"),
+    STRING_EMAIL_FORMAT_CONSTRAINT(19, "invalid email format: '%s'"),
+    STRING_HOSTNAME_FORMAT_CONSTRAINT(20, "invalid hostname format: '%s'"),
+    STRING_IP4_FORMAT_CONSTRAINT(21, "invalid IPv4 format: '%s'"),
+    STRING_IP6_FORMAT_CONSTRAINT(22, "invalid IPv6 format: '%s'"),
+    STRING_URI_FORMAT_CONSTRAINT(23, "invalid URI format: '%s'"),
     
-    NUMBER_MIN_CONSTRAINT(19, "value = %s %s number.minimum = %s"),
-    NUMBER_MAX_CONSTRAINT(20, "value = %s %s number.maximum = %s"),
+    NUMBER_MIN_CONSTRAINT(24, "value = %s %s number.minimum = %s"),
+    NUMBER_MAX_CONSTRAINT(25, "value = %s %s number.maximum = %s"),
 
-    INTEGER_MIN_CONSTRAINT(21, "value = %d %s integer.minimum = %d"),
-    INTEGER_MAX_CONSTRAINT(22, "value = %d %s integer.maximum = %d"),
+    INTEGER_MIN_CONSTRAINT(26, "value = %d %s integer.minimum = %d"),
+    INTEGER_MAX_CONSTRAINT(27, "value = %d %s integer.maximum = %d"),
     
-    ENUM_INVALID_VALUE_TYPE(23, "invalid value type for enum: %s"),
-    ENUM_INVALID_VALUE(24, "value = %s enum.values = %s");
+    ENUM_INVALID_VALUE_TYPE(28, "invalid value type for enum: %s"),
+    ENUM_INVALID_VALUE(29, "value = %s enum.values = %s");
     
     public final int CODE;
     public final String VALUE;

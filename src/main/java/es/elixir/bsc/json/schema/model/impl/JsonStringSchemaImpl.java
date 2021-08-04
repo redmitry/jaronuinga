@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonStringSchema;
@@ -43,7 +42,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.DefaultJsonStringFormatValidator;
 import es.elixir.bsc.json.schema.model.JsonType;
-import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.util.regex.Pattern;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
@@ -51,7 +49,7 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
  * @author Dmitry Repchevsky
  */
 
-public class JsonStringSchemaImpl extends PrimitiveSchema
+public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
                                   implements JsonStringSchema {
     
     private Long minLength;
@@ -152,41 +150,48 @@ public class JsonStringSchemaImpl extends PrimitiveSchema
     }
     
     @Override
-    public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
+    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (value.getValueType() != JsonValue.ValueType.STRING) {
+            errors.add(new ValidationError(getId(), getJsonPointer(),
+                    ValidationMessage.STRING_EXPECTED, value.getValueType().name()));
             return;
         }
-        JsonString string = (JsonString)value;
-        String str = string.getString();
         
-        if (minLength != null && str.length() < minLength) {
+        validate(((JsonString)value).getString(), errors);
+        
+        super.validate(value, parent, errors, callback);
+        
+        if (callback != null) {
+            callback.validated(this, value, parent, errors);
+        }
+    }
+    
+    private void validate(String string, List<ValidationError> errors) {
+        
+        if (minLength != null && string.length() < minLength) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_MIN_LENGTH_CONSTRAINT, str.length(), minLength));
+                    ValidationMessage.STRING_MIN_LENGTH_CONSTRAINT, string.length(), minLength));
         }
         
-        if (maxLength != null && str.length() > maxLength) {
+        if (maxLength != null && string.length() > maxLength) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_MAX_LENGTH_CONSTRAINT, str.length(), maxLength));
+                    ValidationMessage.STRING_MAX_LENGTH_CONSTRAINT, string.length(), maxLength));
 
         }
         
-        if (pattern != null && !pattern.matcher(str).find()) {
+        if (pattern != null && !pattern.matcher(string).find()) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_PATTERN_CONSTRAINT, pattern, str));
+                    ValidationMessage.STRING_PATTERN_CONSTRAINT, pattern, string));
             
         }
         
         if (format != null && !format.isEmpty()) {
             try {
-                DefaultJsonStringFormatValidator.validate(this, str);
+                DefaultJsonStringFormatValidator.validate(this, string);
             } catch (ValidationException ex) {
                 errors.add(ex.error);
             }
-        }
-
-        if (callback != null) {
-            callback.validated(this, value, errors);
-        }
+        }        
     }
 }

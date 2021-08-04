@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,13 +27,13 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonNot;
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -42,18 +42,8 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public class JsonNotImpl implements JsonNot {
-    
-    private URI id;
-    private String jsonPointer;
-
-    public URI getId() {
-        return id;
-    }
-    
-    public String getJsonPointer() {
-        return jsonPointer;
-    }
+public class JsonNotImpl extends PrimitiveSchemaImpl
+                         implements JsonNot {
 
     private JsonSchema schema;
     
@@ -73,24 +63,24 @@ public class JsonNotImpl implements JsonNot {
         this.schema = schema;
     }
     
-    public JsonNotImpl read(JsonSchemaParser parser, 
+    public JsonNotImpl read(JsonSubschemaParser parser, 
                             JsonSchemaLocator locator, 
                             String jsonPointer, 
                             JsonObject object) throws JsonSchemaException {
 
-        this.id = locator.uri;
-        this.jsonPointer = jsonPointer;
+        super.read(parser, locator, jsonPointer, object, null);
         
         this.schema = parser.parse(locator, jsonPointer, object);
         
         return this;
     }
     
-    public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
+    @Override
+    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
-        final int nerrors = errors.size();
-        schema.validate(value, errors, callback);
-        if (errors.size() == nerrors) {
+        final List<ValidationError> err = new ArrayList<>();
+        schema.validate(value, parent, err, callback);
+        if (err.isEmpty()) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
                     ValidationMessage.OBJECT_NOT_CONSTRAINT));
         }

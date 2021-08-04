@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -47,6 +47,11 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, JsonSchema>
                                 implements JsonProperties {
 
     @Override
+    public boolean contains(String name) {
+        return super.containsKey(name);
+    }
+    
+    @Override
     public JsonSchema get(String name) {
         return super.get(name);
     }
@@ -75,7 +80,7 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, JsonSchema>
                     new Object[] {"properties schema", value.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
 
             }
-            
+
             final JsonSchema schema = parser.parse(locator, jsonPointer + entry.getKey() + "/", value.asJsonObject());
 
             put(entry.getKey(), schema);

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -36,18 +36,14 @@ public interface JsonObjectSchema extends JsonSchema {
     public final static String DEFINITIONS = "definitions";
     public final static String PROPERTIES = "properties";
     public final static String REQUIRED = "required";
-    
-    public final static String ALL_OF = "allOf";
-    public final static String ANY_OF = "anyOf";
-    public final static String ONE_OF = "oneOf";
-    public final static String NOT = "not";
+    public final static String DEPENDENCIES = "dependencies";
+    public final static String DEPENDENT_SCHEMAS = "dependentSchemas";
+    public final static String DEPENDENT_REQUIRED = "dependentRequired";
     
     JsonDefinitions getDefinitions();
     JsonProperties getProperties();
     StringArray getRequired();
+    JsonProperties getDependentSchemas();
+    JsonDependentProperties getDependentRequired();
     
-    JsonAllOf getAllOf();
-    JsonAnyOf getAnyOf();
-    JsonOneOf getOneOf();
-    JsonNot getNot();
 }

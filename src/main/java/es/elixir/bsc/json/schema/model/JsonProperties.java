@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,6 +33,7 @@ import java.util.Map;
 
 public interface JsonProperties extends Iterable<Map.Entry<String, JsonSchema>> {
     
+    boolean contains(String name);
     JsonSchema get(String name);
     JsonSchema put(String name, JsonSchema schema);
     JsonSchema remove(String name);

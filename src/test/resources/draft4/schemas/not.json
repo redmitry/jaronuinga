@@ -1,0 +1,11 @@
+{
+  "id": "https://www.elixir-europe.org/json-schemas/test/not",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of 'not'",
+  "type": "object",
+  "properties": {
+    "A": { 
+      "not": { "type": "string" } 
+    }
+  }
+}

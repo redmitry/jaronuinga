@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -30,6 +30,7 @@ package es.elixir.bsc.json.schema.model;
  * (Json Schema defines "number" and "integer") types.
  * 
  * @author Dmitry Repchevsky
+ * 
  * @param <T>
  */
 

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -30,8 +30,8 @@ import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.List;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -39,13 +39,12 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 
 public class JsonAllOfImpl extends SchemaArrayImpl
                            implements JsonAllOf {
-    
 
     @Override
-    public void validate(JsonValue object, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
+    public void validate(JsonValue object, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         final int nerrors = errors.size();
         for (JsonSchema schema : this) {
-            schema.validate(object, errors, callback);
+            schema.validate(object, parent, errors, callback);
         }
         
         if (nerrors != errors.size()) {

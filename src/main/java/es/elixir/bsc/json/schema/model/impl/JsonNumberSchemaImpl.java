@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonNumberSchema;
@@ -46,7 +45,7 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                                   implements JsonNumberSchema {
-    
+
     @Override
     public JsonNumberSchemaImpl read(final JsonSubschemaParser parser, 
                                      final JsonSchemaLocator locator, 
@@ -70,14 +69,24 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
     }
 
     @Override
-    public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
+    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
 
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {
+            errors.add(new ValidationError(getId(), getJsonPointer(),
+                    ValidationMessage.NUMBER_EXPECTED, value.getValueType().name()));
             return;
         }
         
-        JsonNumber number = (JsonNumber)value;
-        BigDecimal dec = number.bigDecimalValue();
+        validate(((JsonNumber)value).bigDecimalValue(), errors);
+
+        super.validate(value, parent, errors, callback);
+
+        if (callback != null) {
+            callback.validated(this, value, parent, errors);
+        }
+    }
+
+    private void validate(BigDecimal dec, List<ValidationError> errors) {
 
         if (minimum != null) {
             if (exclusiveMinimum != null && exclusiveMinimum) {
@@ -101,10 +110,6 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                     errors.add(new ValidationError(getId(), getJsonPointer(),
                             ValidationMessage.NUMBER_MAX_CONSTRAINT, dec.toPlainString(), ">", maximum));
             }
-        }
-        
-        if (callback != null) {
-            callback.validated(this, value, errors);
         }
     }
 }

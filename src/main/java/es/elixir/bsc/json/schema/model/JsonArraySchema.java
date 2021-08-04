@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -48,7 +48,7 @@ public interface JsonArraySchema extends JsonSchema {
     void setMaxItems(Long maxItems);
 
     /**
-     * In case there is only one schema in the list it is either {...} or [{...}].
+     * In a case where there is only one schema in the list it is either {...} or [{...}].
      * Setting 'additionalItems' to <b>NULL</b> means there is a single schema and 
      * not an array with only one schema defined.
      * 

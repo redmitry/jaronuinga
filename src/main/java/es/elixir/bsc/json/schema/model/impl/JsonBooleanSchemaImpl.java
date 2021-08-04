@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,15 +33,15 @@ import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
-import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonBooleanSchemaImpl extends PrimitiveSchema
+public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
                                    implements JsonBooleanSchema {
 
     @Override
@@ -57,16 +57,17 @@ public class JsonBooleanSchemaImpl extends PrimitiveSchema
     }
 
     @Override
-    public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
+    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (JsonValue.ValueType.TRUE != value.getValueType() &&
             JsonValue.ValueType.FALSE != value.getValueType()) {
-            // ???
+            errors.add(new ValidationError(getId(), getJsonPointer(),
+                    ValidationMessage.BOOLEAN_EXPECTED, value.getValueType().name()));
+            return;
         }
         
         if (callback != null) {
-            callback.validated(this, value, errors);
+            callback.validated(this, value, parent, errors);
         }
     }
-    
 }

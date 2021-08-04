@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -25,90 +25,21 @@
 
 package es.elixir.bsc.json.schema.model;
 
-import es.elixir.bsc.json.schema.JsonSchemaException;
-import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import es.elixir.bsc.json.schema.ValidationError;
-import es.elixir.bsc.json.schema.ValidationException;
-import es.elixir.bsc.json.schema.model.impl.JsonSchemaUtil;
-import java.net.URI;
-import java.util.List;
-import javax.json.JsonObject;
-import javax.json.JsonString;
-import javax.json.JsonValue;
-import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-
 /**
  * Primitive empty Json Schema of any type ("object", "array", "string", etc.)
  * 
  * @author Dmitry Repchevsky
  */
 
-public class PrimitiveSchema implements JsonSchema {
-    
-    private URI id;
-    private String jsonPointer;
+public interface PrimitiveSchema extends JsonSchema {
 
-    private String title;
-    private String description;
-    
-    @Override
-    public URI getId() {
-        return id;
-    }
-    
-    @Override
-    public void setId(URI id) {
-        this.id = id;
-    }
+    public final static String ALL_OF = "allOf";
+    public final static String ANY_OF = "anyOf";
+    public final static String ONE_OF = "oneOf";
+    public final static String NOT = "not";
 
-    /**
-     * Returns Json Pointer to locate Json Schema object in the Json Schema document.
-     * The pointer is relative to the schema id.
-     * 
-     * @return Json Pointer to this schema
-     */
-    @Override
-    public String getJsonPointer() {
-        return jsonPointer;
-    }
-    
-    public String getTitle() {
-        return title;
-    }
-    
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public PrimitiveSchema read(final JsonSubschemaParser parser, 
-                                final JsonSchemaLocator locator, 
-                                final String jsonPointer, 
-                                final JsonObject object, 
-                                final JsonType type) throws JsonSchemaException {
-
-        this.jsonPointer = jsonPointer;
-        
-        id = locator.uri;
-
-        final JsonString jtitle = JsonSchemaUtil.check(object.get(TITLE), JsonValue.ValueType.STRING);
-        setTitle(jtitle == null ? null : jtitle.getString());
-        
-        final JsonString jdescription = JsonSchemaUtil.check(object.get(DESCRIPTION), JsonValue.ValueType.STRING);
-        setDescription(jdescription == null ? null : jdescription.getString());
-        
-        return this;
-    }
-
-    @Override
-    public void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback callback) throws ValidationException {
-    }
+    public JsonAllOf getAllOf();
+    public JsonAnyOf getAnyOf();
+    public JsonOneOf getOneOf();
+    public JsonNot getNot();
 }

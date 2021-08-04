@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,7 +27,6 @@ package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import java.util.List;
-import javax.json.JsonValue;
 
 /**
  * Json Schema validation callback interface.
@@ -37,7 +36,21 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonSchemaValidationCallback {
+public interface JsonSchemaValidationCallback<T> {
+    
+    /**
+     * Callback method called by the validator after the value is validated.
+     * Implementations may include custom validation errors into the errors list
+     * or stop validation process by throwing the ValidationException.
+     * 
+     * @param schema Json Schema model to validate json value.
+     * @param value json value that was validated.
+     * @param parent json value that includes the validated one
+     * @param errors the list of validation errors found during the validation.
+     * 
+     * @throws ValidationException the exception to be thrown by the validator.
+     */
+    void validated(PrimitiveSchema schema, T value, T parent, List<ValidationError> errors) throws ValidationException;
     
     /**
      * Callback method called by the validator after the value is validated.
@@ -50,5 +63,7 @@ public interface JsonSchemaValidationCallback {
      * 
      * @throws ValidationException the exception to be thrown by the validator.
      */
-    void validated(PrimitiveSchema schema, JsonValue value, List<ValidationError> errors) throws ValidationException;
+    default void validated(PrimitiveSchema schema, T value, List<ValidationError> errors) throws ValidationException {
+        validated(schema, value, null, errors);
+    }
 }

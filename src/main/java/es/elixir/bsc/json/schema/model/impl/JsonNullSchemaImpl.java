@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,17 +31,16 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.model.JsonNullSchema;
 import java.util.List;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
-import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonNullSchemaImpl extends PrimitiveSchema
+public class JsonNullSchemaImpl extends PrimitiveSchemaImpl
                                 implements JsonNullSchema {
 
     @Override
@@ -57,13 +56,13 @@ public class JsonNullSchemaImpl extends PrimitiveSchema
     }
 
     @Override
-    public void validate(final JsonValue value, 
+    public void validate(final JsonValue value,
+                         final JsonValue parent,
                          final List<ValidationError> errors, 
-                         final JsonSchemaValidationCallback callback) {
+                         final JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (callback != null) {
-            callback.validated(this, value, errors);
+            callback.validated(this, value, parent, errors);
         }
     }
-    
 }

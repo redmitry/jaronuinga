@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -20,26 +20,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *****************************************************************************
+ * *****************************************************************************
  */
 
 package es.elixir.bsc.json.schema.model;
 
-import es.elixir.bsc.json.schema.JsonSchemaException;
-import es.elixir.bsc.json.schema.JsonSchemaReader;
-import es.elixir.bsc.json.schema.ValidationError;
-import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.json.Json;
-import javax.json.JsonStructure;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,73 +32,26 @@ import org.junit.Test;
  * @author Dmitry Repchevsky
  */
 
-public class JsonEnumTest {
+public class JsonEnumTest extends JsonTest {
 
     private final static String JSON_SCHEMA_FILE = "draft4/schemas/enum.json";
+
     private final static String JSON_FILE_01 = "draft4/data/enum_01.json";
     private final static String JSON_FILE_02 = "draft4/data/enum_02.json";
     private final static String JSON_FILE_03 = "draft4/data/enum_03.json";
 
     @Test
     public void test_01() {
-        
-        try (InputStream in = JsonAnyOfTest.class.getClassLoader().getResourceAsStream(JSON_FILE_01)) {
-            
-            URL url = JsonAnyOfTest.class.getClassLoader().getResource(JSON_SCHEMA_FILE);
-            
-            JsonSchema schema = JsonSchemaReader.getReader().read(url);
-            JsonStructure json = Json.createReader(in).read();
-            
-            List<ValidationError> errors = new ArrayList<>();
-            schema.validate(json, errors);
-            
-            Assert.assertTrue(errors.isEmpty());
-
-        } catch (IOException | JsonSchemaException ex) {
-            Logger.getLogger(JsonAnyOfTest.class.getName()).log(Level.SEVERE, null, ex);
-            Assert.fail(ex.getMessage());
-        }
+        Assert.assertTrue(test(JSON_SCHEMA_FILE, JSON_FILE_01).isEmpty());
     }
 
     @Test
     public void test_02() {
-        
-        try (InputStream in = JsonAnyOfTest.class.getClassLoader().getResourceAsStream(JSON_FILE_02)) {
-            
-            URL url = JsonAnyOfTest.class.getClassLoader().getResource(JSON_SCHEMA_FILE);
-            
-            JsonSchema schema = JsonSchemaReader.getReader().read(url);
-            JsonStructure json = Json.createReader(in).read();
-            
-            List<ValidationError> errors = new ArrayList<>();
-            schema.validate(json, errors);
-            
-            Assert.assertTrue(errors.isEmpty());
-
-        } catch (IOException | JsonSchemaException ex) {
-            Logger.getLogger(JsonAnyOfTest.class.getName()).log(Level.SEVERE, null, ex);
-            Assert.fail(ex.getMessage());
-        }
+        Assert.assertTrue(test(JSON_SCHEMA_FILE, JSON_FILE_02).isEmpty());
     }
     
     @Test
     public void test_03() {
-        
-        try (InputStream in = JsonAnyOfTest.class.getClassLoader().getResourceAsStream(JSON_FILE_03)) {
-            
-            URL url = JsonAnyOfTest.class.getClassLoader().getResource(JSON_SCHEMA_FILE);
-            
-            JsonSchema schema = JsonSchemaReader.getReader().read(url);
-            JsonStructure json = Json.createReader(in).read();
-            
-            List<ValidationError> errors = new ArrayList<>();
-            schema.validate(json, errors);
-            
-            Assert.assertEquals(1, errors.size());
-
-        } catch (IOException | JsonSchemaException ex) {
-            Logger.getLogger(JsonAnyOfTest.class.getName()).log(Level.SEVERE, null, ex);
-            Assert.fail(ex.getMessage());
-        }
+        Assert.assertFalse(test(JSON_SCHEMA_FILE, JSON_FILE_03).isEmpty());
     }
 }

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,8 +31,8 @@ import es.elixir.bsc.json.schema.model.JsonOneOf;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.ArrayList;
 import java.util.List;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -42,14 +42,14 @@ public class JsonOneOfImpl extends SchemaArrayImpl
                            implements JsonOneOf {
 
     @Override
-    public void validate(JsonValue object, List<ValidationError> errors, JsonSchemaValidationCallback callback) {
+    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
 
         int matches = 0;
         
         final List<ValidationError> err = new ArrayList<>();
         for (JsonSchema schema : this) {
             final int nerrors = err.size();
-            schema.validate(object, err, callback);
+            schema.validate(value, parent, err, callback);
             if (nerrors == err.size()) {
                 matches++;
             }

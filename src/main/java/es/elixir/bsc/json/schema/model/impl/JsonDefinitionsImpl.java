@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2017 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -67,7 +67,8 @@ public class JsonDefinitionsImpl extends LinkedHashMap<String, JsonSchema>
         return entrySet().iterator();
     }
     
-    public JsonDefinitions read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
+    public JsonDefinitions read(JsonSchemaParser parser, 
+            JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
         
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
             final JsonValue value = entry.getValue();            
