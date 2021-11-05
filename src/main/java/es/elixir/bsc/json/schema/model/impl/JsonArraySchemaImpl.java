@@ -111,6 +111,16 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                                     final JsonType type) throws JsonSchemaException {
 
         super.read(parser, locator, jsonPointer, object, type);
+
+        final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_ITEMS), JsonValue.ValueType.NUMBER);
+        if (min != null) {
+            minItems = min.longValue();
+        }
+        
+        final JsonNumber max = JsonSchemaUtil.check(object.getJsonNumber(MAX_ITEMS), JsonValue.ValueType.NUMBER);
+        if (max != null) {
+            maxItems = max.longValue();
+        }
         
         JsonValue jitems = object.get(ITEMS);
         if (jitems == null) {
@@ -145,16 +155,6 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                    new Object[] {ADDITIONAL_ITEMS, jitems.getValueType().name(), "either object or boolean"}));
             }
-        }
-
-        final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_ITEMS), JsonValue.ValueType.NUMBER);
-        if (min != null) {
-            minItems = min.longValue();
-        }
-        
-        final JsonNumber max = JsonSchemaUtil.check(object.getJsonNumber(MAX_ITEMS), JsonValue.ValueType.NUMBER);
-        if (max != null) {
-            maxItems = max.longValue();
         }
         
         return this;
