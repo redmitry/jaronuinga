@@ -1,0 +1,10 @@
+{
+  "$comment": "Taken from https://json-schema.org/understanding-json-schema/reference/object.html#additional-properties",
+  "type": "object",
+  "properties": {
+    "number": { "type": "number" },
+    "street_name": { "type": "string" },
+    "street_type": { "enum": ["Street", "Avenue", "Boulevard"] }
+  },
+  "additionalProperties": { "type": "string" }
+}

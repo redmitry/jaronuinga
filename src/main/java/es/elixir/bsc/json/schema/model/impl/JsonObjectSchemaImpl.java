@@ -60,6 +60,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     private JsonStringArray required;
     private JsonProperties dependentSchemas;
     private JsonDependentProperties dependentRequired;
+    private Boolean additionalProperties;
+    private JsonSchema additionalPropertiesSchema;
     
     @Override
     public JsonDefinitions getDefinitions() {
@@ -102,6 +104,22 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
+    public JsonSchema getAdditionalProperties() {
+        return additionalPropertiesSchema;
+    }
+    
+    @Override
+    public void setAdditionalProperties(JsonSchema schema) {
+        this.additionalPropertiesSchema = schema;
+    }
+    
+    @Override
+    public void setAdditionalProperties(Boolean additionalProperties) {
+        this.additionalProperties = Boolean.FALSE.equals(additionalProperties) ? Boolean.FALSE : null;
+        additionalPropertiesSchema = null;
+    }
+    
+    @Override
     public JsonObjectSchemaImpl read(final JsonSubschemaParser parser, 
                                      final JsonSchemaLocator locator, 
                                      final String jsonPointer, 
@@ -125,6 +143,16 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             required = new JsonStringArray().read(jrequired);
         }
 
+        JsonValue jadditionalProperties = object.get(ADDITIONAL_PROPERTIES);
+        if (jadditionalProperties != null) {
+            switch(jadditionalProperties.getValueType()) {
+                case OBJECT: additionalPropertiesSchema = parser.parse(locator, jsonPointer + ADDITIONAL_PROPERTIES + "/", jadditionalProperties.asJsonObject(), type);
+                case TRUE:   additionalProperties = null; break;
+                case FALSE:  additionalProperties = false; break;
+                default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                   new Object[] {ADDITIONAL_PROPERTIES, jadditionalProperties.getValueType().name(), "either object or boolean"}));
+            }
+        }
         final JsonObject jdependentSchemas = JsonSchemaUtil.check(object.get(DEPENDENT_SCHEMAS), ValueType.OBJECT);
         if (jdependentSchemas != null) {
             dependentSchemas = new JsonPropertiesImpl().read(parser, locator, jsonPointer + DEPENDENT_SCHEMAS + "/", jdependentSchemas);
@@ -166,9 +194,28 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             return;
         }
         
-        JsonObject object = value.asJsonObject();
+        final JsonObject object = value.asJsonObject();
 
-        StringArray req = new JsonStringArray(required);
+        if (additionalProperties != null) {
+            if (properties == null) {
+                // error;
+            } else {
+                for (String name : object.keySet()) {
+                    if (!properties.contains(name)) {
+                        errors.add(new ValidationError(getId(), getJsonPointer(),
+                            ValidationMessage.OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT, name));
+                    }
+                }
+            }
+        } else if (additionalPropertiesSchema != null) {
+            for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
+                if (!properties.contains(entry.getKey())) {
+                    additionalPropertiesSchema.validate(entry.getValue(), object, errors, callback);
+                }
+            }            
+        }
+        
+        final StringArray req = getRequired();
 
         if (properties != null) {
             for (Map.Entry<String, JsonSchema> property : properties) {
@@ -185,7 +232,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             errors.add(new ValidationError(getId(), getJsonPointer(),
                     ValidationMessage.OBJECT_REQUIRED_PROPERTY_CONSTRAINT, i.next()));
         }
-        
+
         if (dependentSchemas != null) {
             for (Map.Entry<String, JsonSchema> property : dependentSchemas) {
                 final String name = property.getKey();

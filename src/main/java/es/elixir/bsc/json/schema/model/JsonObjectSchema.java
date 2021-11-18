@@ -39,11 +39,26 @@ public interface JsonObjectSchema extends JsonSchema {
     public final static String DEPENDENCIES = "dependencies";
     public final static String DEPENDENT_SCHEMAS = "dependentSchemas";
     public final static String DEPENDENT_REQUIRED = "dependentRequired";
+    public final static String ADDITIONAL_PROPERTIES = "additionalProperties";
     
     JsonDefinitions getDefinitions();
     JsonProperties getProperties();
     StringArray getRequired();
     JsonProperties getDependentSchemas();
     JsonDependentProperties getDependentRequired();
+    
+    /**
+     * @return 'additionalProperties' JsonSchema, <b>NULL</b> if FALSE (or not set), 
+     *         EmptyJsonSchema if TRUE
+     */
+    JsonSchema getAdditionalProperties();
+    void setAdditionalProperties(JsonSchema schema);
+    
+    /**
+     * Setting 'additionalProperties' to <b>NULL</b> means FALSE.
+     * 
+     * @param additionalProperties 
+     */
+    void setAdditionalProperties(Boolean additionalProperties);
     
 }
