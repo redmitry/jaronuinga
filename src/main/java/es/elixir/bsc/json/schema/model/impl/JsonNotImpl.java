@@ -32,11 +32,12 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonNot;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
@@ -45,30 +46,31 @@ import javax.json.JsonValue;
 public class JsonNotImpl extends PrimitiveSchemaImpl
                          implements JsonNot {
 
-    private JsonSchema schema;
+    private AbstractJsonSchema schema;
     
     public JsonNotImpl() {}
     
-    public JsonNotImpl(JsonSchema schema) {
+    public JsonNotImpl(AbstractJsonSchema schema) {
         this.schema = schema;
     }
     
     @Override
-    public JsonSchema getJsonSchema() {
+    public AbstractJsonSchema getJsonSchema() {
         return schema;
     }
 
     @Override
-    public void setJsonSchema(JsonSchema schema) {
+    public void setJsonSchema(AbstractJsonSchema schema) {
         this.schema = schema;
     }
     
-    public JsonNotImpl read(JsonSubschemaParser parser, 
-                            JsonSchemaLocator locator, 
-                            String jsonPointer, 
-                            JsonObject object) throws JsonSchemaException {
+    public JsonNotImpl read(final JsonSubschemaParser parser, 
+                            final JsonSchemaLocator locator,
+                            final JsonSchemaElement parent,
+                            final String jsonPointer, 
+                            final JsonObject object) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, null);
+        super.read(parser, locator, parent, jsonPointer, object, null);
         
         this.schema = parser.parse(locator, jsonPointer, object);
         
@@ -76,13 +78,14 @@ public class JsonNotImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         final List<ValidationError> err = new ArrayList<>();
-        schema.validate(value, parent, err, callback);
+        schema.validate(jsonPointer, value, parent, err, callback);
         if (err.isEmpty()) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.OBJECT_NOT_CONSTRAINT));
+                    jsonPointer, ValidationMessage.OBJECT_NOT_CONSTRAINT_MSG));
         }
     }
 }

@@ -28,14 +28,15 @@ package es.elixir.bsc.json.schema.impl;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonObject;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * <p>
  * JSON Subschema parser interface with optional JsonType parameter.
- * <`p>
+ * </p>
  * 
  * The parse() method allows to pass an optional JSON Type which may be used by the parser 
  * to parse schema elements with no type defined (as in 'oneOf' or 'anyOf').
@@ -46,12 +47,12 @@ import javax.json.JsonObject;
 public interface JsonSubschemaParser extends JsonSchemaParser {
     
     @Override
-    default JsonSchema parse(final JsonSchemaLocator locator, 
+    default AbstractJsonSchema parse(final JsonSchemaLocator locator, 
                              final String jsonPointer, 
                              final JsonObject object) throws JsonSchemaException {
 
-        return parse(locator, jsonPointer, object, null);
+        return parse(locator, null, jsonPointer, object, null);
     }
     
-    JsonSchema parse(JsonSchemaLocator locator, String jsonPointer, JsonObject object, JsonType type) throws JsonSchemaException;
+    AbstractJsonSchema parse(JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer, JsonObject object, JsonType type) throws JsonSchemaException;
 }

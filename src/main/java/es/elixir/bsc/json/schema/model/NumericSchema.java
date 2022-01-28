@@ -34,7 +34,7 @@ package es.elixir.bsc.json.schema.model;
  * @param <T>
  */
 
-public interface NumericSchema<T extends Number> extends JsonSchema {
+public interface NumericSchema<T extends Number> extends AbstractJsonSchema {
     
     public final static String MINIMUM = "minimum";
     public final static String MAXIMUM = "maximum";

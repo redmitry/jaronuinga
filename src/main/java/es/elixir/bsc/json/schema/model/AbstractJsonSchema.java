@@ -23,13 +23,27 @@
  *****************************************************************************
  */
 
-package es.elixir.bsc.json.schema.ext;
+package es.elixir.bsc.json.schema.model;
+
+import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.ValidationError;
+import es.elixir.bsc.json.schema.ValidationException;
+import java.util.List;
+import javax.json.JsonValue;
 
 /**
- * Locators that implement this interface will collect all (sub)schema Json objects.
+ * This interface is used internally and exists only for the purpose to hide
+ * actual validate() method from the outside.
  * 
  * @author Dmitry Repchevsky
  */
 
-public interface ExtendedJsonSchemaLocatorInterface {
+public interface AbstractJsonSchema extends JsonSchema {
+
+    void validate(String jsonPointer, JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
+
+    @Override
+    default void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
+        validate("/", value, null, errors, callback);
+    }
 }

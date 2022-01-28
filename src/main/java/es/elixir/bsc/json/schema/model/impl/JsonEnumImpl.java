@@ -36,6 +36,7 @@ import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -62,12 +63,13 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     
     @Override
     public JsonEnumImpl read(final JsonSubschemaParser parser, 
-                             final JsonSchemaLocator locator, 
+                             final JsonSchemaLocator locator,
+                             final JsonSchemaElement parent,
                              final String jsonPointer, 
                              final JsonObject object,
                              final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
         
         values = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
         
@@ -75,18 +77,19 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     }
 
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (value.getValueType() == JsonValue.ValueType.ARRAY || 
             value.getValueType() == JsonValue.ValueType.OBJECT) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.ENUM_INVALID_VALUE_TYPE, value.getValueType().name()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.ENUM_INVALID_VALUE_TYPE_MSG, value.getValueType().name()));
         } else if (values == null || !values.contains(value)) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.ENUM_INVALID_VALUE, value.toString(), values.toString()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.ENUM_INVALID_VALUE_MSG, value.toString(), values.toString()));
          
         }
         
-        super.validate(value, parent, errors, callback);
-    }    
+        super.validate(jsonPointer, value, parent, errors, callback);
+    }
 }

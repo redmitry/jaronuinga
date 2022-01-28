@@ -29,8 +29,8 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonNot extends JsonSchema {
+public interface JsonNot extends AbstractJsonSchema {
     
-    JsonSchema getJsonSchema();
-    void setJsonSchema(JsonSchema schema);
+    AbstractJsonSchema getJsonSchema();
+    void setJsonSchema(AbstractJsonSchema schema);
 }

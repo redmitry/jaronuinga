@@ -31,8 +31,6 @@ import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
-import es.elixir.bsc.json.schema.model.JsonProperties;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.StringArray;
 import java.util.Iterator;
 import java.util.LinkedHashMap;

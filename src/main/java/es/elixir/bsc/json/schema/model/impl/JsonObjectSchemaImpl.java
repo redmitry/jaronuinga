@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonDefinitions;
 import es.elixir.bsc.json.schema.model.JsonObjectSchema;
 import es.elixir.bsc.json.schema.model.JsonProperties;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,10 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
+import javax.json.Json;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
@@ -61,7 +63,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     private JsonProperties dependentSchemas;
     private JsonDependentProperties dependentRequired;
     private Boolean additionalProperties;
-    private JsonSchema additionalPropertiesSchema;
+    private AbstractJsonSchema additionalPropertiesSchema;
+    private AbstractJsonSchema propertyNames;
     
     @Override
     public JsonDefinitions getDefinitions() {
@@ -104,38 +107,38 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public JsonSchema getAdditionalProperties() {
+    public Boolean isAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    @Override
+    public AbstractJsonSchema getAdditionalProperties() {
         return additionalPropertiesSchema;
     }
     
     @Override
-    public void setAdditionalProperties(JsonSchema schema) {
-        this.additionalPropertiesSchema = schema;
+    public AbstractJsonSchema getPropertyNames() {
+        return propertyNames;
     }
-    
-    @Override
-    public void setAdditionalProperties(Boolean additionalProperties) {
-        this.additionalProperties = Boolean.FALSE.equals(additionalProperties) ? Boolean.FALSE : null;
-        additionalPropertiesSchema = null;
-    }
-    
+
     @Override
     public JsonObjectSchemaImpl read(final JsonSubschemaParser parser, 
-                                     final JsonSchemaLocator locator, 
+                                     final JsonSchemaLocator locator,
+                                     final JsonSchemaElement parent,
                                      final String jsonPointer, 
                                      final JsonObject object,
                                      final JsonType type) throws JsonSchemaException {
         
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
 
         final JsonObject jdefinitions = JsonSchemaUtil.check(object.get(DEFINITIONS), ValueType.OBJECT);
         if (jdefinitions != null) {
-            definitions = new JsonDefinitionsImpl().read(parser, locator, jsonPointer + DEFINITIONS + "/", jdefinitions);
+            definitions = new JsonDefinitionsImpl().read(parser, locator, parent, jsonPointer + DEFINITIONS + "/", jdefinitions);
         }
         
-        final JsonObject jpropertues = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
-        if (jpropertues != null) {
-            properties = new JsonPropertiesImpl().read(parser, locator, jsonPointer + PROPERTIES + "/", jpropertues);
+        final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
+        if (jproperties != null) {
+            properties = new JsonPropertiesImpl().read(parser, locator, this, jsonPointer + PROPERTIES + "/", jproperties);
         }
         
         final JsonArray jrequired = JsonSchemaUtil.check(object.get(REQUIRED), ValueType.ARRAY);
@@ -143,19 +146,25 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             required = new JsonStringArray().read(jrequired);
         }
 
-        JsonValue jadditionalProperties = object.get(ADDITIONAL_PROPERTIES);
+        final JsonValue jadditionalProperties = object.get(ADDITIONAL_PROPERTIES);
         if (jadditionalProperties != null) {
             switch(jadditionalProperties.getValueType()) {
-                case OBJECT: additionalPropertiesSchema = parser.parse(locator, jsonPointer + ADDITIONAL_PROPERTIES + "/", jadditionalProperties.asJsonObject(), type);
+                case OBJECT: additionalPropertiesSchema = parser.parse(locator, this, jsonPointer + ADDITIONAL_PROPERTIES + "/", jadditionalProperties.asJsonObject(), type);
                 case TRUE:   additionalProperties = null; break;
                 case FALSE:  additionalProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                    new Object[] {ADDITIONAL_PROPERTIES, jadditionalProperties.getValueType().name(), "either object or boolean"}));
             }
         }
+
+        final JsonObject jpropertyNames = JsonSchemaUtil.check(object.get(PROPERTY_NAMES), ValueType.OBJECT);
+        if (jpropertyNames != null) {
+            propertyNames = new JsonStringSchemaImpl().read(parser, locator, this, jsonPointer + PROPERTY_NAMES + "/", jpropertyNames.asJsonObject(), JsonType.STRING);
+        }
+        
         final JsonObject jdependentSchemas = JsonSchemaUtil.check(object.get(DEPENDENT_SCHEMAS), ValueType.OBJECT);
         if (jdependentSchemas != null) {
-            dependentSchemas = new JsonPropertiesImpl().read(parser, locator, jsonPointer + DEPENDENT_SCHEMAS + "/", jdependentSchemas);
+            dependentSchemas = new JsonPropertiesImpl().read(parser, locator, this, jsonPointer + DEPENDENT_SCHEMAS + "/", jdependentSchemas);
         }
 
         final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.ARRAY);
@@ -169,7 +178,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 final String name = dependency.getKey();
                 final JsonValue value = dependency.getValue();
                 switch(value.getValueType()) {
-                    case OBJECT: final JsonSchema schema = new JsonObjectSchemaImpl().read(parser, locator, jsonPointer + DEPENDENCIES + "/" + name + "/", value.asJsonObject(), JsonType.OBJECT);
+                    case OBJECT: final AbstractJsonSchema schema = new JsonObjectSchemaImpl().read(parser, locator, this, jsonPointer + DEPENDENCIES + "/" + name + "/", value.asJsonObject(), JsonType.OBJECT);
                                  getDependentSchemas().put(name, schema);
                                  break;
                     case ARRAY:  final StringArray arr = new JsonStringArray().read(value.asJsonArray());
@@ -186,15 +195,22 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
 
         if (value.getValueType() != JsonValue.ValueType.OBJECT) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.OBJECT_EXPECTED, value.getValueType().name()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.OBJECT_EXPECTED_MSG, value.getValueType().name()));
             return;
         }
         
         final JsonObject object = value.asJsonObject();
+
+        if (propertyNames != null) {
+            for (String name : object.keySet()) {
+                propertyNames.validate(Json.createValue(name), errors);
+            }
+        }
 
         if (additionalProperties != null) {
             if (properties == null) {
@@ -202,15 +218,16 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             } else {
                 for (String name : object.keySet()) {
                     if (!properties.contains(name)) {
-                        errors.add(new ValidationError(getId(), getJsonPointer(),
-                            ValidationMessage.OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT, name));
+                        errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                            ValidationMessage.OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT_MSG, name));
                     }
                 }
             }
         } else if (additionalPropertiesSchema != null) {
             for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
-                if (!properties.contains(entry.getKey())) {
-                    additionalPropertiesSchema.validate(entry.getValue(), object, errors, callback);
+                final String name = entry.getKey();
+                if (!properties.contains(name)) {
+                    additionalPropertiesSchema.validate(jsonPointer + "/" + name + "/", entry.getValue(), object, errors, callback);
                 }
             }            
         }
@@ -218,27 +235,27 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final StringArray req = getRequired();
 
         if (properties != null) {
-            for (Map.Entry<String, JsonSchema> property : properties) {
+            for (Map.Entry<String, AbstractJsonSchema> property : properties) {
                 final String name = property.getKey();
                 final JsonValue val = object.get(name);
                 if (val != null) {
-                    property.getValue().validate(val, value, errors, callback);
+                    property.getValue().validate(jsonPointer + "/" + name + "/", val, value, errors, callback);
                     req.remove(name);
                 }
             }
         }
         
         for (Iterator<String> i = req.iterator(); i.hasNext();) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.OBJECT_REQUIRED_PROPERTY_CONSTRAINT, i.next()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.OBJECT_REQUIRED_PROPERTY_CONSTRAINT_MSG, i.next()));
         }
 
         if (dependentSchemas != null) {
-            for (Map.Entry<String, JsonSchema> property : dependentSchemas) {
+            for (Map.Entry<String, AbstractJsonSchema> property : dependentSchemas) {
                 final String name = property.getKey();
                 if (properties != null && properties.contains(name)) {
-                    final JsonSchema dependentSchema = property.getValue();
-                    dependentSchema.validate(value, parent, errors, callback);
+                    final AbstractJsonSchema dependentSchema = property.getValue();
+                    dependentSchema.validate(jsonPointer + "/" + name + "/", value, parent, errors, callback);
                 }
             }
         }
@@ -250,8 +267,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                     final StringArray arr = property.getValue();
                     for (String p : arr) {
                         if (!properties.contains(name)) {
-                            errors.add(new ValidationError(getId(), getJsonPointer(),
-                                ValidationMessage.OBJECT_DEPENDENT_REQUIRED_CONSTRAINT, name));                            
+                            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                                ValidationMessage.OBJECT_DEPENDENT_REQUIRED_CONSTRAINT_MSG, name));                            
                         }
                     }
                 }
@@ -259,7 +276,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         }
 
         if (callback != null) {
-            callback.validated(this, value, parent, errors);
+            callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
 }

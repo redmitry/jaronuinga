@@ -37,10 +37,10 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface SchemaArray extends Iterable<JsonSchema> {
+public interface SchemaArray extends Iterable<AbstractJsonSchema>, AbstractJsonSchema {
     
-    public abstract boolean add(JsonSchema schema);
-    public abstract boolean remove(JsonSchema schema);
-    public abstract boolean contains(JsonSchema schema);
+    public abstract boolean add(AbstractJsonSchema schema);
+    public abstract boolean remove(AbstractJsonSchema schema);
+    public abstract boolean contains(AbstractJsonSchema schema);
 
 }

@@ -27,24 +27,32 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonProperties;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonPropertiesImpl extends LinkedHashMap<String, JsonSchema>
+public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema>
                                 implements JsonProperties {
+
+    private JsonSchemaElement parent;
+    
+    @Override
+    public JsonSchemaElement getParent() {
+        return parent;
+    }
 
     @Override
     public boolean contains(String name) {
@@ -52,26 +60,29 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, JsonSchema>
     }
     
     @Override
-    public JsonSchema get(String name) {
+    public AbstractJsonSchema get(String name) {
         return super.get(name);
     }
 
     @Override
-    public JsonSchema put(String name, JsonSchema schema) {
+    public AbstractJsonSchema put(String name, AbstractJsonSchema schema) {
         return super.put(name, schema);
     }
     
     @Override
-    public JsonSchema remove(String name) {
+    public AbstractJsonSchema remove(String name) {
         return super.remove(name);
     }
     
     @Override
-    public Iterator<Entry<String, JsonSchema>> iterator() {
+    public Iterator<Entry<String, AbstractJsonSchema>> iterator() {
         return entrySet().iterator();
     }
     
-    public JsonProperties read(JsonSchemaParser parser, JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
+    public JsonProperties read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
+            JsonSchemaElement parent, String jsonPointer, JsonObject object) throws JsonSchemaException {
+        
+        this.parent = parent;
         
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
             final JsonValue value = entry.getValue();            
@@ -81,7 +92,7 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, JsonSchema>
 
             }
 
-            final JsonSchema schema = parser.parse(locator, jsonPointer + entry.getKey() + "/", value.asJsonObject());
+            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + entry.getKey() + "/", value.asJsonObject(), null);
 
             put(entry.getKey(), schema);
         }

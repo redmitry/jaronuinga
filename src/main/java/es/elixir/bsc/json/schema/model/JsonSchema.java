@@ -37,7 +37,7 @@ import javax.json.JsonValue;
  * 
  */
 
-public interface JsonSchema {
+public interface JsonSchema extends JsonSchemaElement {
     
     public final static String ID = "id";
     public final static String TYPE = "type";
@@ -49,13 +49,9 @@ public interface JsonSchema {
 
     String getJsonPointer();
     
-    void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
-
-    default void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
-        validate(value, null, errors, callback);
-    }
+    void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
 
     default void validate(JsonValue value, List<ValidationError> errors) {
-        validate(value, null, errors, null);
+        validate(value, errors, null);
     }
 }

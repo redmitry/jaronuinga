@@ -45,47 +45,50 @@ public class DefaultJsonStringFormatValidator implements JsonStringFormatValidat
     private final static Pattern IP4_PATTERN = Pattern.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
     private final static Pattern IP6_PATTERN = Pattern.compile("^((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$");
     
-    public static void validate(final JsonStringSchema schema, String value) throws ValidationException {
+    public static void validate(final String jsonPointer, 
+                                final JsonStringSchema schema, 
+                                final String value) throws ValidationException {
+
         final String format = schema.getFormat();
         switch(format) {
             case DATE_TIME: try { 
                                 ZonedDateTime.parse(value);
                             } catch(DateTimeParseException ex) {
                                 throw new ValidationException(
-                                        new ValidationError(schema.getId(), schema.getJsonPointer(),
-                                        ValidationMessage.STRING_DATE_TIME_FORMAT_CONSTRAINT, value));
+                                        new ValidationError(schema.getId(), schema.getJsonPointer(), jsonPointer,
+                                        ValidationMessage.STRING_DATE_TIME_FORMAT_CONSTRAINT_MSG, value));
                             }
                             break;
             case EMAIL:     if (!EMAIL_PATTERN.matcher(value).matches()) {
                                 throw new ValidationException(
-                                        new ValidationError(schema.getId(), schema.getJsonPointer(),
-                                        ValidationMessage.STRING_EMAIL_FORMAT_CONSTRAINT, value));
+                                        new ValidationError(schema.getId(), schema.getJsonPointer(), jsonPointer,
+                                        ValidationMessage.STRING_EMAIL_FORMAT_CONSTRAINT_MSG, value));
                             }
                             break;
             case HOSTNAME:  if (!HOST_NAME_PATTERN.matcher(value).matches()) {
                                 throw new ValidationException(
-                                        new ValidationError(schema.getId(), schema.getJsonPointer(),
-                                        ValidationMessage.STRING_HOSTNAME_FORMAT_CONSTRAINT, value));
+                                        new ValidationError(schema.getId(), schema.getJsonPointer(), jsonPointer,
+                                        ValidationMessage.STRING_HOSTNAME_FORMAT_CONSTRAINT_MSG, value));
                             }
                             break;
             case IP4:       if (!IP4_PATTERN.matcher(value).matches()) {
                                 throw new ValidationException(
-                                        new ValidationError(schema.getId(), schema.getJsonPointer(),
-                                        ValidationMessage.STRING_IP4_FORMAT_CONSTRAINT, value));
+                                        new ValidationError(schema.getId(), schema.getJsonPointer(), jsonPointer,
+                                        ValidationMessage.STRING_IP4_FORMAT_CONSTRAINT_MSG, value));
                             }
                             break;
             case IP6:       if (!IP6_PATTERN.matcher(value).matches()) {
                                 throw new ValidationException(
-                                        new ValidationError(schema.getId(), schema.getJsonPointer(),
-                                        ValidationMessage.STRING_IP6_FORMAT_CONSTRAINT, value));
+                                        new ValidationError(schema.getId(), schema.getJsonPointer(), jsonPointer,
+                                        ValidationMessage.STRING_IP6_FORMAT_CONSTRAINT_MSG, value));
                             }
                             break;
             case URI:       try {
                                 java.net.URI.create(value);
                             } catch(IllegalArgumentException ex) {
                                 throw new ValidationException(
-                                        new ValidationError(schema.getId(), schema.getJsonPointer(),
-                                        ValidationMessage.STRING_URI_FORMAT_CONSTRAINT, value)); 
+                                        new ValidationError(schema.getId(), schema.getJsonPointer(), jsonPointer,
+                                        ValidationMessage.STRING_URI_FORMAT_CONSTRAINT_MSG, value)); 
                             }
                             break;
         }

@@ -26,10 +26,12 @@
 package es.elixir.bsc.json.schema.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
+import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.json.JsonObject;
 
@@ -56,7 +58,7 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
     public Map<String, JsonObject> getSchemas(final URI uri) {
         Map<String, JsonObject> map = schemas.get(uri);
         if (map == null) {
-            schemas.put(uri, map = new HashMap<>());
+            schemas.put(uri, map = new LinkedHashMap<>());
         }
         return map;
     }
@@ -70,4 +72,15 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
     public InputStream getInputStream() throws IOException {
         return uri.toURL().openStream();
     }
+    
+    @Override
+    public void putSchema(String jsonPointer, JsonObject schema) {
+        
+    }
+    
+    @Override
+    public void putSchema(JsonSchema schema) {
+        
+    }
+
 }

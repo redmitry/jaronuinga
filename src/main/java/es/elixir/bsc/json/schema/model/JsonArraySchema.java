@@ -33,7 +33,7 @@ import java.util.List;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonArraySchema extends JsonSchema {
+public interface JsonArraySchema extends AbstractJsonSchema {
     
     public final static String ITEMS = "items";
     public final static String ADDITIONAL_ITEMS = "additionalItems";
@@ -54,20 +54,11 @@ public interface JsonArraySchema extends JsonSchema {
      * 
      * @return list of schemas
      */
-    List<JsonSchema> getItems();
+    List<AbstractJsonSchema> getItems();
     
     /**
      * @return 'additionalSchema' JsonSchema, <b>NULL</b> if FALSE (or not set), 
      *         EmptyJsonSchema if TRUE
      */
-    JsonSchema getAdditionalItems();
-    void setAdditionalItems(JsonSchema schema);
-    
-    /**
-     * Setting 'additionalItems' to <b>NULL</b> means FALSE if there are
-     * more than one 'items' schemas.
-     * 
-     * @param additionalItems 
-     */
-    void setAdditionalItems(Boolean additionalItems);
+    AbstractJsonSchema getAdditionalItems();
 }

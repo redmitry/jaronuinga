@@ -25,51 +25,53 @@
 
 package es.elixir.bsc.json.schema;
 
+import static es.elixir.bsc.json.schema.ValidationErrorCode.*;
+
 /**
  * @author Dmitry Repchevsky
  */
 
 public enum ValidationMessage {
     
-    OBJECT_EXPECTED(1, "object expected, found: %s"),
-    ARRAY_EXPECTED(2, "array expected, found: %s"),
-    STRING_EXPECTED(3, "string expected, found: %s"),
-    NUMBER_EXPECTED(4, "number expected, found: %s"),
-    BOOLEAN_EXPECTED(5, "boolean expected, found: %s"),
+    OBJECT_EXPECTED_MSG(OBJECT_EXPECTED, "object expected, found: %s"),
+    ARRAY_EXPECTED_MSG(ARRAY_EXPECTED, "array expected, found: %s"),
+    STRING_EXPECTED_MSG(STRING_EXPECTED, "string expected, found: %s"),
+    NUMBER_EXPECTED_MSG(NUMBER_EXPECTED, "number expected, found: %s"),
+    BOOLEAN_EXPECTED_MSG(BOOLEAN_EXPECTED, "boolean expected, found: %s"),
     
-    OBJECT_REQUIRED_PROPERTY_CONSTRAINT(6, "object missed required property: %s"),
-    OBJECT_DEPENDENT_REQUIRED_CONSTRAINT(7, "object missed required dependent property: %s"),
+    OBJECT_REQUIRED_PROPERTY_CONSTRAINT_MSG(OBJECT_REQUIRED_PROPERTY_CONSTRAINT, "object missed required property: %s"),
+    OBJECT_DEPENDENT_REQUIRED_CONSTRAINT_MSG(OBJECT_DEPENDENT_REQUIRED_CONSTRAINT, "object missed required dependent property: %s"),
     
-    OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT(8, "no additional properties allowed: %s"),
+    OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT_MSG(OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT, "no additional properties allowed: %s"),
     
-    OBJECT_ALL_OF_CONSTRAINT(9, "object allOf constraint failed"),
-    OBJECT_ANY_OF_CONSTRAINT(10, "object anyOf constraint failed"),
-    OBJECT_ONE_OF_CONSTRAINT(11, "object oneOf constraint failed"),
-    OBJECT_NOT_CONSTRAINT(12, "object not constraint failed"),
+    OBJECT_ALL_OF_CONSTRAINT_MSG(OBJECT_ALL_OF_CONSTRAINT, "object allOf constraint failed"),
+    OBJECT_ANY_OF_CONSTRAINT_MSG(OBJECT_ANY_OF_CONSTRAINT, "object anyOf constraint failed"),
+    OBJECT_ONE_OF_CONSTRAINT_MSG(OBJECT_ONE_OF_CONSTRAINT, "object oneOf constraint failed"),
+    OBJECT_NOT_CONSTRAINT_MSG(OBJECT_NOT_CONSTRAINT, "object not constraint failed"),
 
-    ARRAY_MIN_ITEMS_CONSTRAINT(13, "minItems = %d > array.items.size = %d"),
-    ARRAY_MAX_ITEMS_CONSTRAINT(14, "maxItems = %d < array.items.size = %d"),
-    ARRAY_LENGTH_MISMATCH(15, "array.length = %d not equals items.length = %d"),
+    ARRAY_MIN_ITEMS_CONSTRAINT_MSG(ARRAY_MIN_ITEMS_CONSTRAINT, "minItems = %d > array.items.size = %d"),
+    ARRAY_MAX_ITEMS_CONSTRAINT_MSG(ARRAY_MAX_ITEMS_CONSTRAINT, "maxItems = %d < array.items.size = %d"),
+    ARRAY_LENGTH_MISMATCH_MSG(ARRAY_LENGTH_MISMATCH, "array.length = %d not equals items.length = %d"),
 
-    STRING_MIN_LENGTH_CONSTRAINT(16, "string.length %d < minLength = %d"),
-    STRING_MAX_LENGTH_CONSTRAINT(17, "string.length %d > maxLength = %d"),
+    STRING_MIN_LENGTH_CONSTRAINT_MSG(STRING_MIN_LENGTH_CONSTRAINT, "string.length %d < minLength = %d"),
+    STRING_MAX_LENGTH_CONSTRAINT_MSG(STRING_MAX_LENGTH_CONSTRAINT, "string.length %d > maxLength = %d"),
     
-    STRING_PATTERN_CONSTRAINT(18, "string.pattern constraint '%s' %s"),
-    STRING_DATE_TIME_FORMAT_CONSTRAINT(19, "invalid datetime format: '%s'"),
-    STRING_EMAIL_FORMAT_CONSTRAINT(20, "invalid email format: '%s'"),
-    STRING_HOSTNAME_FORMAT_CONSTRAINT(21, "invalid hostname format: '%s'"),
-    STRING_IP4_FORMAT_CONSTRAINT(22, "invalid IPv4 format: '%s'"),
-    STRING_IP6_FORMAT_CONSTRAINT(23, "invalid IPv6 format: '%s'"),
-    STRING_URI_FORMAT_CONSTRAINT(24, "invalid URI format: '%s'"),
+    STRING_PATTERN_CONSTRAINT_MSG(STRING_PATTERN_CONSTRAINT, "string.pattern constraint '%s' %s"),
+    STRING_DATE_TIME_FORMAT_CONSTRAINT_MSG(STRING_DATE_TIME_FORMAT_CONSTRAINT, "invalid datetime format: '%s'"),
+    STRING_EMAIL_FORMAT_CONSTRAINT_MSG(STRING_EMAIL_FORMAT_CONSTRAINT, "invalid email format: '%s'"),
+    STRING_HOSTNAME_FORMAT_CONSTRAINT_MSG(STRING_HOSTNAME_FORMAT_CONSTRAINT, "invalid hostname format: '%s'"),
+    STRING_IP4_FORMAT_CONSTRAINT_MSG(STRING_IP4_FORMAT_CONSTRAINT, "invalid IPv4 format: '%s'"),
+    STRING_IP6_FORMAT_CONSTRAINT_MSG(STRING_IP6_FORMAT_CONSTRAINT, "invalid IPv6 format: '%s'"),
+    STRING_URI_FORMAT_CONSTRAINT_MSG(STRING_URI_FORMAT_CONSTRAINT, "invalid URI format: '%s'"),
     
-    NUMBER_MIN_CONSTRAINT(25, "value = %s %s number.minimum = %s"),
-    NUMBER_MAX_CONSTRAINT(26, "value = %s %s number.maximum = %s"),
+    NUMBER_MIN_CONSTRAINT_MSG(NUMBER_MIN_CONSTRAINT, "value = %s %s number.minimum = %s"),
+    NUMBER_MAX_CONSTRAINT_MSG(NUMBER_MAX_CONSTRAINT, "value = %s %s number.maximum = %s"),
 
-    INTEGER_MIN_CONSTRAINT(27, "value = %d %s integer.minimum = %d"),
-    INTEGER_MAX_CONSTRAINT(28, "value = %d %s integer.maximum = %d"),
+    INTEGER_MIN_CONSTRAINT_MSG(INTEGER_MIN_CONSTRAINT, "value = %d %s integer.minimum = %d"),
+    INTEGER_MAX_CONSTRAINT_MSG(INTEGER_MAX_CONSTRAINT, "value = %d %s integer.maximum = %d"),
     
-    ENUM_INVALID_VALUE_TYPE(29, "invalid value type for enum: %s"),
-    ENUM_INVALID_VALUE(30, "value = %s enum.values = %s");
+    ENUM_INVALID_VALUE_TYPE_MSG(ENUM_INVALID_VALUE_TYPE, "invalid value type for enum: %s"),
+    ENUM_INVALID_VALUE_MSG(ENUM_INVALID_VALUE, "value = %s enum.values = %s");
     
     public final int CODE;
     public final String VALUE;

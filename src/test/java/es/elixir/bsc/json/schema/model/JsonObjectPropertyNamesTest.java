@@ -20,15 +20,33 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *****************************************************************************
+ * *****************************************************************************
  */
 
 package es.elixir.bsc.json.schema.model;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public interface JsonBooleanSchema extends AbstractJsonSchema {
+public class JsonObjectPropertyNamesTest extends JsonTest {
     
+    private final static String JSON_SCHEMA_FILE = "draft4/schemas/propertyNames.json";
+
+    private final static String JSON_FILE_01 = "draft4/data/propertyNames_01.json";
+    private final static String JSON_FILE_02 = "draft4/data/propertyNames_02.json";
+
+    @Test
+    public void test_01() {
+        Assert.assertTrue(test(JSON_SCHEMA_FILE, JSON_FILE_01).isEmpty());
+    }
+    
+    @Test
+    public void test_02() {
+        Assert.assertFalse(test(JSON_SCHEMA_FILE, JSON_FILE_02).isEmpty());
+    }
+
 }

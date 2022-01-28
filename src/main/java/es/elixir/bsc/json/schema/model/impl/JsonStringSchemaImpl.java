@@ -44,6 +44,7 @@ import es.elixir.bsc.json.schema.impl.DefaultJsonStringFormatValidator;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.regex.Pattern;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
@@ -101,12 +102,13 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     
     @Override
     public JsonStringSchemaImpl read(final JsonSubschemaParser parser, 
-                                     final JsonSchemaLocator locator, 
+                                     final JsonSchemaLocator locator,
+                                     final JsonSchemaElement parent,
                                      final String jsonPointer, 
                                      final JsonObject object,
                                      final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_LENGTH), JsonValue.ValueType.NUMBER);
         final JsonNumber max = JsonSchemaUtil.check(object.getJsonNumber(MAX_LENGTH), JsonValue.ValueType.NUMBER);
@@ -150,45 +152,46 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (value.getValueType() != JsonValue.ValueType.STRING) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_EXPECTED, value.getValueType().name()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.STRING_EXPECTED_MSG, value.getValueType().name()));
             return;
         }
         
-        validate(((JsonString)value).getString(), errors);
+        validate(jsonPointer, ((JsonString)value).getString(), errors);
         
-        super.validate(value, parent, errors, callback);
+        super.validate(jsonPointer, value, parent, errors, callback);
         
         if (callback != null) {
-            callback.validated(this, value, parent, errors);
+            callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
     
-    private void validate(String string, List<ValidationError> errors) {
+    private void validate(String jsonPointer, String string, List<ValidationError> errors) {
         
         if (minLength != null && string.length() < minLength) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_MIN_LENGTH_CONSTRAINT, string.length(), minLength));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.STRING_MIN_LENGTH_CONSTRAINT_MSG, string.length(), minLength));
         }
         
         if (maxLength != null && string.length() > maxLength) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_MAX_LENGTH_CONSTRAINT, string.length(), maxLength));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.STRING_MAX_LENGTH_CONSTRAINT_MSG, string.length(), maxLength));
 
         }
         
         if (pattern != null && !pattern.matcher(string).find()) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.STRING_PATTERN_CONSTRAINT, pattern, string));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.STRING_PATTERN_CONSTRAINT_MSG, pattern, string));
             
         }
         
         if (format != null && !format.isEmpty()) {
             try {
-                DefaultJsonStringFormatValidator.validate(this, string);
+                DefaultJsonStringFormatValidator.validate(jsonPointer, this, string);
             } catch (ValidationException ex) {
                 errors.add(ex.error);
             }

@@ -31,7 +31,7 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface PrimitiveSchema extends JsonSchema {
+public interface PrimitiveSchema extends AbstractJsonSchema {
 
     public final static String ALL_OF = "allOf";
     public final static String ANY_OF = "anyOf";

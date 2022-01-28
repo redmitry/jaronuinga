@@ -40,6 +40,7 @@ import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * Json Schema implementation for the Json Integer type.
@@ -52,12 +53,13 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
     
     @Override
     public JsonIntegerSchemaImpl read(final JsonSubschemaParser parser, 
-                                      final JsonSchemaLocator locator, 
+                                      final JsonSchemaLocator locator,
+                                      final JsonSchemaElement parent,
                                       final String jsonPointer, 
                                       final JsonObject object,
                                       final JsonType type) throws JsonSchemaException {
         
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
 
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MINIMUM), JsonValue.ValueType.NUMBER);
         if (min != null) {
@@ -73,45 +75,46 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
     }
 
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback <JsonValue>callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback <JsonValue>callback) {
 
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.NUMBER_EXPECTED, value.getValueType().name()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.NUMBER_EXPECTED_MSG, value.getValueType().name()));
             return;
         }
 
-        validate(((JsonNumber)value).bigIntegerValue(), errors);
+        validate(jsonPointer, ((JsonNumber)value).bigIntegerValue(), errors);
         
-        super.validate(value, parent, errors, callback);
+        super.validate(jsonPointer, value, parent, errors, callback);
 
         if (callback != null) {
-            callback.validated(this, value, parent, errors);
+            callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
 
-    public void validate(BigInteger num, List<ValidationError> errors) {
+    public void validate(String jsonPointer, BigInteger num, List<ValidationError> errors) {
         if (minimum != null) {
             if (exclusiveMinimum != null && exclusiveMinimum) {
                 if (num.compareTo(minimum) <= 0) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(),
-                            ValidationMessage.NUMBER_MIN_CONSTRAINT, num, "<=", minimum));
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                            ValidationMessage.NUMBER_MIN_CONSTRAINT_MSG, num, "<=", minimum));
                 }
             } else if (num.compareTo(minimum) < 0) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(),
-                            ValidationMessage.NUMBER_MIN_CONSTRAINT, num, "<", minimum));
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                            ValidationMessage.NUMBER_MIN_CONSTRAINT_MSG, num, "<", minimum));
             }
         }
         
         if (maximum != null) {
             if (exclusiveMaximum != null && exclusiveMaximum) {
                 if (num.compareTo(maximum) >= 0) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(),
-                            ValidationMessage.NUMBER_MAX_CONSTRAINT, num, ">=", maximum));
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                            ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, num, ">=", maximum));
                 }
             } else if (num.compareTo(maximum) > 0) {
-                    errors.add(new ValidationError(getId(), getJsonPointer(),
-                            ValidationMessage.NUMBER_MAX_CONSTRAINT, num, ">", maximum));
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                            ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, num, ">", maximum));
             }
         }
     }

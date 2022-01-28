@@ -25,27 +25,18 @@
 
 package es.elixir.bsc.json.schema.model;
 
-import es.elixir.bsc.json.schema.model.impl.JsonAnyOfImpl;
-import java.net.URI;
-
 /**
- * Compound Json Schema type which is used when there is no type is defined or
- * several types are provided (i.e. 'type': ['string', 'integer']).
+ * Any parsable Json Schema element (i.g. Schema, Schema properties, etc)
  * 
  * @author Dmitry Repchevsky
  */
 
-public class CompoundSchema extends JsonAnyOfImpl {
-
-    @Override
-    public URI getId() {
-        return isEmpty() ? null : iterator().next().getId();
-    }
-
-    @Override
-    public void setId(URI id) {
-        this.forEach((schema) -> {
-            schema.setId(id);
-        });
-    }
+public interface JsonSchemaElement {
+    
+    /**
+     * Get the enclosing Json Schema element.
+     * 
+     * @return immediate parent node (element) 
+     */
+    JsonSchemaElement getParent();
 }

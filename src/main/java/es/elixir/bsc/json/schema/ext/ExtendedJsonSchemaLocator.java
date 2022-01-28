@@ -25,7 +25,6 @@
 
 package es.elixir.bsc.json.schema.ext;
 
-import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
 import java.net.URI;
 import java.util.Map;
@@ -35,8 +34,7 @@ import javax.json.JsonObject;
  * @author Dmitry Repchevsky
  */
 
-public class ExtendedJsonSchemaLocator extends DefaultJsonSchemaLocator
-                                       implements ExtendedJsonSchemaLocatorInterface {
+public abstract class ExtendedJsonSchemaLocator extends DefaultJsonSchemaLocator {
     
     public ExtendedJsonSchemaLocator(URI uri) {
         super(uri);
@@ -48,7 +46,7 @@ public class ExtendedJsonSchemaLocator extends DefaultJsonSchemaLocator
     }
 
     @Override
-    public JsonSchemaLocator resolve(final URI uri) {
-        return new ExtendedJsonSchemaLocator(super.uri.resolve(uri), schemas);
+    public void putSchema(String jsonPointer, JsonObject schema) {
+        super.getSchemas(uri).put(jsonPointer, schema);
     }
 }

@@ -34,6 +34,7 @@ import javax.json.JsonObject;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonValue;
 
 /**
@@ -45,24 +46,26 @@ public class JsonNullSchemaImpl extends PrimitiveSchemaImpl
 
     @Override
     public JsonNullSchemaImpl read(final JsonSubschemaParser parser, 
-                                   final JsonSchemaLocator locator, 
+                                   final JsonSchemaLocator locator,
+                                   final JsonSchemaElement parent,
                                    final String jsonPointer, 
                                    final JsonObject object,
                                    final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
 
         return this;
     }
 
     @Override
-    public void validate(final JsonValue value,
+    public void validate(final String jsonPointer, 
+                         final JsonValue value,
                          final JsonValue parent,
                          final List<ValidationError> errors, 
                          final JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (callback != null) {
-            callback.validated(this, value, parent, errors);
+            callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
 }

@@ -28,11 +28,11 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonOneOf;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 
 /**
  * @author Dmitry Repchevsky
@@ -42,14 +42,15 @@ public class JsonOneOfImpl extends SchemaArrayImpl
                            implements JsonOneOf {
 
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
 
         int matches = 0;
         
         final List<ValidationError> err = new ArrayList<>();
-        for (JsonSchema schema : this) {
+        for (AbstractJsonSchema schema : this) {
             final int nerrors = err.size();
-            schema.validate(value, parent, err, callback);
+            schema.validate(jsonPointer, value, parent, err, callback);
             if (nerrors == err.size()) {
                 matches++;
             }
@@ -60,8 +61,8 @@ public class JsonOneOfImpl extends SchemaArrayImpl
         
         if (matches != 1) {
             errors.addAll(err);
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.OBJECT_ONE_OF_CONSTRAINT));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.OBJECT_ONE_OF_CONSTRAINT_MSG));
         }
     }
 }

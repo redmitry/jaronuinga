@@ -36,6 +36,7 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
@@ -46,28 +47,30 @@ public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
 
     @Override
     public JsonBooleanSchemaImpl read(final JsonSubschemaParser parser, 
-                                      final JsonSchemaLocator locator, 
+                                      final JsonSchemaLocator locator,
+                                      final JsonSchemaElement parent,
                                       final String jsonPointer, 
                                       final JsonObject object,
                                       final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
 
         return this;
     }
 
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (JsonValue.ValueType.TRUE != value.getValueType() &&
             JsonValue.ValueType.FALSE != value.getValueType()) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.BOOLEAN_EXPECTED, value.getValueType().name()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.BOOLEAN_EXPECTED_MSG, value.getValueType().name()));
             return;
         }
         
         if (callback != null) {
-            callback.validated(this, value, parent, errors);
+            callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
 }

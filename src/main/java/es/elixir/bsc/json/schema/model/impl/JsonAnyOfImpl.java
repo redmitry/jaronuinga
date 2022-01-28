@@ -25,14 +25,24 @@
 
 package es.elixir.bsc.json.schema.model.impl;
 
+import es.elixir.bsc.json.schema.JsonSchemaException;
+import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonAnyOf;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.ParsingError;
+import es.elixir.bsc.json.schema.ParsingMessage;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.JsonType;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
 
 /**
  * @author Dmitry Repchevsky
@@ -41,13 +51,53 @@ import javax.json.JsonValue;
 public class JsonAnyOfImpl extends SchemaArrayImpl 
                            implements JsonAnyOf {
     
+    public SchemaArrayImpl read(final JsonSubschemaParser parser, 
+                                final JsonSchemaLocator locator,
+                                final JsonSchemaElement parent,
+                                final String jsonPointer, 
+                                final JsonObject object,
+                                final JsonArray types) throws JsonSchemaException {
+        
+        this.id = locator.uri;
+        this.parent = parent;
+        this.jsonPointer = jsonPointer;
+        
+        if (types == null) {
+            for (JsonType val : JsonType.values()) {
+                try {
+                    final AbstractJsonSchema s = parser.parse(locator, this, jsonPointer, object, val);
+                    if (s != null) {
+                        add(s);
+                    }
+                } catch(JsonSchemaException ex) {
+                    // do nothing
+                }
+            }
+        } else {
+            for (JsonValue val : types) {
+                if (JsonValue.ValueType.STRING != val.getValueType()) {
+                    
+                }
+                try {
+                     final JsonType type = JsonType.fromValue(((JsonString)val).getString());
+                     add(parser.parse(locator, parent, jsonPointer, object, type));
+                } catch(IllegalArgumentException ex) {
+                    throw new JsonSchemaException(
+                        new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, new Object[] {val}));
+                }
+            }            
+        }        
+        return this;
+    }
+
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
         List<ValidationError> err = new ArrayList<>();
-        for (JsonSchema schema : this) {
+        for (AbstractJsonSchema schema : this) {
             final int nerrors = err.size();
-            schema.validate(value, parent, err, callback);
+            schema.validate(jsonPointer, value, parent, err, callback);
             if (nerrors == err.size()) {
                 return; // found the schema that matches
             }
@@ -55,6 +105,6 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
 
         errors.addAll(err);
         errors.add(new ValidationError(getId(), getJsonPointer(), 
-                ValidationMessage.OBJECT_ANY_OF_CONSTRAINT));
+                jsonPointer, ValidationMessage.OBJECT_ANY_OF_CONSTRAINT_MSG));
     }
 }

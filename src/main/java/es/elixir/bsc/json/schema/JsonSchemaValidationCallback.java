@@ -39,31 +39,16 @@ import java.util.List;
 public interface JsonSchemaValidationCallback<T> {
     
     /**
-     * Callback method called by the validator after the value is validated.
-     * Implementations may include custom validation errors into the errors list
-     * or stop validation process by throwing the ValidationException.
+     * Callback method called by the validator after the value is validated.Implementations may include custom validation errors into the errors list
+ or stop validation process by throwing the ValidationException.
      * 
-     * @param schema Json Schema model to validate json value.
+     * @param schema json schema model to validate json value.
+     * @param pointer json pointer to the validated value
      * @param value json value that was validated.
      * @param parent json value that includes the validated one
      * @param errors the list of validation errors found during the validation.
      * 
      * @throws ValidationException the exception to be thrown by the validator.
      */
-    void validated(PrimitiveSchema schema, T value, T parent, List<ValidationError> errors) throws ValidationException;
-    
-    /**
-     * Callback method called by the validator after the value is validated.
-     * Implementations may include custom validation errors into the errors list
-     * or stop validation process by throwing the ValidationException.
-     * 
-     * @param schema Json Schema model to validate json value.
-     * @param value json value that was validated.
-     * @param errors the list of validation errors found during the validation.
-     * 
-     * @throws ValidationException the exception to be thrown by the validator.
-     */
-    default void validated(PrimitiveSchema schema, T value, List<ValidationError> errors) throws ValidationException {
-        validated(schema, value, null, errors);
-    }
+    void validated(PrimitiveSchema schema, String pointer, T value, T parent, List<ValidationError> errors) throws ValidationException;
 }

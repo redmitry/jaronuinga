@@ -36,23 +36,34 @@ public class ValidationError {
     public final int code;
     public final URI id;
     public final String pointer;
+    public final String path;
     public final String message;
     
     public ValidationError(final String message) {
-        this(null, null, message);
+        this(null, null, null, message);
     }
     
     public ValidationError(final URI id, final String pointer, final String message) {
+        this(id, pointer, null, message);
+    }
+
+    public ValidationError(final URI id, final String pointer, 
+            final String path, final String message) {
+        
         this.code = -1;
         this.id = id;
         this.pointer = pointer;
+        this.path = path;
         this.message = message;
     }
     
-    public ValidationError(final URI id, final String pointer, final ValidationMessage message, Object... args) {
+    public ValidationError(final URI id, final String pointer, 
+            final String path, final ValidationMessage message, Object... args) {
+        
         this.code = message.CODE;
         this.id = id;
         this.pointer = pointer;
+        this.path = path;
         this.message = String.format(message.VALUE, args);
     }
 }

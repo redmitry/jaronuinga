@@ -31,7 +31,7 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonObjectSchema extends JsonSchema {
+public interface JsonObjectSchema extends AbstractJsonSchema {
 
     public final static String DEFINITIONS = "definitions";
     public final static String PROPERTIES = "properties";
@@ -40,25 +40,14 @@ public interface JsonObjectSchema extends JsonSchema {
     public final static String DEPENDENT_SCHEMAS = "dependentSchemas";
     public final static String DEPENDENT_REQUIRED = "dependentRequired";
     public final static String ADDITIONAL_PROPERTIES = "additionalProperties";
+    public final static String PROPERTY_NAMES = "propertyNames";
     
     JsonDefinitions getDefinitions();
     JsonProperties getProperties();
     StringArray getRequired();
     JsonProperties getDependentSchemas();
     JsonDependentProperties getDependentRequired();
-    
-    /**
-     * @return 'additionalProperties' JsonSchema, <b>NULL</b> if FALSE (or not set), 
-     *         EmptyJsonSchema if TRUE
-     */
-    JsonSchema getAdditionalProperties();
-    void setAdditionalProperties(JsonSchema schema);
-    
-    /**
-     * Setting 'additionalProperties' to <b>NULL</b> means FALSE.
-     * 
-     * @param additionalProperties 
-     */
-    void setAdditionalProperties(Boolean additionalProperties);
-    
+    AbstractJsonSchema getPropertyNames();
+    AbstractJsonSchema getAdditionalProperties();
+    Boolean isAdditionalProperties();    
 }

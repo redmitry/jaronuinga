@@ -31,6 +31,7 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import javax.json.JsonObject;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
@@ -87,12 +88,13 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
 
     @Override
     public NumericSchemaImpl read(final JsonSubschemaParser parser, 
-                                  final JsonSchemaLocator locator, 
+                                  final JsonSchemaLocator locator,
+                                  final JsonSchemaElement parent,
                                   final String jsonPointer, 
                                   final JsonObject object, 
                                   final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, type);
+        super.read(parser, locator, parent, jsonPointer, object, type);
         
         if (object.getBoolean(EXCLUSIVE_MINIMUM, false)) {
             exclusiveMinimum = true;

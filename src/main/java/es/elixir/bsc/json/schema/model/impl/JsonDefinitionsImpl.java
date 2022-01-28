@@ -27,12 +27,13 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonDefinitions;
 import es.elixir.bsc.json.schema.model.JsonObjectSchema;
-import es.elixir.bsc.json.schema.model.JsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -44,31 +45,31 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public class JsonDefinitionsImpl extends LinkedHashMap<String, JsonSchema>
+public class JsonDefinitionsImpl extends LinkedHashMap<String, AbstractJsonSchema>
                                  implements JsonDefinitions {
     
     @Override
-    public JsonSchema get(String name) {
+    public AbstractJsonSchema get(String name) {
         return super.get(name);
     }
 
     @Override
-    public JsonSchema put(String name, JsonSchema schema) {
+    public AbstractJsonSchema put(String name, AbstractJsonSchema schema) {
         return super.put(name, schema);
     }
     
     @Override
-    public JsonSchema remove(String name) {
+    public AbstractJsonSchema remove(String name) {
         return super.remove(name);
     }
     
     @Override
-    public Iterator<Entry<String, JsonSchema>> iterator() {
+    public Iterator<Entry<String, AbstractJsonSchema>> iterator() {
         return entrySet().iterator();
     }
     
-    public JsonDefinitions read(JsonSchemaParser parser, 
-            JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException {
+    public JsonDefinitions read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
+            JsonSchemaElement parent, String jsonPointer, JsonObject object) throws JsonSchemaException {
         
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
             final JsonValue value = entry.getValue();            
@@ -77,9 +78,9 @@ public class JsonDefinitionsImpl extends LinkedHashMap<String, JsonSchema>
                     new Object[] {"definition schema", value.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
             }
             
-            final JsonSchema schema = parser.parse(locator, jsonPointer + entry.getKey() + "/", value.asJsonObject());
+            final AbstractJsonSchema schema = parser.parse(locator, parent, jsonPointer + entry.getKey() + "/", value.asJsonObject(), null);
 
-            locator.getSchemas().put("#/" + JsonObjectSchema.DEFINITIONS + "/" + entry.getKey(), value.asJsonObject());
+            locator.getSchemas(locator.uri).put("#/" + JsonObjectSchema.DEFINITIONS + "/" + entry.getKey(), value.asJsonObject());
             put(entry.getKey(), schema);
         }
         

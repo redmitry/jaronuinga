@@ -32,7 +32,7 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonEnum extends JsonSchema {
+public interface JsonEnum extends AbstractJsonSchema {
     
     public final static String ENUM = "enum";
     

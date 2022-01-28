@@ -66,7 +66,7 @@ public class JsonSchemaValidationCallbackTest {
             
             final AtomicInteger counter = new AtomicInteger();
             List<ValidationError> errors = new ArrayList<>();
-            schema.validate(json, null, errors, (PrimitiveSchema model, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
+            schema.validate(json, errors, (PrimitiveSchema model, String pointer, JsonValue value, JsonValue parent, List<ValidationError> err) -> {
                 counter.incrementAndGet();
             });
 
@@ -77,5 +77,4 @@ public class JsonSchemaValidationCallbackTest {
             Logger.getLogger(JsonAnyOfTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 }

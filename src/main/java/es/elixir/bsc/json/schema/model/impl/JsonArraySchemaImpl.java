@@ -36,12 +36,13 @@ import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonNumber;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 
 /**
  * @author Dmitry Repchevsky
@@ -50,15 +51,15 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                                  implements JsonArraySchema {
 
-    private List<JsonSchema> items;
+    private List<AbstractJsonSchema> items;
     private Boolean additionalItems;
-    private JsonSchema additionalItemsSchema;
+    private AbstractJsonSchema additionalItemsSchema;
     
     private Long minItems;
     private Long maxItems;
     
     @Override
-    public List<JsonSchema> getItems() {
+    public List<AbstractJsonSchema> getItems() {
         if (items == null) {
             items = new ArrayList<>();
         }
@@ -87,31 +88,20 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public JsonSchema getAdditionalItems() {
+    public AbstractJsonSchema getAdditionalItems() {
         return additionalItemsSchema;
-    }
-
-    @Override
-    public void setAdditionalItems(JsonSchema schema) {
-        this.additionalItemsSchema = schema;
-        this.additionalItems = null;
-    }
-
-    @Override
-    public void setAdditionalItems(Boolean additionalItems) {
-        this.additionalItems = additionalItems;
-        this.additionalItemsSchema = null;
     }
     
     @Override
     public JsonArraySchemaImpl read(final JsonSubschemaParser parser, 
-                                    final JsonSchemaLocator locator, 
+                                    final JsonSchemaLocator locator,
+                                    final JsonSchemaElement parent,
                                     final String jsonPointer, 
                                     final JsonObject object,
                                     final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, jsonPointer, object, type);
-
+        super.read(parser, locator, parent, jsonPointer, object, type);
+        
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_ITEMS), JsonValue.ValueType.NUMBER);
         if (min != null) {
             minItems = min.longValue();
@@ -121,7 +111,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (max != null) {
             maxItems = max.longValue();
         }
-        
+
         JsonValue jitems = object.get(ITEMS);
         if (jitems == null) {
             // Omitting this keyword has the same behavior as an empty schema.
@@ -129,14 +119,14 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         }
         
         if (jitems instanceof JsonObject) {
-            final JsonSchema schema = parser.parse(locator, jsonPointer + ITEMS + "/", jitems.asJsonObject(), type);
+            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + ITEMS + "/", jitems.asJsonObject(), type);
             getItems().add(schema);
         } else if (jitems instanceof JsonArray) {
             additionalItems = true;
             for (int i = 0, n = jitems.asJsonArray().size(); i < n; i++) {
                 final JsonValue value = jitems.asJsonArray().get(i);
                 final JsonObject o = JsonSchemaUtil.check(value, JsonValue.ValueType.OBJECT);
-                final JsonSchema schema = parser.parse(locator, jsonPointer + Integer.toString(i) + "/", o, type);
+                final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + Integer.toString(i) + "/", o, type);
                 getItems().add(schema);                
             }
         } else {
@@ -148,7 +138,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (jadditionalItems != null) {
             switch(jadditionalItems.getValueType()) {
                 case OBJECT: additionalItems = null;
-                             additionalItemsSchema = parser.parse(locator, jsonPointer + ADDITIONAL_ITEMS + "/", jadditionalItems.asJsonObject(), type);
+                             additionalItemsSchema = parser.parse(locator, this, jsonPointer + ADDITIONAL_ITEMS + "/", jadditionalItems.asJsonObject(), type);
                              break;
                 case TRUE:   additionalItems = true; break;
                 case FALSE:  additionalItems = false; break;
@@ -161,59 +151,60 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public void validate(JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
 
         if (value.getValueType() != JsonValue.ValueType.ARRAY) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.ARRAY_EXPECTED, value.getValueType().name()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer, 
+                    ValidationMessage.ARRAY_EXPECTED_MSG, value.getValueType().name()));
             return;
         }
 
         final JsonArray array = value.asJsonArray();
 
         if (minItems != null && array.size() < minItems) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.ARRAY_MIN_ITEMS_CONSTRAINT, minItems, items == null ? 0 : array.size()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.ARRAY_MIN_ITEMS_CONSTRAINT_MSG, minItems, items == null ? 0 : array.size()));
         }
 
         if (maxItems != null && array.size() > maxItems) {
-            errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.ARRAY_MAX_ITEMS_CONSTRAINT, maxItems, items == null ? 0 : items.size()));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.ARRAY_MAX_ITEMS_CONSTRAINT_MSG, maxItems, items == null ? 0 : items.size()));
         }
 
         if (items != null) {
             if (items.size() == 1 && additionalItems == null) {
                 // items is a json object - all values must match the schema
-                final JsonSchema schema = items.get(0);
+                final AbstractJsonSchema schema = items.get(0);
                 for (int i = 0, n = array.size(); i < n; i++) {
                     final JsonValue val = array.get(i);
-                    schema.validate(val, value, errors, callback);
+                    schema.validate(jsonPointer + i + "/", val, value, errors, callback);
                 }
             } else if (array.size() <= items.size()) {
                 for (int i = 0, n = array.size(); i < n; i++) {
                     final JsonValue val = array.get(i);
-                    items.get(i).validate(val, value, errors, callback);
+                    items.get(i).validate(jsonPointer + i + "/", val, value, errors, callback);
                 }
             } else if (Boolean.FALSE.equals(additionalItems)) {
-                errors.add(new ValidationError(getId(), getJsonPointer(),
-                        ValidationMessage.ARRAY_LENGTH_MISMATCH, array.size(), items.size()));
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_LENGTH_MISMATCH_MSG, array.size(), items.size()));
             } else {
                 for (int i = 0, n = items.size(); i < n; i++) {
                     final JsonValue val = array.get(i);
-                    items.get(i).validate(val, value, errors, callback);
+                    items.get(i).validate(jsonPointer + i + "/", val, value, errors, callback);
                 }
 
                 if (additionalItemsSchema != null) {
                     for (int i = items.size(), n = array.size(); i < n; i++) {
                         final JsonValue val = array.get(i);
-                        additionalItemsSchema.validate(val, value, errors, callback);
+                        additionalItemsSchema.validate(jsonPointer + i + "/", val, value, errors, callback);
                     }
                 }
             }
         }
 
         if (callback != null) {
-            callback.validated(this, value, parent, errors);
+            callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
 }

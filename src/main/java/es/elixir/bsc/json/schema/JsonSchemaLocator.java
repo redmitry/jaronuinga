@@ -25,6 +25,7 @@
 
 package es.elixir.bsc.json.schema;
 
+import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -42,14 +43,6 @@ public abstract class JsonSchemaLocator {
     public JsonSchemaLocator(final URI uri) {
         this.uri = uri;
     }
-
-    /**
-     * @return a map of json schema objects defined in the locator's URI.
-     * The map keys are the json pointers.
-     */
-    public final Map<String, JsonObject> getSchemas() {
-        return getSchemas(uri);
-    }
     
     public abstract Map<String, JsonObject> getSchemas(URI uri);
     
@@ -64,4 +57,21 @@ public abstract class JsonSchemaLocator {
      * @throws IOException 
      */
     public abstract InputStream getInputStream() throws IOException;
+
+    /**
+     * Implementations may be interested to store all subschemas as an original
+     * JsonObject object
+     * 
+     * @param jsonPointer
+     * @param schema 
+     */
+    public abstract void putSchema(String jsonPointer, JsonObject schema);
+
+    /**
+     * Implementations may be interested to store all subschemas as parsed
+     * JsonSchema object
+     *
+     * @param schema 
+     */    
+    public abstract void putSchema(JsonSchema schema);
 }

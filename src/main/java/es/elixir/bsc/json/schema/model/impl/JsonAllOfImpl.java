@@ -28,10 +28,10 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import javax.json.JsonValue;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 
 /**
  * @author Dmitry Repchevsky
@@ -41,15 +41,15 @@ public class JsonAllOfImpl extends SchemaArrayImpl
                            implements JsonAllOf {
 
     @Override
-    public void validate(JsonValue object, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue object, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         final int nerrors = errors.size();
-        for (JsonSchema schema : this) {
-            schema.validate(object, parent, errors, callback);
+        for (AbstractJsonSchema schema : this) {
+            schema.validate(jsonPointer, object, parent, errors, callback);
         }
         
         if (nerrors != errors.size()) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
-                    ValidationMessage.OBJECT_ALL_OF_CONSTRAINT));
+                    jsonPointer, ValidationMessage.OBJECT_ALL_OF_CONSTRAINT_MSG));
         }
     }
 }

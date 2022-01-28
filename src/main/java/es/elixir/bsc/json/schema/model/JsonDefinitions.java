@@ -31,9 +31,9 @@ import java.util.Map;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonDefinitions extends Iterable<Map.Entry<String, JsonSchema>> {
+public interface JsonDefinitions extends Iterable<Map.Entry<String, AbstractJsonSchema>> {
 
-    JsonSchema get(String name);
-    JsonSchema put(String name, JsonSchema schema);
-    JsonSchema remove(String name);
+    AbstractJsonSchema get(String name);
+    AbstractJsonSchema put(String name, AbstractJsonSchema schema);
+    AbstractJsonSchema remove(String name);
 }
