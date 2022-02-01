@@ -41,6 +41,9 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
     public final static String DEPENDENT_REQUIRED = "dependentRequired";
     public final static String ADDITIONAL_PROPERTIES = "additionalProperties";
     public final static String PROPERTY_NAMES = "propertyNames";
+    public final static String IF = "if";
+    public final static String THEN = "then";
+    public final static String ELSE = "else";
     
     JsonDefinitions getDefinitions();
     JsonProperties getProperties();
@@ -49,5 +52,8 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
     JsonDependentProperties getDependentRequired();
     AbstractJsonSchema getPropertyNames();
     AbstractJsonSchema getAdditionalProperties();
-    Boolean isAdditionalProperties();    
+    Boolean isAdditionalProperties();
+    AbstractJsonSchema getIf();
+    AbstractJsonSchema getThen();
+    AbstractJsonSchema getElse();
 }

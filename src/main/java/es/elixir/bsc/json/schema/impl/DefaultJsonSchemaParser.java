@@ -59,7 +59,9 @@ import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import static es.elixir.bsc.json.schema.model.JsonConst.CONST;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.impl.JsonConstImpl;
 
 /**
  * @author Dmitry Repchevsky
@@ -166,6 +168,14 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             return _enum;
         }
 
+        final JsonValue jconst = object.get(CONST);
+        if (jconst != null) {
+            final JsonConstImpl _const = new JsonConstImpl();
+            _const.read(this, locator, parent, jsonPointer, object, type);
+            locator.putSchema(_const);
+            return _const;
+        }
+        
         if (type == null) {
             final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
             if (jallOf != null) {

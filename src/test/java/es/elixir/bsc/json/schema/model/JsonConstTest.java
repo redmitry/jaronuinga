@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -20,37 +20,32 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
- *****************************************************************************
+ * *****************************************************************************
  */
 
 package es.elixir.bsc.json.schema.model;
 
-import es.elixir.bsc.json.schema.ValidationError;
-import es.elixir.bsc.json.schema.ValidationException;
-import java.util.List;
-import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import java.net.URI;
-import javax.json.JsonValue;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public interface JsonSchema extends JsonSchemaElement {
-    
-    public final static String ID = "id";
-    public final static String TYPE = "type";
-    public final static String TITLE = "title";
-    public final static String DESCRIPTION = "description";
-    
-    URI getId();
-    void setId(URI id);
+public class JsonConstTest extends JsonTest {
 
-    String getJsonPointer();
-    
-    void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
+    private final static String JSON_SCHEMA_FILE = "draft6/schemas/const.json";
 
-    default void validate(JsonValue value, List<ValidationError> errors) {
-        validate(value, errors, null);
+    private final static String JSON_FILE_01 = "draft6/data/const_01.json";
+    private final static String JSON_FILE_02 = "draft6/data/const_02_fail.json";
+
+    @Test
+    public void test_01() {
+        Assert.assertTrue(test(JSON_SCHEMA_FILE, JSON_FILE_01).isEmpty());
+    }
+
+    @Test
+    public void test_02() {
+        Assert.assertFalse(test(JSON_SCHEMA_FILE, JSON_FILE_02).isEmpty());
     }
 }

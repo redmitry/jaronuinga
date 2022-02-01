@@ -49,6 +49,7 @@ import javax.json.Json;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import java.util.ArrayList;
 
 /**
  * @author Dmitry Repchevsky
@@ -65,6 +66,9 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     private Boolean additionalProperties;
     private AbstractJsonSchema additionalPropertiesSchema;
     private AbstractJsonSchema propertyNames;
+    private AbstractJsonSchema _if;
+    private AbstractJsonSchema _then;
+    private AbstractJsonSchema _else;
     
     @Override
     public JsonDefinitions getDefinitions() {
@@ -119,6 +123,21 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     @Override
     public AbstractJsonSchema getPropertyNames() {
         return propertyNames;
+    }
+
+    @Override
+    public AbstractJsonSchema getIf() {
+        return _if;
+    }
+
+    @Override
+    public AbstractJsonSchema getThen() {
+        return _then;
+    }
+
+    @Override
+    public AbstractJsonSchema getElse() {
+        return _else;
     }
 
     @Override
@@ -189,6 +208,21 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                                        value.getValueType().name(), JsonValue.ValueType.OBJECT.name() + " or " + JsonValue.ValueType.ARRAY.name()}));
                 }
             }
+        }
+        
+        final JsonObject jif = JsonSchemaUtil.check(object.get(IF), ValueType.OBJECT);
+        if (jif != null) {
+            _if = parser.parse(locator, this, jsonPointer + IF + "/", jif, type);
+        }
+
+        final JsonObject jelse = JsonSchemaUtil.check(object.get(ELSE), ValueType.OBJECT);
+        if (jelse != null) {
+            _else = parser.parse(locator, this, jsonPointer + ELSE + "/", jelse, type);
+        }
+
+        final JsonObject jthen = JsonSchemaUtil.check(object.get(THEN), ValueType.OBJECT);
+        if (jthen != null) {
+            _then = parser.parse(locator, this, jsonPointer + THEN + "/", jthen, type);
         }
         
         return this;
@@ -272,6 +306,18 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                         }
                     }
                 }
+            }
+        }
+
+        if (_if != null) {
+            final List<ValidationError> err = new ArrayList<>();
+            _if.validate(object, err);
+            if (err.isEmpty()) {
+                if (_then != null) {
+                    _then.validate(jsonPointer, value, parent, errors, callback);
+                }
+            } else if (_else != null) {
+                _else.validate(jsonPointer, value, parent, errors, callback);
             }
         }
 

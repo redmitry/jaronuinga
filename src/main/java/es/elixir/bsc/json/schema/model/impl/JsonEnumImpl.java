@@ -37,6 +37,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import java.io.StringReader;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -80,14 +81,10 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
             List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
-        if (value.getValueType() == JsonValue.ValueType.ARRAY || 
-            value.getValueType() == JsonValue.ValueType.OBJECT) {
+        if (values == null || !values.contains(value)) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.ENUM_INVALID_VALUE_TYPE_MSG, value.getValueType().name()));
-        } else if (values == null || !values.contains(value)) {
-            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.ENUM_INVALID_VALUE_MSG, value.toString(), values.toString()));
-         
+                    ValidationMessage.ENUM_INVALID_VALUE_MSG, value.toString(), 
+                    values == null ? "" : values.toString()));
         }
         
         super.validate(jsonPointer, value, parent, errors, callback);

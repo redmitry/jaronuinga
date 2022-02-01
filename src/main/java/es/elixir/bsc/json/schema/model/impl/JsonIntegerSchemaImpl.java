@@ -92,7 +92,7 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
             callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
-
+    
     public void validate(String jsonPointer, BigInteger num, List<ValidationError> errors) {
         if (minimum != null) {
             if (exclusiveMinimum != null && exclusiveMinimum) {

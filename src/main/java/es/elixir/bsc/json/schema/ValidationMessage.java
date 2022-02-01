@@ -38,6 +38,7 @@ public enum ValidationMessage {
     STRING_EXPECTED_MSG(STRING_EXPECTED, "string expected, found: %s"),
     NUMBER_EXPECTED_MSG(NUMBER_EXPECTED, "number expected, found: %s"),
     BOOLEAN_EXPECTED_MSG(BOOLEAN_EXPECTED, "boolean expected, found: %s"),
+    NULL_EXPECTED_MSG(NULL_EXPECTED, "null expected, found: %s"),
     
     OBJECT_REQUIRED_PROPERTY_CONSTRAINT_MSG(OBJECT_REQUIRED_PROPERTY_CONSTRAINT, "object missed required property: %s"),
     OBJECT_DEPENDENT_REQUIRED_CONSTRAINT_MSG(OBJECT_DEPENDENT_REQUIRED_CONSTRAINT, "object missed required dependent property: %s"),
@@ -71,7 +72,9 @@ public enum ValidationMessage {
     INTEGER_MAX_CONSTRAINT_MSG(INTEGER_MAX_CONSTRAINT, "value = %d %s integer.maximum = %d"),
     
     ENUM_INVALID_VALUE_TYPE_MSG(ENUM_INVALID_VALUE_TYPE, "invalid value type for enum: %s"),
-    ENUM_INVALID_VALUE_MSG(ENUM_INVALID_VALUE, "value = %s enum.values = %s");
+    ENUM_INVALID_VALUE_MSG(ENUM_INVALID_VALUE, "value = %s enum.values = %s"),
+    
+    CONST_CONSTRAINT_MSG(CONST_CONSTRAINT, "value = %s doesn't match const %s");
     
     public final int CODE;
     public final String VALUE;

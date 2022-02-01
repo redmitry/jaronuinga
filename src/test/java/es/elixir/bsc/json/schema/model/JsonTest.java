@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.Json;
-import javax.json.JsonStructure;
+import javax.json.JsonValue;
 import org.junit.Assert;
 
 /**
@@ -54,7 +54,7 @@ public class JsonTest {
             URL url = JsonTest.class.getClassLoader().getResource(fschema);
             
             JsonSchema schema = JsonSchemaReader.getReader().read(url);
-            JsonStructure json = Json.createReader(in).read();
+            JsonValue json = Json.createReader(in).readValue();
             
             schema.validate(json, errors);
         } catch (IOException | JsonSchemaException ex) {

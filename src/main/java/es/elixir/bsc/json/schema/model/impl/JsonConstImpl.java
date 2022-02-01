@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,52 +27,60 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
+import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
-import es.elixir.bsc.json.schema.model.JsonNullSchema;
+import es.elixir.bsc.json.schema.ValidationMessage;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonConst;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.List;
 import javax.json.JsonObject;
-import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import es.elixir.bsc.json.schema.ValidationMessage;
-import es.elixir.bsc.json.schema.model.JsonType;
-import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonNullSchemaImpl extends PrimitiveSchemaImpl
-                                implements JsonNullSchema {
+public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
+
+    private JsonValue value;
+    
+    @Override
+    public JsonValue getValue() {
+        return value;
+    }
 
     @Override
-    public JsonNullSchemaImpl read(final JsonSubschemaParser parser, 
-                                   final JsonSchemaLocator locator,
-                                   final JsonSchemaElement parent,
-                                   final String jsonPointer, 
-                                   final JsonObject object,
-                                   final JsonType type) throws JsonSchemaException {
+    public void setValue(JsonValue value) {
+        this.value = value;
+    }
+    
+    @Override
+    public JsonConstImpl read(final JsonSubschemaParser parser, 
+                             final JsonSchemaLocator locator,
+                             final JsonSchemaElement parent,
+                             final String jsonPointer, 
+                             final JsonObject object,
+                             final JsonType type) throws JsonSchemaException {
 
         super.read(parser, locator, parent, jsonPointer, object, type);
-
+        
+        value = object.get(CONST);
+        
         return this;
     }
 
     @Override
-    public void validate(final String jsonPointer, 
-                         final JsonValue value,
-                         final JsonValue parent,
-                         final List<ValidationError> errors, 
-                         final JsonSchemaValidationCallback<JsonValue> callback) {
+    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
         
-        if (JsonValue.NULL.getValueType() != value.getValueType()) {
+        if (this.value == null || !this.value.equals(value)) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.NULL_EXPECTED_MSG, value.getValueType().name()));
-            return;
+                    ValidationMessage.CONST_CONSTRAINT_MSG, value.toString(), 
+                    this.value == null ? "" : this.value.toString()));
         }
-
-        if (callback != null) {
-            callback.validated(this, jsonPointer, value, parent, errors);
-        }
+        
+        super.validate(jsonPointer, value, parent, errors, callback);
     }
 }

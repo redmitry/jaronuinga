@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -25,32 +25,16 @@
 
 package es.elixir.bsc.json.schema.model;
 
-import es.elixir.bsc.json.schema.ValidationError;
-import es.elixir.bsc.json.schema.ValidationException;
-import java.util.List;
-import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import java.net.URI;
 import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public interface JsonSchema extends JsonSchemaElement {
-    
-    public final static String ID = "id";
-    public final static String TYPE = "type";
-    public final static String TITLE = "title";
-    public final static String DESCRIPTION = "description";
-    
-    URI getId();
-    void setId(URI id);
+public interface JsonConst extends AbstractJsonSchema {
 
-    String getJsonPointer();
+    public final static String CONST = "const";
     
-    void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
-
-    default void validate(JsonValue value, List<ValidationError> errors) {
-        validate(value, errors, null);
-    }
+    JsonValue getValue();
+    void setValue(JsonValue value);
 }
