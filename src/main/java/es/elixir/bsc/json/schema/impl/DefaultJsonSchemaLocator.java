@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -30,10 +30,16 @@ import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonException;
 import javax.json.JsonObject;
+import javax.json.JsonPointer;
+import javax.json.JsonReader;
+import javax.json.JsonReaderFactory;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -41,41 +47,67 @@ import javax.json.JsonObject;
     
 public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
-    // there could be many schemas with the same ID
-    protected final Map<URI, Map<String, JsonObject>> schemas;
+    protected final Map<URI, JsonObject> schemas;
 
     public DefaultJsonSchemaLocator(final URI uri) {
         this(uri, new HashMap<>());
     }
     
     protected DefaultJsonSchemaLocator(final URI uri, 
-                                       final Map<URI, Map<String, JsonObject>> schemas) {
+                                       final Map<URI, JsonObject> schemas) {
         super(uri);
         this.schemas = schemas;
     }
 
     @Override
-    public Map<String, JsonObject> getSchemas(final URI uri) {
-        Map<String, JsonObject> map = schemas.get(uri);
-        if (map == null) {
-            schemas.put(uri, map = new LinkedHashMap<>());
+    public void setSchema(final JsonObject schema) {
+        schemas.put(uri, schema);
+    }
+
+    @Override
+    public JsonObject getSchema(final String jsonPointer) 
+            throws IOException, JsonException {
+        return getSchema(this.uri, jsonPointer);
+    }
+
+    @Override
+    public JsonObject getSchema(final URI uri, final String jsonPointer)
+            throws IOException, JsonException {
+        
+        JsonObject schema = schemas.get(uri);
+        if (schema == null) {
+            final JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);
+            try (InputStream in = uri.toURL().openStream()){
+                final JsonReader reader = factory.createReader(in);
+                final JsonValue val = reader.readValue();
+
+                if (JsonValue.ValueType.OBJECT == val.getValueType()) {
+                    schema = val.asJsonObject();
+                }
+                setSchema(schema);
+            }
         }
-        return map;
+
+        if ("/".endsWith(jsonPointer)) {
+            return schema;
+        }
+        
+        final JsonPointer pointer = Json.createPointer(jsonPointer);
+        
+        // there is a bug as containsValue() rises an exception when not found. 
+        if (pointer.containsValue(schema)) {
+            final JsonValue subschema = pointer.getValue(schema);
+            if (JsonValue.ValueType.OBJECT == subschema.getValueType()) {
+                return subschema.asJsonObject();
+            }
+        }
+
+        return null;
     }
 
     @Override
     public JsonSchemaLocator resolve(final URI uri) {
         return new DefaultJsonSchemaLocator(super.uri.resolve(uri), schemas);
-    }
-
-    @Override
-    public InputStream getInputStream() throws IOException {
-        return uri.toURL().openStream();
-    }
-    
-    @Override
-    public void putSchema(String jsonPointer, JsonObject schema) {
-        
     }
     
     @Override

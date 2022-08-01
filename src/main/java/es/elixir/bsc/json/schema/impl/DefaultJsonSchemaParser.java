@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,11 +27,9 @@ package es.elixir.bsc.json.schema.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaReader;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import static es.elixir.bsc.json.schema.model.JsonEnum.ENUM;
-import es.elixir.bsc.json.schema.model.JsonObjectSchema;
 import static es.elixir.bsc.json.schema.model.JsonSchema.TYPE;
 import es.elixir.bsc.json.schema.model.JsonType;
 import static es.elixir.bsc.json.schema.model.PrimitiveSchema.ALL_OF;
@@ -52,7 +50,6 @@ import es.elixir.bsc.json.schema.model.impl.JsonOneOfImpl;
 import es.elixir.bsc.json.schema.model.impl.JsonSchemaUtil;
 import es.elixir.bsc.json.schema.model.impl.JsonStringSchemaImpl;
 import java.net.URI;
-import java.util.Map;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonString;
@@ -60,8 +57,12 @@ import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import static es.elixir.bsc.json.schema.model.JsonConst.CONST;
+import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.impl.JsonConstImpl;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import javax.json.JsonException;
 
 /**
  * @author Dmitry Repchevsky
@@ -81,68 +82,79 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                                     String jsonPointer, 
                                     JsonObject object,
                                     JsonType type) throws JsonSchemaException {
-        
-        JsonValue ref = object.get("$ref");
-        if (ref != null) {
-            if (JsonValue.ValueType.STRING != ref.getValueType()) {
+
+        if (locator == null) {
+            locator = this.locator;
+        }
+
+        JsonValue id = object.get(JsonSchema.ID);
+        if (id == null) {
+            id = object.get("id"); // draft4
+        } 
+
+        if (id != null) {
+            if (id.getValueType() != JsonValue.ValueType.STRING) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                       new Object[] {"$ref", ref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+                   new Object[] {"id", id.getValueType().name(), JsonValue.ValueType.STRING.name()}));
             }
 
-            String value = ((JsonString)ref).getString();
+            final String value = ((JsonString)id).getString();
 
             try {
-                final int idx_fragment = value.indexOf("#/" + JsonObjectSchema.DEFINITIONS + "/");
-                if (idx_fragment > 0) {
-                    final URI uri = URI.create(value);
-                    locator = locator.resolve(uri);
-                    JsonSchemaReader.getReader().read(locator);
-                    value = value.substring(idx_fragment);
-                } else if (idx_fragment < 0) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                                  new Object[] {value}));                    
-                }
-                final Map<String, JsonObject> jsubschemas = locator.getSchemas(locator.uri);
-                if (jsubschemas == null) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.CRITICAL_PARSING_ERROR, null));
-                }
-
-                final JsonObject jsubschema = jsubschemas.get(value);
-                if (jsubschema != null) {
-                    return parse(locator, parent, value, jsubschema, type);
-                }
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE,
-                                              new Object[] {value}));
+                locator = locator.resolve(URI.create(value));
+                locator.setSchema(object);
             } catch(IllegalArgumentException ex) {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
                                               new Object[] {value}));
             }
         }
 
+        JsonValue jref = object.get("$ref");
+        if (jref != null) {
+            if (JsonValue.ValueType.STRING != jref.getValueType()) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                       new Object[] {"$ref", jref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+            }
 
-        if (locator == null) {
-            locator = this.locator;
-        } else {
-            // subschema (not root)
-            JsonValue id = object.get("id");
-            if (id != null) {
-                if (id.getValueType() != JsonValue.ValueType.STRING) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                       new Object[] {"id", id.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+            String ref = ((JsonString)jref).getString();
+
+            try {
+                JsonObject jsubschema;
+                AbstractJsonSchema schema;
+                final String ref_pointer;
+                final JsonSchemaLocator ref_locator;
+                final URI uri = URI.create(ref);
+                final String fragment = uri.getFragment();
+                if (fragment == null) {
+                    ref_pointer = "/";
+                    ref_locator = locator.resolve(uri);
+                } else {
+                    ref_pointer = fragment.replaceAll("/$", "");
+                    if (ref.startsWith("#")) {
+                        ref_locator = locator;
+                    } else {
+                        ref_locator = locator.resolve(
+                            new URI(uri.getScheme(), uri.getUserInfo(), 
+                                    uri.getHost(), uri.getPort(), uri.getPath(), 
+                                    null, null));                        
+                    }
                 }
-
-                final String value = ((JsonString)id).getString();
-
-                try {
-                    locator = locator.resolve(URI.create(value));
-                } catch(IllegalArgumentException ex) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                                  new Object[] {value}));
+                
+                jsubschema = ref_locator.getSchema(ref_pointer);
+                if (jsubschema == null) {
+                    throw new JsonSchemaException(
+                            new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, new Object[] {ref}));
                 }
+                    
+                schema = parse(ref_locator, parent, "/".equals(ref_pointer) ? ref_pointer : ref_pointer + "/", jsubschema, type);
+
+                locator.putSchema(schema);
+                return schema;
+            } catch(IOException | JsonException | IllegalArgumentException | URISyntaxException ex) {
+                throw new JsonSchemaException(
+                        new ParsingError(ParsingMessage.INVALID_REFERENCE, new Object[] {ref}));
             }
         }
-
-        locator.putSchema(jsonPointer, object);
         
         final JsonValue value = object.get(TYPE);
         final ValueType vtype;

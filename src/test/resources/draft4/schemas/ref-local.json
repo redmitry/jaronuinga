@@ -1,0 +1,15 @@
+{
+  "$comment": "validates local reference",
+  "type": "object",
+  "properties": {
+    "gender": {
+      "$ref": "#/definitions/Gender"
+    }
+  },
+  "definitions": {
+    "Gender": {
+      "type": "string",
+      "enum": ["male", "female"]
+    }
+  }
+}

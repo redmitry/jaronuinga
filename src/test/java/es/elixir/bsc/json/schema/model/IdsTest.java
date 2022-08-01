@@ -28,11 +28,13 @@ package es.elixir.bsc.json.schema.model;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaReader;
 import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.JsonException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,12 +54,11 @@ public class IdsTest {
             URL url = IdsTest.class.getClassLoader().getResource(JSON_SCHEMA_FILE);
             DefaultJsonSchemaLocator locator = new DefaultJsonSchemaLocator(url.toURI());
             JsonSchema schema = JsonSchemaReader.getReader().read(locator);
-            
-            URI other = schema.getId().resolve(JSON_OTHER_SCHEMA_ID);
-            
-            Assert.assertFalse("unresolved " + JSON_OTHER_SCHEMA_ID, locator.getSchemas(other).isEmpty());
 
-        } catch (JsonSchemaException | URISyntaxException ex) {
+            URI other = schema.getId().resolve(JSON_OTHER_SCHEMA_ID);
+            Assert.assertNotNull("unresolved " + JSON_OTHER_SCHEMA_ID, locator.getSchema(other, "/"));
+
+        } catch (JsonSchemaException | URISyntaxException | IOException | JsonException ex) {
             Logger.getLogger(IdsTest.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }

@@ -27,9 +27,8 @@ package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.Map;
+import javax.json.JsonException;
 import javax.json.JsonObject;
 
 /**
@@ -44,28 +43,46 @@ public abstract class JsonSchemaLocator {
         this.uri = uri;
     }
     
-    public abstract Map<String, JsonObject> getSchemas(URI uri);
-    
+    /**
+     * Set Json Schema Object for this location.
+     * There are cases were the location URI doesn't resolve the schema, but
+     * is used as an identifier ('id' or '$id").
+     * 
+     * @param schema the schema to associate with this locator (URI).
+     */
+    public abstract void setSchema(JsonObject schema);
+
+    /**
+     * Get Json Schema Object associated with this locator.
+     * 
+     * @param jsonPointer Json Pointer that points to the (sub)schema ("/" for the root)
+     * @return Json Object that corresponds to the Json Schema found by this locator
+     * 
+     * @throws IOException
+     * @throws JsonException 
+     */
+    public abstract JsonObject getSchema(String jsonPointer)
+            throws IOException, JsonException;
+
+    /**
+     * Get Json Schema Object found by this and all related locators.
+     * 
+     * @param uri URI of the locator (not necessary resolvable URI location)
+     * @param jsonPointer Json Pointer that points to the (sub)schema ("/" for the root)
+     * 
+     * @return found Json Schema Object or null
+     * 
+     * @throws IOException
+     * @throws JsonException 
+     */
+    public abstract JsonObject getSchema(URI uri, String jsonPointer)
+            throws IOException, JsonException;
+
     /**
      * @param uri the URI to be resolved in a context this locator.
      * @return new locator that is able to return Json Schema.
      */
     public abstract JsonSchemaLocator resolve(URI uri);
-    
-    /**
-     * @return the input stream for the Json Schema located by this locator
-     * @throws IOException 
-     */
-    public abstract InputStream getInputStream() throws IOException;
-
-    /**
-     * Implementations may be interested to store all subschemas as an original
-     * JsonObject object
-     * 
-     * @param jsonPointer
-     * @param schema 
-     */
-    public abstract void putSchema(String jsonPointer, JsonObject schema);
 
     /**
      * Implementations may be interested to store all subschemas as parsed

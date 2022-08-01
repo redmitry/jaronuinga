@@ -1,0 +1,9 @@
+{
+  "$comment": "validates local reference",
+  "type": "object",
+  "properties": {
+    "gender": {
+      "$ref": "ref-local.json#/definitions/Gender"
+    }
+  }
+}

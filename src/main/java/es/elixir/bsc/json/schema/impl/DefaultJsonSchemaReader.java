@@ -32,17 +32,13 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import javax.json.Json;
-import javax.json.JsonReader;
-import javax.json.JsonReaderFactory;
-import javax.json.JsonValue;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import javax.json.JsonException;
+import javax.json.JsonObject;
 
 /**
  * @author Dmitry Repchevsky
@@ -70,21 +66,18 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     public JsonSchema read(final JsonSchemaLocator locator) throws JsonSchemaException {
         JsonSchema schema = schemas.get(locator.uri);
         if (schema == null) {
-            JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);
-
-            try (InputStream in = locator.getInputStream()){
-                final JsonReader reader = factory.createReader(in);
-                final JsonValue val = reader.readValue();
-
-                if (JsonValue.ValueType.OBJECT != val.getValueType()) {
-                    throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_OBJECT_TYPE, 
-                        new Object[] {"root object", val.getValueType().name(), JsonValue.ValueType.OBJECT.toString()}));
-                }
-                schema = new DefaultJsonSchemaParser(locator).parse(null, "/", val.asJsonObject());
-                schemas.put(locator.uri, schema);
+            final JsonObject obj;
+            try {
+                obj = locator.getSchema("/");
             } catch (IOException ex) {
-                throw new JsonSchemaException(new ParsingError(ex.getMessage()));
+                throw new JsonSchemaException(
+                        new ParsingError(ParsingMessage.UNRESOLVABLE_SCHEMA, new Object[] {locator.uri}));
+            } catch (JsonException ex) {
+                throw new JsonSchemaException(
+                        new ParsingError(ParsingMessage.JSON_PARSING_ERROR, new Object[] {ex.getMessage()}));
             }
+            schema = new DefaultJsonSchemaParser(locator).parse(null, "/", obj);
+            schemas.put(locator.uri, schema);
         }
         return schema;
     }

@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonDefinitions;
-import es.elixir.bsc.json.schema.model.JsonObjectSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -80,7 +79,6 @@ public class JsonDefinitionsImpl extends LinkedHashMap<String, AbstractJsonSchem
             
             final AbstractJsonSchema schema = parser.parse(locator, parent, jsonPointer + entry.getKey() + "/", value.asJsonObject(), null);
 
-            locator.getSchemas(locator.uri).put("#/" + JsonObjectSchema.DEFINITIONS + "/" + entry.getKey(), value.asJsonObject());
             put(entry.getKey(), schema);
         }
         

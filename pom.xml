@@ -8,8 +8,21 @@
 
     <groupId>es.elixir.bsc.json.schema</groupId>
     <artifactId>jaronuinga</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.6</version>
     <packaging>jar</packaging>
+
+    <organization>
+        <name>Barcelona Supercomputing Center</name>
+        <url>https://www.bsc.es/</url>
+    </organization>
+
+    <licenses>
+      <license>
+        <name>LGPL-2.1-or-later</name>
+        <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
 
     <developers>
         <developer>

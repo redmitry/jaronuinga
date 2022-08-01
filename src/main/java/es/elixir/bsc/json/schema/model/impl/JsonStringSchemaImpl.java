@@ -169,7 +169,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
             callback.validated(this, jsonPointer, value, parent, errors);
         }
     }
-
+    
     private void validate(String jsonPointer, String string, List<ValidationError> errors) {
         
         if (minLength != null && string.length() < minLength) {

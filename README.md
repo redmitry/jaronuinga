@@ -7,7 +7,7 @@ import via maven:
   <dependency>
     <groupId>es.elixir.bsc.json.schema</groupId>
     <artifactId>jaronuinga</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.6</version>
   </dependency>
 ...
 <repositories>

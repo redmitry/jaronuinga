@@ -31,15 +31,16 @@ package es.elixir.bsc.json.schema;
 
 public enum ParsingMessage {
     
-    CRITICAL_PARSING_ERROR(1, "critical parsing error."),
-    INVALID_ATTRIBUTE_TYPE(2, "invalid attribute type: '%s': '%s' (must be '%s')."),
-    MISSED_ATTRIBUTE(3, "mandatory attribute missed: '%s'."),
-    INVALID_OBJECT_TYPE(4, "invalid object type: %s type '%s' (must be '%s')."),
-    UNKNOWN_OBJECT_TYPE(5, "unknown object type: '%s'."),
-    INVALID_REFERENCE(6, "invalid reference: '$ref': '%s'."),
-    UNRESOLVABLE_REFERENCE(7, "unable to resolve reference. '$ref': '%s'."),
-    CONSTRAINT_ERROR(8, "%s constraint: '%s' '%s."),
-    EMPTY_ENUM(9, "empty enum.");
+    UNRESOLVABLE_SCHEMA(1, "failed to resolve schema: '%s'"),
+    JSON_PARSING_ERROR(2, "json parsing error: '%s'"),
+    INVALID_ATTRIBUTE_TYPE(3, "invalid attribute type: '%s': '%s' (must be '%s')."),
+    MISSED_ATTRIBUTE(4, "mandatory attribute missed: '%s'."),
+    INVALID_OBJECT_TYPE(5, "invalid object type: %s type '%s' (must be '%s')."),
+    UNKNOWN_OBJECT_TYPE(6, "unknown object type: '%s'."),
+    INVALID_REFERENCE(7, "invalid reference: '$ref': '%s'."),
+    UNRESOLVABLE_REFERENCE(8, "unable to resolve reference. '$ref': '%s'."),
+    CONSTRAINT_ERROR(9, "%s constraint: '%s' '%s."),
+    EMPTY_ENUM(10, "empty enum.");
     
     public final int CODE;
     public final String VALUE;

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -23,30 +23,35 @@
  *****************************************************************************
  */
 
-package es.elixir.bsc.json.schema.ext;
+package es.elixir.bsc.json.schema.model;
 
-import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
-import java.net.URI;
-import java.util.Map;
-import javax.json.JsonObject;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public abstract class ExtendedJsonSchemaLocator extends DefaultJsonSchemaLocator {
+public class JsonSchemaReferenceTest extends JsonTest {
     
-    public ExtendedJsonSchemaLocator(URI uri) {
-        super(uri);
+    private final static String JSON_SCHEMA_LOCAL_REFERENCE_FILE = "draft4/schemas/ref-local.json";
+    private final static String JSON_SCHEMA_EXTERNAL_REFERENCE_FILE = "draft4/schemas/ref-external.json";
+    private final static String JSON_SCHEMA_EXTERNAL_FRAGMENT_REFERENCE_FILE = "draft4/schemas/ref-external-fragment.json";
+    
+    private final static String JSON_FILE = "draft4/data/ref.json";
+    
+    @Test
+    public void test_01() {
+        Assert.assertTrue(test(JSON_SCHEMA_LOCAL_REFERENCE_FILE, JSON_FILE).isEmpty());
     }
     
-    protected ExtendedJsonSchemaLocator(final URI uri, 
-                                        final Map<URI, Map<String, JsonObject>> schemas) {
-        super(uri, schemas);
+    @Test
+    public void test_02() {
+        Assert.assertTrue(test(JSON_SCHEMA_EXTERNAL_REFERENCE_FILE, JSON_FILE).isEmpty());
     }
-
-    @Override
-    public void putSchema(String jsonPointer, JsonObject schema) {
-        super.getSchemas(uri).put(jsonPointer, schema);
+    
+    @Test
+    public void test_03() {
+        Assert.assertTrue(test(JSON_SCHEMA_EXTERNAL_FRAGMENT_REFERENCE_FILE, JSON_FILE).isEmpty());
     }
 }
