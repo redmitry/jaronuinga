@@ -34,9 +34,9 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonConst;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
-import java.util.List;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import java.util.List;
 
 /**
  * @author Dmitry Repchevsky
@@ -58,11 +58,11 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
     
     @Override
     public JsonConstImpl read(final JsonSubschemaParser parser, 
-                             final JsonSchemaLocator locator,
-                             final JsonSchemaElement parent,
-                             final String jsonPointer, 
-                             final JsonObject object,
-                             final JsonType type) throws JsonSchemaException {
+                              final JsonSchemaLocator locator,
+                              final JsonSchemaElement parent,
+                              final String jsonPointer, 
+                              final JsonObject object,
+                              final JsonType type) throws JsonSchemaException {
 
         super.read(parser, locator, parent, jsonPointer, object, type);
         
@@ -72,15 +72,17 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
     }
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (this.value == null || !this.value.equals(value)) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.CONST_CONSTRAINT_MSG, value.toString(), 
                     this.value == null ? "" : this.value.toString()));
+            return false;
         }
         
-        super.validate(jsonPointer, value, parent, errors, callback);
-    }
+        return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
+    }    
 }

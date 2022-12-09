@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective

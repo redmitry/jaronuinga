@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -30,19 +30,19 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonArraySchema;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
-import javax.json.JsonNumber;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -119,14 +119,14 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         }
         
         if (jitems instanceof JsonObject) {
-            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + ITEMS + "/", jitems.asJsonObject(), type);
+            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + ITEMS, jitems.asJsonObject(), type);
             getItems().add(schema);
         } else if (jitems instanceof JsonArray) {
             additionalItems = true;
             for (int i = 0, n = jitems.asJsonArray().size(); i < n; i++) {
                 final JsonValue value = jitems.asJsonArray().get(i);
                 final JsonObject o = JsonSchemaUtil.check(value, JsonValue.ValueType.OBJECT);
-                final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + Integer.toString(i) + "/", o, type);
+                final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + Integer.toString(i), o, type);
                 getItems().add(schema);                
             }
         } else {
@@ -138,7 +138,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (jadditionalItems != null) {
             switch(jadditionalItems.getValueType()) {
                 case OBJECT: additionalItems = null;
-                             additionalItemsSchema = parser.parse(locator, this, jsonPointer + ADDITIONAL_ITEMS + "/", jadditionalItems.asJsonObject(), type);
+                             additionalItemsSchema = parser.parse(locator, this, jsonPointer + "/" + ADDITIONAL_ITEMS, jadditionalItems.asJsonObject(), type);
                              break;
                 case TRUE:   additionalItems = true; break;
                 case FALSE:  additionalItems = false; break;
@@ -151,15 +151,18 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) {
 
         if (value.getValueType() != JsonValue.ValueType.ARRAY) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer, 
                     ValidationMessage.ARRAY_EXPECTED_MSG, value.getValueType().name()));
-            return;
+            return false;
         }
 
+        final int nerrors = errors.size();
+        
         final JsonArray array = value.asJsonArray();
 
         if (minItems != null && array.size() < minItems) {
@@ -178,12 +181,12 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 final AbstractJsonSchema schema = items.get(0);
                 for (int i = 0, n = array.size(); i < n; i++) {
                     final JsonValue val = array.get(i);
-                    schema.validate(jsonPointer + i + "/", val, value, errors, callback);
+                    schema.validate(jsonPointer + "/" + i, val, value, null, errors, callback);
                 }
             } else if (array.size() <= items.size()) {
                 for (int i = 0, n = array.size(); i < n; i++) {
                     final JsonValue val = array.get(i);
-                    items.get(i).validate(jsonPointer + i + "/", val, value, errors, callback);
+                    items.get(i).validate(jsonPointer + "/" + i, val, value, null, errors, callback);
                 }
             } else if (Boolean.FALSE.equals(additionalItems)) {
                 errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
@@ -191,13 +194,13 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
             } else {
                 for (int i = 0, n = items.size(); i < n; i++) {
                     final JsonValue val = array.get(i);
-                    items.get(i).validate(jsonPointer + i + "/", val, value, errors, callback);
+                    items.get(i).validate(jsonPointer + "/" + i, val, value, null, errors, callback);
                 }
 
                 if (additionalItemsSchema != null) {
                     for (int i = items.size(), n = array.size(); i < n; i++) {
                         final JsonValue val = array.get(i);
-                        additionalItemsSchema.validate(jsonPointer + i + "/", val, value, errors, callback);
+                        additionalItemsSchema.validate(jsonPointer + "/" + i, val, value, null, errors, callback);
                     }
                 }
             }
@@ -206,5 +209,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (callback != null) {
             callback.validated(this, jsonPointer, value, parent, errors);
         }
+        
+        return nerrors == errors.size();
     }
 }

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -36,13 +36,13 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonString;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -60,7 +60,7 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
         
         this.id = locator.uri;
         this.parent = parent;
-        this.jsonPointer = jsonPointer;
+        this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
         
         if (types == null) {
             for (JsonType val : JsonType.values()) {
@@ -91,20 +91,21 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
     }
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) {
         
         List<ValidationError> err = new ArrayList<>();
         for (AbstractJsonSchema schema : this) {
-            final int nerrors = err.size();
-            schema.validate(jsonPointer, value, parent, err, callback);
-            if (nerrors == err.size()) {
-                return; // found the schema that matches
+            if (schema.validate(jsonPointer, value, parent, evaluated, err, callback)) {
+                return true; // found the schema that matches
             }
         }
 
         errors.addAll(err);
         errors.add(new ValidationError(getId(), getJsonPointer(), 
                 jsonPointer, ValidationMessage.OBJECT_ANY_OF_CONSTRAINT_MSG));
+        
+        return false;
     }
 }

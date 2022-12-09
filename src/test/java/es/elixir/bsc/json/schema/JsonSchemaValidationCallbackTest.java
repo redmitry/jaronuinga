@@ -27,6 +27,9 @@ package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import javax.json.Json;
+import javax.json.JsonStructure;
+import javax.json.JsonValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -35,9 +38,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.Json;
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
 import org.junit.Assert;
 import org.junit.Test;
 

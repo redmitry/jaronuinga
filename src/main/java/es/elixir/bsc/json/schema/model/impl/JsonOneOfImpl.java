@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,8 +31,8 @@ import es.elixir.bsc.json.schema.model.JsonOneOf;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -42,16 +42,15 @@ public class JsonOneOfImpl extends SchemaArrayImpl
                            implements JsonOneOf {
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) {
 
         int matches = 0;
         
         final List<ValidationError> err = new ArrayList<>();
         for (AbstractJsonSchema schema : this) {
-            final int nerrors = err.size();
-            schema.validate(jsonPointer, value, parent, err, callback);
-            if (nerrors == err.size()) {
+            if (schema.validate(jsonPointer, value, parent, null, err, callback)) {
                 matches++;
             }
         }
@@ -63,6 +62,9 @@ public class JsonOneOfImpl extends SchemaArrayImpl
             errors.addAll(err);
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.OBJECT_ONE_OF_CONSTRAINT_MSG));
+            return false;
         }
+        
+        return true;
     }
 }

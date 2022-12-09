@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -40,6 +40,8 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
     public final static String DEPENDENT_SCHEMAS = "dependentSchemas";
     public final static String DEPENDENT_REQUIRED = "dependentRequired";
     public final static String ADDITIONAL_PROPERTIES = "additionalProperties";
+    public final static String PATTERN_PROPERTIES = "patternProperties";
+    public final static String UNEVALUATED_PROPERTIES = "unevaluatedProperties";
     public final static String PROPERTY_NAMES = "propertyNames";
     public final static String IF = "if";
     public final static String THEN = "then";
@@ -53,6 +55,9 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
     AbstractJsonSchema getPropertyNames();
     AbstractJsonSchema getAdditionalProperties();
     Boolean isAdditionalProperties();
+    JsonProperties getPatternProperties();
+    AbstractJsonSchema getUnevaluatedProperties();
+    Boolean isUnevaluatedProperties();
     AbstractJsonSchema getIf();
     AbstractJsonSchema getThen();
     AbstractJsonSchema getElse();

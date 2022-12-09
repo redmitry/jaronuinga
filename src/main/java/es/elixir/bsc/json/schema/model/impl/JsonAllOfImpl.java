@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -30,8 +30,9 @@ import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import javax.json.JsonValue;
+import java.util.ArrayList;
 
 /**
  * @author Dmitry Repchevsky
@@ -41,15 +42,28 @@ public class JsonAllOfImpl extends SchemaArrayImpl
                            implements JsonAllOf {
 
     @Override
-    public void validate(String jsonPointer, JsonValue object, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public boolean validate(String jsonPointer, JsonValue object, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) {
+
         final int nerrors = errors.size();
+        
         for (AbstractJsonSchema schema : this) {
-            schema.validate(jsonPointer, object, parent, errors, callback);
+            if (evaluated == null) {
+                schema.validate(jsonPointer, object, parent, null, errors, callback);
+            } else {
+                final List<String> properties = new ArrayList();
+                if (schema.validate(jsonPointer, object, parent, properties, errors, callback)) {
+                    evaluated.addAll(properties);
+                }
+            }
         }
         
         if (nerrors != errors.size()) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
                     jsonPointer, ValidationMessage.OBJECT_ALL_OF_CONSTRAINT_MSG));
         }
+        
+        return nerrors == errors.size();
     }
 }

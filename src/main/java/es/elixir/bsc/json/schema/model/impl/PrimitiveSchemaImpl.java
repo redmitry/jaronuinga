@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -30,11 +30,7 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
-import java.net.URI;
 import java.util.List;
-import javax.json.JsonObject;
-import javax.json.JsonString;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
 import es.elixir.bsc.json.schema.model.JsonAnyOf;
@@ -44,6 +40,9 @@ import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 
 /**
  * Primitive empty Json Schema of any type ("object", "array", "string", etc.)
@@ -51,11 +50,8 @@ import javax.json.JsonArray;
  * @author Dmitry Repchevsky
  */
 
-public class PrimitiveSchemaImpl implements PrimitiveSchema {
-    
-    private URI id;
-    private JsonSchemaElement parent;
-    private String jsonPointer;
+public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
+        implements PrimitiveSchema {
 
     private String title;
     private String description;
@@ -64,32 +60,6 @@ public class PrimitiveSchemaImpl implements PrimitiveSchema {
     private JsonAnyOfImpl anyOf;
     private JsonOneOfImpl oneOf;
     private JsonNotImpl not;
-    
-    @Override
-    public URI getId() {
-        return id;
-    }
-    
-    @Override
-    public void setId(URI id) {
-        this.id = id;
-    }
-
-    @Override
-    public JsonSchemaElement getParent() {
-        return parent;
-    }
-
-    /**
-     * Returns Json Pointer to locate Json Schema object in the Json Schema document.
-     * The pointer is relative to the schema id.
-     * 
-     * @return Json Pointer to this schema
-     */
-    @Override
-    public String getJsonPointer() {
-        return jsonPointer;
-    }
     
     public String getTitle() {
         return title;
@@ -127,6 +97,7 @@ public class PrimitiveSchemaImpl implements PrimitiveSchema {
         return not;
     }
 
+    @Override
     public PrimitiveSchemaImpl read(final JsonSubschemaParser parser, 
                                     final JsonSchemaLocator locator,
                                     final JsonSchemaElement parent,
@@ -134,10 +105,7 @@ public class PrimitiveSchemaImpl implements PrimitiveSchema {
                                     final JsonObject object, 
                                     final JsonType type) throws JsonSchemaException {
 
-        this.parent = parent;
-        this.jsonPointer = jsonPointer;
-        
-        id = locator.uri;
+        super.read(parser, locator, parent, jsonPointer, object, type);
 
         final JsonString jtitle = JsonSchemaUtil.check(object.get(TITLE), JsonValue.ValueType.STRING);
         setTitle(jtitle == null ? null : jtitle.getString());
@@ -148,28 +116,28 @@ public class PrimitiveSchemaImpl implements PrimitiveSchema {
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
         if (jallOf != null) {
             allOf = new JsonAllOfImpl();
-            allOf.read(parser, locator, this, jsonPointer + ALL_OF + "/", jallOf, type);
+            allOf.read(parser, locator, this, jsonPointer + "/" + ALL_OF, jallOf, type);
             locator.putSchema(allOf);
         }
         
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), JsonValue.ValueType.ARRAY);
         if (janyOf != null) {
             anyOf = new JsonAnyOfImpl();
-            anyOf.read(parser, locator, this, jsonPointer + ANY_OF + "/", janyOf, type);
+            anyOf.read(parser, locator, this, jsonPointer + "/" + ANY_OF, janyOf, type);
             locator.putSchema(anyOf);
         }
         
         final JsonArray joneOf = JsonSchemaUtil.check(object.get(ONE_OF), JsonValue.ValueType.ARRAY);
         if (joneOf != null) {
             oneOf = new JsonOneOfImpl();
-            oneOf.read(parser, locator, this, jsonPointer + ONE_OF + "/", joneOf, type);
+            oneOf.read(parser, locator, this, jsonPointer + "/" + ONE_OF, joneOf, type);
             locator.putSchema(oneOf);
         }
 
         final JsonObject jnot = JsonSchemaUtil.check(object.get(NOT), JsonValue.ValueType.OBJECT);
         if (jnot != null) {
             not = new JsonNotImpl();            
-            not.read(parser, locator, this, jsonPointer + NOT + "/", jnot);
+            not.read(parser, locator, this, jsonPointer + "/" + NOT, jnot);
             locator.putSchema(not);
         }
 
@@ -177,23 +145,28 @@ public class PrimitiveSchemaImpl implements PrimitiveSchema {
     }
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
 
+        final int nerrors = errors.size();
+        
         if (allOf != null) {
-            allOf.validate(jsonPointer, value, parent, errors, callback);
+            allOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
         }
         
         if (anyOf != null) {
-            anyOf.validate(jsonPointer, value, parent, errors, callback);
+            anyOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
         }
 
         if (oneOf != null) {
-            oneOf.validate(jsonPointer, value, parent, errors, callback);
+            oneOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
         }
 
         if (not != null) {
-            not.validate(jsonPointer, value, parent, errors, callback);
+            not.validate(jsonPointer, value, parent, evaluated, errors, callback);
         }
-    }
+        
+        return nerrors == errors.size();
+    }    
 }

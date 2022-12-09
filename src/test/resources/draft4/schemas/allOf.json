@@ -1,0 +1,23 @@
+{
+  "id": "https://www.elixir-europe.org/json-schemas/test/allOf",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of 'allOf'",
+  "type": "object",
+  "allOf" : [
+    {
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "surename": {
+          "type": "string"
+        }
+      }
+    }
+  ]
+}

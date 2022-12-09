@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,12 +32,12 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
 import es.elixir.bsc.json.schema.model.StringArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky

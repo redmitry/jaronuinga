@@ -1,0 +1,119 @@
+[
+    {
+        "description": "Location-independent identifier",
+        "schema": {
+            "allOf": [{
+                "$ref": "#foo"
+            }],
+            "definitions": {
+                "A": {
+                    "id": "#foo",
+                    "type": "integer"
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": 1,
+                "description": "match",
+                "valid": true
+            },
+            {
+                "data": "a",
+                "description": "mismatch",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "Location-independent identifier with base URI change in subschema",
+        "schema": {
+            "id": "http://localhost:1234/root",
+            "allOf": [{
+                "$ref": "http://localhost:1234/nested.json#foo"
+            }],
+            "definitions": {
+                "A": {
+                    "id": "nested.json",
+                    "definitions": {
+                        "B": {
+                            "id": "#foo",
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": 1,
+                "description": "match",
+                "valid": true
+            },
+            {
+                "data": "a",
+                "description": "mismatch",
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "naive replacement of $ref with its destination is not correct",
+        "schema": {
+            "definitions": {
+                "a_string": { "type": "string" }
+            },
+            "enum": [
+                { "$ref": "#/definitions/a_string" }
+            ]
+        },
+        "tests": [
+            {
+                "description": "do not evaluate the $ref inside the enum, matching any string",
+                "data": "this is a string",
+                "valid": false
+            },
+            {
+                "description": "match the enum exactly",
+                "data": { "$ref": "#/definitions/a_string" },
+                "valid": true
+            }
+        ]
+    },
+    {
+        "description": "id must be resolved against nearest parent, not just immediate parent",
+        "schema": {
+            "id": "http://example.com/a.json",
+            "definitions": {
+                "x": {
+                    "id": "http://example.com/b/c.json",
+                    "not": {
+                        "definitions": {
+                            "y": {
+                                "id": "d.json",
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            },
+            "allOf": [
+                {
+                    "$ref": "http://example.com/b/d.json"
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "number is valid",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "non-number is invalid",
+                "data": "a",
+                "valid": false
+            }
+        ]
+    }
+]

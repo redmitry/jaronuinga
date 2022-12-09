@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -28,6 +28,8 @@ package es.elixir.bsc.json.schema.model;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaReader;
 import es.elixir.bsc.json.schema.ValidationError;
+import javax.json.Json;
+import javax.json.JsonValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -35,8 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.Json;
-import javax.json.JsonValue;
 import org.junit.Assert;
 
 /**

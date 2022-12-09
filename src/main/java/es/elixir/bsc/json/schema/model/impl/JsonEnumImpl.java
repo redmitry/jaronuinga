@@ -33,10 +33,10 @@ import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonEnum;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.List;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -72,15 +72,17 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     }
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (values == null || !values.contains(value)) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.ENUM_INVALID_VALUE_MSG, value.toString(), 
                     values == null ? "" : values.toString()));
+            return false;
         }
         
-        super.validate(jsonPointer, value, parent, errors, callback);
-    }
+        return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
+    }    
 }

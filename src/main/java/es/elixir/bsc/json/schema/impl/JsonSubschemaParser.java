@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -29,9 +29,9 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.model.JsonType;
-import javax.json.JsonObject;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonValue;
 
 /**
  * <p>
@@ -47,12 +47,11 @@ import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 public interface JsonSubschemaParser extends JsonSchemaParser {
     
     @Override
-    default AbstractJsonSchema parse(final JsonSchemaLocator locator, 
-                             final String jsonPointer, 
-                             final JsonObject object) throws JsonSchemaException {
+    default AbstractJsonSchema parse(JsonSchemaLocator locator,
+            String jsonPointer, JsonValue schema) throws JsonSchemaException {
 
-        return parse(locator, null, jsonPointer, object, null);
+        return parse(locator, null, jsonPointer, schema, null);
     }
     
-    AbstractJsonSchema parse(JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer, JsonObject object, JsonType type) throws JsonSchemaException;
+    AbstractJsonSchema parse(JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer, JsonValue schema, JsonType type) throws JsonSchemaException;
 }

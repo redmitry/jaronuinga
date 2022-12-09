@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -25,8 +25,8 @@
 
 package es.elixir.bsc.json.schema.model;
 
-import java.util.List;
 import javax.json.JsonValue;
+import java.util.List;
 
 /**
  * @author Dmitry Repchevsky
@@ -35,8 +35,7 @@ import javax.json.JsonValue;
 public interface JsonEnum extends AbstractJsonSchema {
     
     public final static String ENUM = "enum";
-    
-    
+
     List<JsonValue> getValues();    
     void setValues(List<JsonValue> values);
 }

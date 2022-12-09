@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -26,7 +26,7 @@
 package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Rechevsky
@@ -38,11 +38,11 @@ public interface JsonSchemaParser {
      * 
      * @param locator current Json Schema locator that holds current ID (URI).
      * @param jsonPointer Json Pointer to the current object positions.
-     * @param object Json object that represents Json Schema.
+     * @param schema Json object that represents Json Schema.
      * 
      * @return Json Schema model object.
      * 
      * @throws JsonSchemaException 
      */
-    JsonSchema parse(JsonSchemaLocator locator, String jsonPointer, JsonObject object) throws JsonSchemaException;
+    JsonSchema parse(JsonSchemaLocator locator, String jsonPointer, JsonValue schema) throws JsonSchemaException;
 }

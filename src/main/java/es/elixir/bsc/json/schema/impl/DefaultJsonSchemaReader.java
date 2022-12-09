@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,14 +31,14 @@ import es.elixir.bsc.json.schema.JsonSchemaReader;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonSchema;
+import javax.json.JsonException;
+import javax.json.JsonObject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import javax.json.JsonException;
-import javax.json.JsonObject;
 
 /**
  * @author Dmitry Repchevsky
@@ -53,7 +53,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     }
     
     @Override
-    public JsonSchema read(final URL url) throws JsonSchemaException {
+    public JsonSchema read(URL url) throws JsonSchemaException {
         try {
             return read(new DefaultJsonSchemaLocator(url.toURI()));
         } catch (URISyntaxException ex) {
@@ -63,7 +63,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     }
     
     @Override
-    public JsonSchema read(final JsonSchemaLocator locator) throws JsonSchemaException {
+    public JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException {
         JsonSchema schema = schemas.get(locator.uri);
         if (schema == null) {
             final JsonObject obj;
@@ -76,7 +76,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
                 throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.JSON_PARSING_ERROR, new Object[] {ex.getMessage()}));
             }
-            schema = new DefaultJsonSchemaParser(locator).parse(null, "/", obj);
+            schema = new DefaultJsonSchemaParser(locator).parse(null, "", obj);
             schemas.put(locator.uri, schema);
         }
         return schema;

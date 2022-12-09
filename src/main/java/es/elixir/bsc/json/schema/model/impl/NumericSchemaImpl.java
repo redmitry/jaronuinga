@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -29,9 +29,9 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
-import javax.json.JsonObject;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonObject;
 
 /**
  * @author Dmitry Repchevsky

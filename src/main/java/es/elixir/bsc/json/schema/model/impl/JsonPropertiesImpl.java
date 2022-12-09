@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,18 +27,16 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.ParsingError;
-import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonProperties;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -48,10 +46,16 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema
                                 implements JsonProperties {
 
     private JsonSchemaElement parent;
+    private String jsonPointer;
     
     @Override
     public JsonSchemaElement getParent() {
         return parent;
+    }
+
+    @Override
+    public String getJsonPointer() {
+        return jsonPointer;
     }
 
     @Override
@@ -83,17 +87,11 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema
             JsonSchemaElement parent, String jsonPointer, JsonObject object) throws JsonSchemaException {
         
         this.parent = parent;
+        this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
         
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
-            final JsonValue value = entry.getValue();            
-            if (JsonValue.ValueType.OBJECT != value.getValueType()) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_OBJECT_TYPE, 
-                    new Object[] {"properties schema", value.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
-
-            }
-
-            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + entry.getKey() + "/", value.asJsonObject(), null);
-
+            final JsonValue value = entry.getValue();
+            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + entry.getKey(), value, null);
             put(entry.getKey(), schema);
         }
         

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -40,10 +40,13 @@ public enum ValidationMessage {
     BOOLEAN_EXPECTED_MSG(BOOLEAN_EXPECTED, "boolean expected, found: %s"),
     NULL_EXPECTED_MSG(NULL_EXPECTED, "null expected, found: %s"),
     
+    REFERENCE_UNRESOLVED_MSG(REFERENCE_UNRESOLVED, "unable to resolve reference. '$ref': '%s'."),
+    
     OBJECT_REQUIRED_PROPERTY_CONSTRAINT_MSG(OBJECT_REQUIRED_PROPERTY_CONSTRAINT, "object missed required property: %s"),
     OBJECT_DEPENDENT_REQUIRED_CONSTRAINT_MSG(OBJECT_DEPENDENT_REQUIRED_CONSTRAINT, "object missed required dependent property: %s"),
     
     OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT_MSG(OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT, "no additional properties allowed: %s"),
+    OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT_MSG(OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT, "unevaluated property found: %s"),
     
     OBJECT_ALL_OF_CONSTRAINT_MSG(OBJECT_ALL_OF_CONSTRAINT, "object allOf constraint failed"),
     OBJECT_ANY_OF_CONSTRAINT_MSG(OBJECT_ANY_OF_CONSTRAINT, "object anyOf constraint failed"),

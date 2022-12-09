@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,16 +31,17 @@ package es.elixir.bsc.json.schema;
 
 public enum ParsingMessage {
     
-    UNRESOLVABLE_SCHEMA(1, "failed to resolve schema: '%s'"),
-    JSON_PARSING_ERROR(2, "json parsing error: '%s'"),
-    INVALID_ATTRIBUTE_TYPE(3, "invalid attribute type: '%s': '%s' (must be '%s')."),
-    MISSED_ATTRIBUTE(4, "mandatory attribute missed: '%s'."),
-    INVALID_OBJECT_TYPE(5, "invalid object type: %s type '%s' (must be '%s')."),
-    UNKNOWN_OBJECT_TYPE(6, "unknown object type: '%s'."),
-    INVALID_REFERENCE(7, "invalid reference: '$ref': '%s'."),
-    UNRESOLVABLE_REFERENCE(8, "unable to resolve reference. '$ref': '%s'."),
-    CONSTRAINT_ERROR(9, "%s constraint: '%s' '%s."),
-    EMPTY_ENUM(10, "empty enum.");
+    JSON_PARSING_ERROR(1, "json parsing error: '%s'"),
+    SCHEMA_OBJECT_ERROR(2, "schema json type error: '%s' (must be either 'true', 'false' or 'object')"),
+    UNRESOLVABLE_SCHEMA(3, "failed to resolve schema: '%s'"),
+    INVALID_ATTRIBUTE_TYPE(4, "invalid attribute type: '%s': '%s' (must be '%s')."),
+    MISSED_ATTRIBUTE(5, "mandatory attribute missed: '%s'."),
+    INVALID_OBJECT_TYPE(6, "invalid object type: %s type '%s' (must be '%s')."),
+    UNKNOWN_OBJECT_TYPE(7, "unknown object type: '%s'."),
+    INVALID_REFERENCE(8, "invalid reference: '$ref': '%s'."),
+    UNRESOLVABLE_REFERENCE(9, "unable to resolve reference. '$ref': '%s'."),
+    CONSTRAINT_ERROR(10, "%s constraint: '%s' '%s."),
+    EMPTY_ENUM(11, "empty enum.");
     
     public final int CODE;
     public final String VALUE;

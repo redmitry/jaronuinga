@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,19 +33,18 @@ public class ParsingError {
     public final int code;
     public final String message;
     
-    public ParsingError(final String message) {
+    public ParsingError(String message) {
         this.code = -1;
         this.message = message;
     }
     
-    public ParsingError(final ParsingMessage message) {
+    public ParsingError(ParsingMessage message) {
         this.code = message.CODE;
         this.message = message.VALUE;
     }
     
-    public ParsingError(final ParsingMessage message, Object[] args) {
+    public ParsingError(ParsingMessage message, Object[] args) {
         this.code = message.CODE;
         this.message = String.format(message.VALUE, args);
     }
-
 }

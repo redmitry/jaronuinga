@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -28,6 +28,7 @@ package es.elixir.bsc.json.schema.model;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonValue;
 
@@ -40,10 +41,10 @@ import javax.json.JsonValue;
 
 public interface AbstractJsonSchema extends JsonSchema {
 
-    void validate(String jsonPointer, JsonValue value, JsonValue parent, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
+    boolean validate(String jsonPointer, JsonValue value, JsonValue parent, List<String> evaluated, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
 
     @Override
     default void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
-        validate("/", value, null, errors, callback);
-    }
+        validate("", value, null, new ArrayList(), errors, callback);
+    }    
 }

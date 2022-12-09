@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,12 +33,12 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonDefinitions;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -77,7 +77,7 @@ public class JsonDefinitionsImpl extends LinkedHashMap<String, AbstractJsonSchem
                     new Object[] {"definition schema", value.getValueType().name(), JsonValue.ValueType.OBJECT.name()}));
             }
             
-            final AbstractJsonSchema schema = parser.parse(locator, parent, jsonPointer + entry.getKey() + "/", value.asJsonObject(), null);
+            final AbstractJsonSchema schema = parser.parse(locator, parent, jsonPointer + "/" + entry.getKey(), value.asJsonObject(), null);
 
             put(entry.getKey(), schema);
         }

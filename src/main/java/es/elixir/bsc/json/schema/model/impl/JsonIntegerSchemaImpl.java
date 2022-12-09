@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2021 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -34,13 +34,13 @@ import static es.elixir.bsc.json.schema.model.NumericSchema.MAXIMUM;
 import static es.elixir.bsc.json.schema.model.NumericSchema.MINIMUM;
 import java.math.BigInteger;
 import java.util.List;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * Json Schema implementation for the Json Integer type.
@@ -75,24 +75,29 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
     }
 
     @Override
-    public void validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<ValidationError> errors, JsonSchemaValidationCallback <JsonValue>callback) {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
+            List<String> evaluated, List<ValidationError> errors,
+            JsonSchemaValidationCallback <JsonValue>callback) {
 
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.NUMBER_EXPECTED_MSG, value.getValueType().name()));
-            return;
+            return false;
         }
 
+        final int nerrors = errors.size();
+        
         validate(jsonPointer, ((JsonNumber)value).bigIntegerValue(), errors);
         
-        super.validate(jsonPointer, value, parent, errors, callback);
+        super.validate(jsonPointer, value, parent, evaluated, errors, callback);
 
         if (callback != null) {
             callback.validated(this, jsonPointer, value, parent, errors);
         }
+        
+        return nerrors == errors.size();
     }
-    
+
     public void validate(String jsonPointer, BigInteger num, List<ValidationError> errors) {
         if (minimum != null) {
             if (exclusiveMinimum != null && exclusiveMinimum) {

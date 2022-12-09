@@ -27,12 +27,6 @@ package es.elixir.bsc.json.schema.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
@@ -40,6 +34,12 @@ import javax.json.JsonPointer;
 import javax.json.JsonReader;
 import javax.json.JsonReaderFactory;
 import javax.json.JsonValue;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Dmitry Repchevsky
@@ -49,29 +49,28 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
     protected final Map<URI, JsonObject> schemas;
 
-    public DefaultJsonSchemaLocator(final URI uri) {
+    public DefaultJsonSchemaLocator(URI uri) {
         this(uri, new HashMap<>());
     }
     
-    protected DefaultJsonSchemaLocator(final URI uri, 
-                                       final Map<URI, JsonObject> schemas) {
+    protected DefaultJsonSchemaLocator(URI uri, Map<URI, JsonObject> schemas) {
         super(uri);
         this.schemas = schemas;
     }
 
     @Override
-    public void setSchema(final JsonObject schema) {
+    public void setSchema(JsonObject schema) {
         schemas.put(uri, schema);
     }
 
     @Override
-    public JsonObject getSchema(final String jsonPointer) 
+    public JsonObject getSchema(String jsonPointer) 
             throws IOException, JsonException {
         return getSchema(this.uri, jsonPointer);
     }
 
     @Override
-    public JsonObject getSchema(final URI uri, final String jsonPointer)
+    public JsonObject getSchema(URI uri, String jsonPointer)
             throws IOException, JsonException {
         
         JsonObject schema = schemas.get(uri);
@@ -106,7 +105,7 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
     }
 
     @Override
-    public JsonSchemaLocator resolve(final URI uri) {
+    public JsonSchemaLocator resolve(URI uri) {
         return new DefaultJsonSchemaLocator(super.uri.resolve(uri), schemas);
     }
     
