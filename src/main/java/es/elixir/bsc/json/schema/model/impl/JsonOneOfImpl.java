@@ -48,10 +48,15 @@ public class JsonOneOfImpl extends SchemaArrayImpl
 
         int matches = 0;
         
+        final List<String> eva = new ArrayList();
         final List<ValidationError> err = new ArrayList<>();
         for (AbstractJsonSchema schema : this) {
-            if (schema.validate(jsonPointer, value, parent, null, err, callback)) {
+            final int nevaluated = eva.size();
+            if (schema.validate(jsonPointer, value, parent, eva, err, callback)) {
                 matches++;
+            } else {
+                // if validation fails, remove all evaluated properties
+                eva.subList(nevaluated, eva.size()).clear();
             }
         }
         
@@ -64,6 +69,8 @@ public class JsonOneOfImpl extends SchemaArrayImpl
                     ValidationMessage.OBJECT_ONE_OF_CONSTRAINT_MSG));
             return false;
         }
+        
+        evaluated.addAll(eva);
         
         return true;
     }

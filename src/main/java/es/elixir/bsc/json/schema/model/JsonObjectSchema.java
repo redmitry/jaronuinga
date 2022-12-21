@@ -35,6 +35,8 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
 
     public final static String DEFINITIONS = "definitions";
     public final static String PROPERTIES = "properties";
+    public final static String MIN_PROPERTIES = "minProperties";
+    public final static String MAX_PROPERTIES = "maxProperties";
     public final static String REQUIRED = "required";
     public final static String DEPENDENCIES = "dependencies";
     public final static String DEPENDENT_SCHEMAS = "dependentSchemas";
@@ -49,6 +51,8 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
     
     JsonDefinitions getDefinitions();
     JsonProperties getProperties();
+    Integer getMinProperties();
+    Integer getMaxProperties();
     StringArray getRequired();
     JsonProperties getDependentSchemas();
     JsonDependentProperties getDependentRequired();

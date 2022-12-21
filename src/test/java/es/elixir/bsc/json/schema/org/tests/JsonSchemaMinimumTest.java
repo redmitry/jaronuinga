@@ -23,12 +23,20 @@
  *****************************************************************************
  */
 
-package es.elixir.bsc.json.schema.model.impl;
+package es.elixir.bsc.json.schema.org.tests;
+
+import org.junit.Test;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonSchemaReferenceImpl {
+public class JsonSchemaMinimumTest extends JsonSchemaOrgTest {
     
+    private final static String JSON_TEST_FILE = "json-schema-org/draft4/minimum.json";
+    
+    @Test
+    public void test_01() {
+        test(JSON_TEST_FILE);
+    }
 }

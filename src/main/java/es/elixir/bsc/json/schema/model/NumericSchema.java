@@ -25,6 +25,8 @@
 
 package es.elixir.bsc.json.schema.model;
 
+import java.math.BigDecimal;
+
 /**
  * The interface for Numeric Json Schema types.
  * (Json Schema defines "number" and "integer") types.
@@ -36,11 +38,16 @@ package es.elixir.bsc.json.schema.model;
 
 public interface NumericSchema<T extends Number> extends AbstractJsonSchema {
     
+    public final static String MULTIPLE_OF = "multipleOf";
+    
     public final static String MINIMUM = "minimum";
     public final static String MAXIMUM = "maximum";
     
     public final static String EXCLUSIVE_MINIMUM = "exclusiveMinimum";
     public final static String EXCLUSIVE_MAXIMUM = "exclusiveMaximum";
+
+    public BigDecimal getMultipleOf();
+    public void setMultipleOf(BigDecimal multipleOf);
 
     Boolean getExclusiveMinimum();
     void setExclusiveMinimum(Boolean exclusiveMinimum);

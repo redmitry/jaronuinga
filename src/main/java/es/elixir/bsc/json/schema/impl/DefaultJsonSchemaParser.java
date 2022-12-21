@@ -127,11 +127,16 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             vtype = null;
         } else {
             vtype = type_value.getValueType();
-            if (vtype != ValueType.STRING && vtype != ValueType.ARRAY) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                    new Object[] {"type", type_value.getValueType().name(), "either a string or an array"}));
+            switch(vtype) {
+                case STRING: type = getType(type_value);
+                case ARRAY: break;
+                default: 
+                    throw new JsonSchemaException(new ParsingError(
+                            ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                            new Object[] {"type", type_value.getValueType().name(), 
+                                          "either a string or an array"}));
+
             }
-            type = getType(type_value);
         }
         
         final JsonArray jenum = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
@@ -152,17 +157,11 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
             locator.putSchema(_const);
             return _const;
         }
-        
+
         if (type == null) {
             final JsonAnyOfImpl anyOf = new JsonAnyOfImpl();
-            anyOf.read(this, locator, parent, jsonPointer, object, null);
-            locator.putSchema(anyOf);
-            return anyOf;
-        }
-        
-        if (vtype == ValueType.ARRAY) {
-            final JsonAnyOfImpl anyOf = new JsonAnyOfImpl();
-            anyOf.read(this, locator, parent, jsonPointer, object, type_value.asJsonArray());
+            anyOf.read(this, locator, parent, jsonPointer, object, 
+                    vtype == ValueType.ARRAY ? type_value.asJsonArray() : null);
             locator.putSchema(anyOf);
             return anyOf;
         }

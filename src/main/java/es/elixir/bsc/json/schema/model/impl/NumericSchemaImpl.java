@@ -31,7 +31,11 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import static es.elixir.bsc.json.schema.model.NumericSchema.MULTIPLE_OF;
+import java.math.BigDecimal;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -40,12 +44,24 @@ import javax.json.JsonObject;
 
 public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchemaImpl
                                         implements NumericSchema<T> {
+    protected BigDecimal multipleOf;
+    
     protected T minimum;
     protected T maximum;
 
     protected Boolean exclusiveMinimum;
     protected Boolean exclusiveMaximum;
-        
+
+    @Override
+    public BigDecimal getMultipleOf() {
+        return multipleOf;
+    }
+    
+    @Override
+    public void setMultipleOf(BigDecimal multipleOf) {
+        this.multipleOf = multipleOf;
+    }
+    
     @Override
     public T getMinimum() {
         return minimum;
@@ -96,6 +112,11 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
 
         super.read(parser, locator, parent, jsonPointer, object, type);
         
+        final JsonNumber mul = JsonSchemaUtil.check(object.getJsonNumber(MULTIPLE_OF), JsonValue.ValueType.NUMBER);
+        if (mul != null) {
+            multipleOf = mul.bigDecimalValue();
+        }
+
         if (object.getBoolean(EXCLUSIVE_MINIMUM, false)) {
             exclusiveMinimum = true;
         }
@@ -105,5 +126,5 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
         }
 
         return this;
-    }
+    }    
 }

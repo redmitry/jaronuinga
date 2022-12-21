@@ -166,7 +166,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
         
         validate(jsonPointer, ((JsonString)value).getString(), errors);
         
-        super.validate(jsonPointer, value, parent, null, errors, callback);
+        super.validate(jsonPointer, value, parent, evaluated, errors, callback);
         
         if (callback != null) {
             callback.validated(this, jsonPointer, value, parent, errors);
@@ -177,12 +177,12 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     
     private void validate(String jsonPointer, String string, List<ValidationError> errors) {
         
-        if (minLength != null && string.length() < minLength) {
+        if (minLength != null && string.codePointCount(0, string.length()) < minLength) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.STRING_MIN_LENGTH_CONSTRAINT_MSG, string.length(), minLength));
         }
         
-        if (maxLength != null && string.length() > maxLength) {
+        if (maxLength != null && string.codePointCount(0, string.length()) > maxLength) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.STRING_MAX_LENGTH_CONSTRAINT_MSG, string.length(), maxLength));
 

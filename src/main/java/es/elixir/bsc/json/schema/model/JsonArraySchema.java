@@ -36,6 +36,7 @@ import java.util.List;
 public interface JsonArraySchema extends AbstractJsonSchema {
     
     public final static String ITEMS = "items";
+    public final static String UNIQUE_ITEMS = "uniqueItems";
     public final static String ADDITIONAL_ITEMS = "additionalItems";
     
     public final static String MIN_ITEMS = "minItems";
@@ -56,6 +57,8 @@ public interface JsonArraySchema extends AbstractJsonSchema {
      */
     List<AbstractJsonSchema> getItems();
     
+    Boolean isUniqueItems();
+
     /**
      * @return 'additionalSchema' JsonSchema, <b>NULL</b> if FALSE (or not set), 
      *         EmptyJsonSchema if TRUE

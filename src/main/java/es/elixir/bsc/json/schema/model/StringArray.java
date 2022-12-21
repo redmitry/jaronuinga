@@ -25,6 +25,8 @@
 
 package es.elixir.bsc.json.schema.model;
 
+import java.util.Set;
+
 /**
  * The list of JSON strings.
  * 
@@ -38,10 +40,8 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface StringArray extends Iterable<String> {
+public interface StringArray extends Set<String> {
     
-    boolean add(String name);
     boolean remove(String name);
     boolean contains(String name);
-    
 }

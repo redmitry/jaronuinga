@@ -97,12 +97,9 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
             if (fragment == null) {
                 ref_pointer = "";
                 ref_locator = locator.resolve(uri);
-            } else if (fragment.isEmpty()) {
+            } else if ("#".equals(ref)) {
                 ref_pointer = "";
-                ref_locator = locator.resolve(
-                        new URI(uri.getScheme(), uri.getUserInfo(), 
-                                uri.getHost(), uri.getPort(), uri.getPath(), 
-                                null, null));
+                ref_locator = locator;
             } else if (fragment.startsWith("/")){
                 ref_pointer = fragment.replaceAll("/$", "");
                 if (ref.startsWith("#")) {

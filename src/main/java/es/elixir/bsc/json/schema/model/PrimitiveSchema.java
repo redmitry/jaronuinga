@@ -36,6 +36,7 @@ public interface PrimitiveSchema extends AbstractJsonSchema {
     public final static String TYPE = "type";
     public final static String TITLE = "title";
     public final static String DESCRIPTION = "description";
+    public final static String DEFAULT = "default";
 
     public final static String ALL_OF = "allOf";
     public final static String ANY_OF = "anyOf";

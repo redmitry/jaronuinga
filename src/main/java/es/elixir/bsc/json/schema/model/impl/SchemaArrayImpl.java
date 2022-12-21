@@ -35,7 +35,6 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonArray;
-import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 /**

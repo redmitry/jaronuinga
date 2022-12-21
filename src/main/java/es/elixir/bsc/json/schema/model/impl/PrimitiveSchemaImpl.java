@@ -168,5 +168,5 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         }
         
         return nerrors == errors.size();
-    }    
+    }
 }

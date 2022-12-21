@@ -37,6 +37,7 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.json.JsonNumber;
 
 /**
  * @author Dmitry Repchevsky
@@ -76,13 +77,26 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
             List<String> evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
-        if (values == null || !values.contains(value)) {
-            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.ENUM_INVALID_VALUE_MSG, value.toString(), 
-                    values == null ? "" : values.toString()));
-            return false;
+        if (values != null) {
+            final JsonValue.ValueType type = value.getValueType();
+            for (JsonValue v : values) {
+                if (type == v.getValueType() && equals(v, value)) {
+                    return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
+                }
+            }
         }
-        
-        return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
+
+        errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                ValidationMessage.ENUM_INVALID_VALUE_MSG, value.toString(), 
+                values == null ? "" : values.toString()));
+
+        return false;
+    }
+    
+    private boolean equals(JsonValue v1, JsonValue v2) {
+        switch(v1.getValueType()) {
+            case NUMBER: return ((JsonNumber)v1).doubleValue() == ((JsonNumber)v2).doubleValue();
+        }
+        return v1.equals(v2);
     }    
 }

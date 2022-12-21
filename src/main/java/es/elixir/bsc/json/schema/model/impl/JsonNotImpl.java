@@ -82,7 +82,7 @@ public class JsonNotImpl extends PrimitiveSchemaImpl
             List<String> evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
-        if (schema.validate(jsonPointer, value, parent, null, new ArrayList(), callback)) {
+        if (schema.validate(jsonPointer, value, parent, new ArrayList(), new ArrayList(), callback)) {
             errors.add(new ValidationError(getId(), getJsonPointer(),
                     jsonPointer, ValidationMessage.OBJECT_NOT_CONSTRAINT_MSG));
             return false;

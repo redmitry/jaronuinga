@@ -38,6 +38,7 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import java.math.BigDecimal;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -85,9 +86,16 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
             return false;
         }
 
+        final JsonNumber number = ((JsonNumber)value);
+        if(!number.isIntegral()) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.NUMBER_NOT_INTEGER_MSG, number.numberValue()));
+            return false;
+        }
+
         final int nerrors = errors.size();
         
-        validate(jsonPointer, ((JsonNumber)value).bigIntegerValue(), errors);
+        validate(jsonPointer, number.bigIntegerValue(), errors);
         
         super.validate(jsonPointer, value, parent, evaluated, errors, callback);
 
@@ -121,6 +129,11 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                             ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, num, ">", maximum));
             }
+        }
+        
+        if (multipleOf != null && new BigDecimal(num).divideAndRemainder(multipleOf)[1].compareTo(BigDecimal.ZERO) != 0) {
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.NUMBER_MULTIPLE_OF_CONSTRAINT_MSG, num, multipleOf));
         }
     }
 }

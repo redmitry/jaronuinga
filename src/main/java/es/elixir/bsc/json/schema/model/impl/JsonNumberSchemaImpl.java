@@ -56,7 +56,7 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                                      final JsonType type) throws JsonSchemaException {
 
         super.read(parser, locator, parent, jsonPointer, object, type);
-
+        
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MINIMUM), JsonValue.ValueType.NUMBER);
         if (min != null) {
             minimum = min.bigDecimalValue();
@@ -118,6 +118,11 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                             ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, dec.toPlainString(), ">", maximum));
             }
+        }
+        
+        if (multipleOf != null && dec.divideAndRemainder(multipleOf)[1].compareTo(BigDecimal.ZERO) != 0) {
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.NUMBER_MULTIPLE_OF_CONSTRAINT_MSG, dec, multipleOf));
         }
     }
 }

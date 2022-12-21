@@ -44,6 +44,9 @@ public enum ValidationMessage {
     
     OBJECT_REQUIRED_PROPERTY_CONSTRAINT_MSG(OBJECT_REQUIRED_PROPERTY_CONSTRAINT, "object missed required property: %s"),
     OBJECT_DEPENDENT_REQUIRED_CONSTRAINT_MSG(OBJECT_DEPENDENT_REQUIRED_CONSTRAINT, "object missed required dependent property: %s"),
+
+    OBJECT_MIN_PROPERTIES_CONSTRAINT_MSG(OBJECT_MIN_PROPERTIES_CONSTRAINT, "minProperties = %d > object.properties.size = %d"),
+    OBJECT_MAX_PROPERTIES_CONSTRAINT_MSG(OBJECT_MAX_PROPERTIES_CONSTRAINT, "maxProperties = %d < object.properties.size = %d"),
     
     OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT_MSG(OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT, "no additional properties allowed: %s"),
     OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT_MSG(OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT, "unevaluated property found: %s"),
@@ -53,8 +56,11 @@ public enum ValidationMessage {
     OBJECT_ONE_OF_CONSTRAINT_MSG(OBJECT_ONE_OF_CONSTRAINT, "object oneOf constraint failed"),
     OBJECT_NOT_CONSTRAINT_MSG(OBJECT_NOT_CONSTRAINT, "object not constraint failed"),
 
+    NUMBER_NOT_INTEGER_MSG(NUMBER_NOT_INTEGER, "number %s is not an integer"),
+    
     ARRAY_MIN_ITEMS_CONSTRAINT_MSG(ARRAY_MIN_ITEMS_CONSTRAINT, "minItems = %d > array.items.size = %d"),
     ARRAY_MAX_ITEMS_CONSTRAINT_MSG(ARRAY_MAX_ITEMS_CONSTRAINT, "maxItems = %d < array.items.size = %d"),
+    ARRAY_UNIQUE_ITEMS_CONSTRAINT_MSG(ARRAY_MAX_ITEMS_CONSTRAINT, "duplicate values in array %s"),
     ARRAY_LENGTH_MISMATCH_MSG(ARRAY_LENGTH_MISMATCH, "array.length = %d not equals items.length = %d"),
 
     STRING_MIN_LENGTH_CONSTRAINT_MSG(STRING_MIN_LENGTH_CONSTRAINT, "string.length %d < minLength = %d"),
@@ -70,6 +76,7 @@ public enum ValidationMessage {
     
     NUMBER_MIN_CONSTRAINT_MSG(NUMBER_MIN_CONSTRAINT, "value = %s %s number.minimum = %s"),
     NUMBER_MAX_CONSTRAINT_MSG(NUMBER_MAX_CONSTRAINT, "value = %s %s number.maximum = %s"),
+    NUMBER_MULTIPLE_OF_CONSTRAINT_MSG(NUMBER_MULTIPLE_OF_CONSTRAINT, "value = %s in not multipleOf = %s"),
 
     INTEGER_MIN_CONSTRAINT_MSG(INTEGER_MIN_CONSTRAINT, "value = %d %s integer.minimum = %d"),
     INTEGER_MAX_CONSTRAINT_MSG(INTEGER_MAX_CONSTRAINT, "value = %d %s integer.maximum = %d"),

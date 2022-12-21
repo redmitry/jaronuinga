@@ -51,6 +51,11 @@ import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.json.JsonNumber;
 
 /**
  * @author Dmitry Repchevsky
@@ -61,6 +66,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
     private JsonDefinitions definitions;
     private JsonProperties properties;
+    private Integer minProperties;
+    private Integer maxProperties;
     private JsonStringArray required;
     private JsonProperties dependentSchemas;
     private JsonDependentProperties dependentRequired;
@@ -88,6 +95,16 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             properties = new JsonPropertiesImpl();
         }
         return properties;
+    }
+
+    @Override
+    public Integer getMinProperties() {
+        return minProperties;
+    }
+    
+    @Override
+    public Integer getMaxProperties() {
+        return maxProperties;
     }
 
     @Override
@@ -177,6 +194,16 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonObject jproperties = JsonSchemaUtil.check(object.get(PROPERTIES), ValueType.OBJECT);
         if (jproperties != null) {
             properties = new JsonPropertiesImpl().read(parser, locator, this, jsonPointer + "/" + PROPERTIES, jproperties);
+        }
+
+        final JsonNumber jminProperties = JsonSchemaUtil.check(object.get(MIN_PROPERTIES), ValueType.NUMBER);
+        if (jminProperties != null) {
+            minProperties = jminProperties.intValue();
+        }
+
+        final JsonNumber jmaxProperties = JsonSchemaUtil.check(object.get(MAX_PROPERTIES), ValueType.NUMBER);
+        if (jmaxProperties != null) {
+            maxProperties = jmaxProperties.intValue();
         }
 
         final JsonObject jpatternProperties = JsonSchemaUtil.check(object.get(PATTERN_PROPERTIES), ValueType.OBJECT);
@@ -280,44 +307,33 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         
         final JsonObject object = value.asJsonObject();
         
+        if (minProperties != null && minProperties > object.size()) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.OBJECT_MIN_PROPERTIES_CONSTRAINT_MSG, minProperties, object.size()));            
+        }
+
+        if (maxProperties != null && maxProperties < object.size()) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.OBJECT_MAX_PROPERTIES_CONSTRAINT_MSG, maxProperties, object.size()));            
+        }
+        
         if (propertyNames != null) {
             for (String name : object.keySet()) {
                 propertyNames.validate(Json.createValue(name), errors);
             }
         }
-
-        if (Objects.equals(additionalProperties, Boolean.FALSE)) {
-            if (properties == null) {
-                // error;
-            } else {
-                for (String name : object.keySet()) {
-                    if (!properties.contains(name)) {
-                        errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                            ValidationMessage.OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT_MSG, name));
-                    }
-                }
-            }
-        } else if (additionalPropertiesSchema != null) {
-            for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
-                final String name = entry.getKey();
-                if (!properties.contains(name)) {
-                    additionalPropertiesSchema.validate(jsonPointer + "/" + name, entry.getValue(), object, null, errors, callback);
-                }
-            }            
-        }
         
-        final StringArray req = getRequired();
-
+        final Set req = new TreeSet(getRequired());
+        final ArrayList<String> eva = new ArrayList();
+        
         if (properties != null) {
             for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
                 final String name = entry.getKey();
                 final AbstractJsonSchema property = properties.get(name);
                 if (property != null) {
                     req.remove(name);
-                    if (property.validate(jsonPointer + "/" + name, entry.getValue(), value, evaluated, errors, callback)) {
-                        if (evaluated != null) {
-                            evaluated.add(name);
-                        }
+                    if (property.validate(jsonPointer + "/" + name, entry.getValue(), value, new ArrayList(), errors, callback)) {
+                        eva.add(name);
                     }
                 }
             }
@@ -327,15 +343,36 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
                 final String name = entry.getKey();
                 for (Map.Entry<String, AbstractJsonSchema> property : patternProperties) {
-                    if (name.matches(property.getKey()) &&
-                        property.getValue().validate(jsonPointer + "/" + name, entry.getValue(), value, null, errors, callback)) {
-                        if (evaluated != null) {
-                            evaluated.add(name);
-                        }                        
+                    final Matcher matcher = Pattern.compile(property.getKey()).matcher(name);
+                    if (matcher.find() &&
+                        property.getValue().validate(jsonPointer + "/" + name, entry.getValue(), value, new ArrayList(), errors, callback)) {
+                        eva.add(name);
                     }
                 }
             }
         }
+        
+        if (Objects.equals(additionalProperties, Boolean.FALSE)) {
+            for (String name : object.keySet()) {
+                if (!eva.contains(name)) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT_MSG, name));
+                }
+            }
+        } else if (additionalPropertiesSchema != null) {
+            for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
+                final String name = entry.getKey();
+                if (!eva.contains(name) &&
+                    additionalPropertiesSchema.validate(jsonPointer + "/" + name, entry.getValue(), object, new ArrayList(), errors, callback)) {
+                    evaluated.add(name);
+                }
+            }            
+        } else {
+            // allowed additinal properties
+            req.removeAll(object.keySet());
+        }
+        
+        evaluated.addAll(eva);
         
         for (Iterator<String> i = req.iterator(); i.hasNext();) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
@@ -345,9 +382,9 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         if (dependentSchemas != null) {
             for (Map.Entry<String, AbstractJsonSchema> property : dependentSchemas) {
                 final String name = property.getKey();
-                if (properties != null && properties.contains(name)) {
+                if (object.containsKey(name)) {
                     final AbstractJsonSchema dependentSchema = property.getValue();
-                    dependentSchema.validate(jsonPointer + "/" + name, value, parent, null, errors, callback);
+                    dependentSchema.validate(jsonPointer + "/" + name, value, parent, new ArrayList(), errors, callback);
                 }
             }
         }
@@ -355,10 +392,10 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         if (dependentRequired != null) {
             for (Map.Entry<String, StringArray> property : dependentRequired) {
                 final String name = property.getKey();
-                if (properties != null && properties.contains(name)) {
+                if (object.containsKey(name)) {
                     final StringArray arr = property.getValue();
-                    for (String p : arr) {
-                        if (!properties.contains(name)) {
+                    for (String dname : arr) {
+                        if (!object.containsKey(dname)) {
                             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                                 ValidationMessage.OBJECT_DEPENDENT_REQUIRED_CONSTRAINT_MSG, name));                            
                         }
@@ -378,7 +415,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
         if (unevaluatedProperties != null && !Objects.equals(additionalProperties, Boolean.TRUE)) {
             for (String name : object.keySet()) {
-                if (evaluated != null && evaluated.contains(name)) {
+                if (evaluated.contains(name)) {
                     continue;
                 }
                 errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
@@ -387,8 +424,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         } else if (unevaluatedPropertiesSchema != null) {
             for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
                 final String name = entry.getKey();
-                if ((evaluated != null && evaluated.contains(name)) ||
-                    unevaluatedPropertiesSchema.validate(jsonPointer + "/" + name, entry.getValue(), object, null, errors, callback)) {
+                if (evaluated.contains(name) ||
+                    unevaluatedPropertiesSchema.validate(jsonPointer + "/" + name, entry.getValue(), object, new ArrayList(), errors, callback)) {
                     continue;
                 }
                 errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,

@@ -69,10 +69,14 @@ public class JsonNullSchemaImpl extends PrimitiveSchemaImpl
             return false;
         }
 
+        final int nerrors = errors.size();
+        
+        super.validate(jsonPointer, value, parent, evaluated, errors, callback);
+        
         if (callback != null) {
             callback.validated(this, jsonPointer, value, parent, errors);
         }
         
-        return true;
+        return nerrors == errors.size();
     }
 }
