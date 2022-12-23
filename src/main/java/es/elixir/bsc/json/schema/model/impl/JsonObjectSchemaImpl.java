@@ -331,9 +331,10 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 final String name = entry.getKey();
                 final AbstractJsonSchema property = properties.get(name);
                 if (property != null) {
+                    eva.add(name);
                     req.remove(name);
                     if (property.validate(jsonPointer + "/" + name, entry.getValue(), value, new ArrayList(), errors, callback)) {
-                        eva.add(name);
+                        evaluated.add(name);
                     }
                 }
             }
@@ -344,9 +345,11 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                 final String name = entry.getKey();
                 for (Map.Entry<String, AbstractJsonSchema> property : patternProperties) {
                     final Matcher matcher = Pattern.compile(property.getKey()).matcher(name);
-                    if (matcher.find() &&
-                        property.getValue().validate(jsonPointer + "/" + name, entry.getValue(), value, new ArrayList(), errors, callback)) {
+                    if (matcher.find()) {
                         eva.add(name);
+                        if (property.getValue().validate(jsonPointer + "/" + name, entry.getValue(), value, new ArrayList(), errors, callback)) {
+                            evaluated.add(name);
+                        }
                     }
                 }
             }
@@ -371,8 +374,6 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             // allowed additinal properties
             req.removeAll(object.keySet());
         }
-        
-        evaluated.addAll(eva);
         
         for (Iterator<String> i = req.iterator(); i.hasNext();) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,

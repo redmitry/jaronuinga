@@ -97,7 +97,9 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
         
         List<ValidationError> err = new ArrayList<>();
         for (AbstractJsonSchema schema : this) {
-            if (schema.validate(jsonPointer, value, parent, evaluated, err, callback)) {
+            final List<String> eva = new ArrayList();
+            if (schema.validate(jsonPointer, value, parent, eva, err, callback)) {
+                evaluated.addAll(eva);
                 return true; // found the schema that matches
             }
         }

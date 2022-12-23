@@ -49,9 +49,9 @@ public class JsonAllOfImpl extends SchemaArrayImpl
         final int nerrors = errors.size();
         
         for (AbstractJsonSchema schema : this) {
-            final List<String> properties = new ArrayList();
-            if (schema.validate(jsonPointer, object, parent, properties, errors, callback)) {
-                evaluated.addAll(properties);
+            final List<String> eva = new ArrayList();
+            if (schema.validate(jsonPointer, object, parent, eva, errors, callback)) {
+                evaluated.addAll(eva);
             }
         }
         
@@ -61,5 +61,5 @@ public class JsonAllOfImpl extends SchemaArrayImpl
         }
         
         return nerrors == errors.size();
-    }  
+    }
 }
