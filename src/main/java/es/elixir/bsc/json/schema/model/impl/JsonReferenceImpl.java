@@ -43,7 +43,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import javax.json.JsonException;
-import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 
@@ -64,7 +63,7 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
     public AbstractJsonSchema getSchema() throws JsonSchemaException {
         if (schema == null) {
             try {
-                JsonObject jsubschema = ref_locator.getSchema(ref_pointer);
+                    JsonValue jsubschema = ref_locator.getSchema(ref_pointer);
                 if (jsubschema == null) {
                     throw new JsonSchemaException(
                             new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, new Object[] {ref}));
@@ -106,9 +105,7 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
                     ref_locator = locator;
                 } else {
                     ref_locator = locator.resolve(
-                        new URI(uri.getScheme(), uri.getUserInfo(), 
-                                uri.getHost(), uri.getPort(), uri.getPath(), 
-                                null, null));                        
+                        new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null));                        
                 }
             } else {
                 ref_pointer = "";

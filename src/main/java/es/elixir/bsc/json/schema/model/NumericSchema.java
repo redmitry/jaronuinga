@@ -49,12 +49,18 @@ public interface NumericSchema<T extends Number> extends AbstractJsonSchema {
     public BigDecimal getMultipleOf();
     public void setMultipleOf(BigDecimal multipleOf);
 
-    Boolean getExclusiveMinimum();
+    Boolean isExclusiveMinimum();
     void setExclusiveMinimum(Boolean exclusiveMinimum);
+
+    Number getExclusiveMinimum();
+    void setExclusiveMinimum(Number exclusiveMinimum);
     
-    Boolean getExclusiveMaximum();
+    Boolean isExclusiveMaximum();
     void setExclusiveMaximum(Boolean exclusiveMaximum);
 
+    Number getExclusiveMaximum();
+    void setExclusiveMaximum(Number exclusiveMaximum);
+    
     T getMinimum();
     void setMinimum(T minimum);
     

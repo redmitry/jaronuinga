@@ -38,50 +38,53 @@ public final class ValidationErrorCode {
     public final static int BOOLEAN_EXPECTED = 5;
     public final static int NULL_EXPECTED = 6;
     
-    public final static int REFERENCE_UNRESOLVED = 7;
+    public final static int UNEVALUATED_BOOLEAN_SCHEMA = 7;
     
-    public final static int OBJECT_REQUIRED_PROPERTY_CONSTRAINT = 8;
-    public final static int OBJECT_DEPENDENT_REQUIRED_CONSTRAINT = 9;
+    public final static int REFERENCE_UNRESOLVED = 8;
+    
+    public final static int OBJECT_REQUIRED_PROPERTY_CONSTRAINT = 9;
+    public final static int OBJECT_DEPENDENT_REQUIRED_CONSTRAINT = 10;
 
-    public final static int OBJECT_MIN_PROPERTIES_CONSTRAINT = 10;
-    public final static int OBJECT_MAX_PROPERTIES_CONSTRAINT = 11;
+    public final static int OBJECT_MIN_PROPERTIES_CONSTRAINT = 11;
+    public final static int OBJECT_MAX_PROPERTIES_CONSTRAINT = 12;
     
-    public final static int OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT = 12;
-    public final static int OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT = 13;
+    public final static int OBJECT_ADDITIONAL_PROPERTY_CONSTRAINT = 13;
+    public final static int OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT = 14;
     
-    public final static int OBJECT_ALL_OF_CONSTRAINT = 14;
-    public final static int OBJECT_ANY_OF_CONSTRAINT = 15;
-    public final static int OBJECT_ONE_OF_CONSTRAINT = 16;
-    public final static int OBJECT_NOT_CONSTRAINT = 17;
+    public final static int OBJECT_ALL_OF_CONSTRAINT = 15;
+    public final static int OBJECT_ANY_OF_CONSTRAINT = 16;
+    public final static int OBJECT_ONE_OF_CONSTRAINT = 17;
+    public final static int OBJECT_NOT_CONSTRAINT = 18;
 
-    public final static int ARRAY_MIN_ITEMS_CONSTRAINT = 18;
-    public final static int ARRAY_MAX_ITEMS_CONSTRAINT = 19;
-    public final static int ARRAY_UNIQUE_ITEMS_CONSTRAINT = 20;
+    public final static int ARRAY_MIN_ITEMS_CONSTRAINT = 19;
+    public final static int ARRAY_MAX_ITEMS_CONSTRAINT = 20;
+    public final static int ARRAY_UNIQUE_ITEMS_CONSTRAINT = 21;
 
-    public final static int ARRAY_LENGTH_MISMATCH = 21;
+    public final static int ARRAY_LENGTH_MISMATCH = 22;
 
-    public final static int STRING_MIN_LENGTH_CONSTRAINT = 22;
-    public final static int STRING_MAX_LENGTH_CONSTRAINT = 23;
+    public final static int ARRAY_CONTAINS_CONSTRAINT = 23;
+    public final static int STRING_MIN_LENGTH_CONSTRAINT = 24;
+    public final static int STRING_MAX_LENGTH_CONSTRAINT = 25;
     
-    public final static int STRING_PATTERN_CONSTRAINT = 24;
-    public final static int STRING_DATE_TIME_FORMAT_CONSTRAINT = 25;
-    public final static int STRING_EMAIL_FORMAT_CONSTRAINT = 26;
-    public final static int STRING_HOSTNAME_FORMAT_CONSTRAINT = 27;
-    public final static int STRING_IP4_FORMAT_CONSTRAINT = 28;
-    public final static int STRING_IP6_FORMAT_CONSTRAINT = 29;
-    public final static int STRING_URI_FORMAT_CONSTRAINT = 30;
+    public final static int STRING_PATTERN_CONSTRAINT = 26;
+    public final static int STRING_DATE_TIME_FORMAT_CONSTRAINT = 27;
+    public final static int STRING_EMAIL_FORMAT_CONSTRAINT = 28;
+    public final static int STRING_HOSTNAME_FORMAT_CONSTRAINT = 29;
+    public final static int STRING_IP4_FORMAT_CONSTRAINT = 30;
+    public final static int STRING_IP6_FORMAT_CONSTRAINT = 31;
+    public final static int STRING_URI_FORMAT_CONSTRAINT = 32;
     
-    public final static int NUMBER_NOT_INTEGER = 31;
-    public final static int NUMBER_MIN_CONSTRAINT = 32;
-    public final static int NUMBER_MAX_CONSTRAINT = 33;
-    public final static int NUMBER_MULTIPLE_OF_CONSTRAINT = 34;
+    public final static int NUMBER_NOT_INTEGER = 33;
+    public final static int NUMBER_MIN_CONSTRAINT = 34;
+    public final static int NUMBER_MAX_CONSTRAINT = 35;
+    public final static int NUMBER_MULTIPLE_OF_CONSTRAINT = 36;
 
-    public final static int INTEGER_MIN_CONSTRAINT = 35;
-    public final static int INTEGER_MAX_CONSTRAINT = 36;
+    public final static int INTEGER_MIN_CONSTRAINT = 37;
+    public final static int INTEGER_MAX_CONSTRAINT = 38;
     
-    public final static int ENUM_INVALID_VALUE_TYPE = 37;
-    public final static int ENUM_INVALID_VALUE = 38;
+    public final static int ENUM_INVALID_VALUE_TYPE = 39;
+    public final static int ENUM_INVALID_VALUE = 40;
     
-    public final static int CONST_CONSTRAINT = 39;
+    public final static int CONST_CONSTRAINT = 41;
 
 }

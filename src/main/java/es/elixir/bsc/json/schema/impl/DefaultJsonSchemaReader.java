@@ -32,13 +32,13 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import javax.json.JsonException;
-import javax.json.JsonObject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -66,7 +66,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
     public JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException {
         JsonSchema schema = schemas.get(locator.uri);
         if (schema == null) {
-            final JsonObject obj;
+            final JsonValue obj;
             try {
                 obj = locator.getSchema("/");
             } catch (IOException ex) {

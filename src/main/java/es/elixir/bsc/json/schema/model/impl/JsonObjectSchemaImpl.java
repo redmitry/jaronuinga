@@ -219,7 +219,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue jadditionalProperties = object.get(ADDITIONAL_PROPERTIES);
         if (jadditionalProperties != null) {
             switch(jadditionalProperties.getValueType()) {
-                case OBJECT: additionalPropertiesSchema = parser.parse(locator, this, jsonPointer + "/" + ADDITIONAL_PROPERTIES, jadditionalProperties.asJsonObject(), JsonType.OBJECT); break;
+                case OBJECT: additionalPropertiesSchema = parser.parse(locator, this, jsonPointer + "/" + ADDITIONAL_PROPERTIES, jadditionalProperties, JsonType.OBJECT); break;
                 case TRUE:   additionalProperties = true; break;
                 case FALSE:  additionalProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -230,7 +230,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         final JsonValue junevaluatedProperties = object.get(UNEVALUATED_PROPERTIES);
         if (junevaluatedProperties != null) {
             switch(junevaluatedProperties.getValueType()) {
-                case OBJECT: unevaluatedPropertiesSchema = parser.parse(locator, this, jsonPointer + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties.asJsonObject(), type); break;
+                case OBJECT: unevaluatedPropertiesSchema = parser.parse(locator, this, jsonPointer + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, type); break;
                 case TRUE:   unevaluatedProperties = null; break;
                 case FALSE:  unevaluatedProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -238,9 +238,17 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             }
         }
 
-        final JsonObject jpropertyNames = JsonSchemaUtil.check(object.get(PROPERTY_NAMES), ValueType.OBJECT);
+        final JsonValue jpropertyNames = object.get(PROPERTY_NAMES);
         if (jpropertyNames != null) {
-            propertyNames = new JsonStringSchemaImpl().read(parser, locator, this, jsonPointer + "/" + PROPERTY_NAMES, jpropertyNames.asJsonObject(), JsonType.STRING);
+            switch(jpropertyNames.getValueType()) {
+                case OBJECT: propertyNames = new JsonStringSchemaImpl().read(parser, locator, this, jsonPointer + "/" + PROPERTY_NAMES, jpropertyNames.asJsonObject(), null);
+                             break;
+                case TRUE:   
+                case FALSE:  propertyNames = new BooleanJsonSchemaImpl().read(parser, locator, this, jsonPointer + "/" + PROPERTY_NAMES, jpropertyNames, null);
+                             break;
+                default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                   new Object[] {PROPERTY_NAMES, jpropertyNames.getValueType().name(), "either object or boolean"}));
+            }
         }
         
         final JsonObject jdependentSchemas = JsonSchemaUtil.check(object.get(DEPENDENT_SCHEMAS), ValueType.OBJECT);
@@ -258,8 +266,11 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             for (Map.Entry<String, JsonValue> dependency : jdependencies.entrySet()) {
                 final String name = dependency.getKey();
                 final JsonValue value = dependency.getValue();
+                
                 switch(value.getValueType()) {
-                    case OBJECT: final AbstractJsonSchema schema = new JsonObjectSchemaImpl().read(parser, locator, this, jsonPointer + "/" + DEPENDENCIES + name + "/", value.asJsonObject(), JsonType.OBJECT);
+                    case OBJECT:
+                    case TRUE:
+                    case FALSE:  final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + DEPENDENCIES + "/" + name + "/", value, null);
                                  getDependentSchemas().put(name, schema);
                                  break;
                     case ARRAY:  final StringArray arr = new JsonStringArray().read(value.asJsonArray());

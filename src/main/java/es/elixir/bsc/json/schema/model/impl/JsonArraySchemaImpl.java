@@ -63,6 +63,8 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     private Long minItems;
     private Long maxItems;
     
+    private AbstractJsonSchema contains;
+    
     @Override
     public List<AbstractJsonSchema> getItems() {
         if (items == null) {
@@ -103,6 +105,11 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
+    public AbstractJsonSchema getContains() {
+        return contains;
+    }
+    
+    @Override
     public JsonArraySchemaImpl read(final JsonSubschemaParser parser, 
                                     final JsonSchemaLocator locator,
                                     final JsonSchemaElement parent,
@@ -132,26 +139,40 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
             }
         }
 
+        final JsonValue jcontains = object.get(CONTAINS);
+        if (jcontains != null) {
+            contains = parser.parse(locator, this, jsonPointer + "/" + CONTAINS, jcontains, null);
+        }
+
         JsonValue jitems = object.get(ITEMS);
         if (jitems == null) {
             // Omitting this keyword has the same behavior as an empty schema.
             return this;
         }
         
-        if (jitems instanceof JsonObject) {
-            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + ITEMS, jitems.asJsonObject(), null);
-            getItems().add(schema);
-        } else if (jitems instanceof JsonArray) {
-            additionalItems = true;
-            for (int i = 0, n = jitems.asJsonArray().size(); i < n; i++) {
-                final JsonValue value = jitems.asJsonArray().get(i);
-                final JsonObject o = JsonSchemaUtil.check(value, JsonValue.ValueType.OBJECT);
-                final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + Integer.toString(i), o, null);
-                getItems().add(schema);                
-            }
-        } else {
-            throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                new Object[] {ITEMS, jitems.getValueType().name(), "either an object or an array"}));
+        switch(jitems.getValueType()) {
+            case OBJECT:
+            case TRUE:
+            case FALSE: final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + ITEMS, jitems, null);
+                        getItems().add(schema);
+                        break;
+            case ARRAY: additionalItems = true;
+                        for (int i = 0, n = jitems.asJsonArray().size(); i < n; i++) {
+                            final JsonValue value = jitems.asJsonArray().get(i);
+                            switch(value.getValueType()) {
+                                case OBJECT:
+                                case TRUE:
+                                case FALSE: final AbstractJsonSchema arr = parser.parse(locator, this, jsonPointer + "/" + ITEMS + "/" + i, value, null);
+                                            getItems().add(arr);
+                                            break;
+                                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                             new Object[] {ITEMS + "/" + i, value.getValueType().name(), "either an object or boolean"}));
+                            }
+                        }
+                        break;
+            default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                     new Object[] {ITEMS, jitems.getValueType().name(), "either an object, boolean or an array"}));
+
         }
 
         if (additionalItems != null) {
@@ -168,7 +189,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 }
             }
         }
-        
+
         return this;
     }
 
@@ -243,6 +264,22 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                 } else {
                     values.add(o);
                 }
+            }
+        }
+
+        if (contains != null) {
+            final List<String> eva = new ArrayList();
+            final List<ValidationError> err = new ArrayList<>();
+            int idx = array.size();
+            while (idx-- > 0) {
+                final JsonValue val = array.get(idx);
+                if (contains.validate(jsonPointer, val, parent, eva, err, callback)) {
+                    break;
+                }
+            }
+            if (idx < 0) {
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_CONTAINS_CONSTRAINT_MSG));
             }
         }
 

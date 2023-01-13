@@ -87,8 +87,19 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.SCHEMA_OBJECT_ERROR, 
                    new Object[] {value.getValueType()}));
         }
-        
+
         JsonObject object = value.asJsonObject();
+
+        JsonValue jref = object.get(JsonReference.REF);
+        if (jref != null) {
+            if (JsonValue.ValueType.STRING != jref.getValueType()) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                       new Object[] {JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+            }
+
+            return new JsonReferenceImpl().read(this, locator, parent, jsonPointer, (JsonString)jref, null);
+        }
+
         JsonValue $id = object.get(JsonSchema.ID);
         if ($id == null) {
             $id = object.get("id"); // draft4
@@ -109,16 +120,6 @@ public class DefaultJsonSchemaParser implements JsonSubschemaParser {
                 throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
                                               new Object[] {id}));
             }
-        }
-
-        JsonValue jref = object.get(JsonReference.REF);
-        if (jref != null) {
-            if (JsonValue.ValueType.STRING != jref.getValueType()) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                       new Object[] {JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
-            }
-
-            return new JsonReferenceImpl().read(this, locator, parent, jsonPointer, (JsonString)jref, null);
         }
         
         final JsonValue type_value = object.get(TYPE);

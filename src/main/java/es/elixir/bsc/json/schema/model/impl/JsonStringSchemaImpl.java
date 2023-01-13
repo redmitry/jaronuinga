@@ -30,11 +30,8 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonStringSchema;
-import java.math.BigInteger;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import es.elixir.bsc.json.schema.ParsingError;
-import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.DefaultJsonStringFormatValidator;
 import es.elixir.bsc.json.schema.model.JsonType;
@@ -111,10 +108,13 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
         super.read(parser, locator, parent, jsonPointer, object, type);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_LENGTH), JsonValue.ValueType.NUMBER);
+        if (min != null) {
+            minLength = min.longValue();
+        }
         final JsonNumber max = JsonSchemaUtil.check(object.getJsonNumber(MAX_LENGTH), JsonValue.ValueType.NUMBER);
-        
-        minLength = getLength(min);
-        maxLength = getLength(max);
+        if (max != null) {
+            maxLength = max.longValue();
+        }
         
         final JsonString jformat = JsonSchemaUtil.check(object.getJsonString(FORMAT), JsonValue.ValueType.STRING);
         if (jformat != null) {
@@ -127,28 +127,6 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
         }
 
         return this;
-    }
-
-    private Long getLength(JsonNumber length) throws JsonSchemaException {
-        if (length == null) {
-            return null;
-        }
-        
-        if (length.isIntegral()) {
-            final BigInteger bi = length.bigIntegerValue();
-            if (bi.bitLength() > Integer.SIZE) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                              new Object[] {"string length", bi.toString(), "is too big"}));
-            } else if (bi.signum() < 0) {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                              new Object[] {"string length", bi.toString(), "cant be negative"}));
-            }
-            
-            return bi.longValue();
-        } else {
-                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
-                                              new Object[] {"string length", length.bigDecimalValue(), "cant be decimal"}));
-        }
     }
     
     @Override

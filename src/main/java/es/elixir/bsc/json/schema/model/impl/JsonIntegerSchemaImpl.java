@@ -88,9 +88,12 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
 
         final JsonNumber number = ((JsonNumber)value);
         if(!number.isIntegral()) {
-            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.NUMBER_NOT_INTEGER_MSG, number.numberValue()));
-            return false;
+            final BigDecimal decimal = number.bigDecimalValue();
+            if (decimal.signum() != 0 && decimal.scale() > 0 && decimal.stripTrailingZeros().scale() > 0) {
+                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.NUMBER_NOT_INTEGER_MSG, number.numberValue()));
+                return false;
+            }
         }
 
         final int nerrors = errors.size();
@@ -108,7 +111,7 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
 
     public void validate(String jsonPointer, BigInteger num, List<ValidationError> errors) {
         if (minimum != null) {
-            if (exclusiveMinimum != null && exclusiveMinimum) {
+            if (isExclusiveMinimum != null && isExclusiveMinimum) {
                 if (num.compareTo(minimum) <= 0) {
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                             ValidationMessage.NUMBER_MIN_CONSTRAINT_MSG, num, "<=", minimum));
@@ -120,7 +123,7 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
         }
         
         if (maximum != null) {
-            if (exclusiveMaximum != null && exclusiveMaximum) {
+            if (isExclusiveMaximum != null && isExclusiveMaximum) {
                 if (num.compareTo(maximum) >= 0) {
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                             ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, num, ">=", maximum));
@@ -131,6 +134,16 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
             }
         }
         
+        if (exclusiveMinimum != null && num.compareTo(BigInteger.valueOf(exclusiveMinimum.longValue())) <= 0) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.NUMBER_MIN_CONSTRAINT_MSG, num, "<=", minimum));
+        }
+
+        if (exclusiveMaximum != null && num.compareTo(BigInteger.valueOf(exclusiveMaximum.longValue())) >= 0) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, num, ">=", maximum));
+        }
+
         if (multipleOf != null && new BigDecimal(num).divideAndRemainder(multipleOf)[1].compareTo(BigDecimal.ZERO) != 0) {
                 errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                         ValidationMessage.NUMBER_MULTIPLE_OF_CONSTRAINT_MSG, num, multipleOf));

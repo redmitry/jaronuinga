@@ -40,6 +40,8 @@ public enum ValidationMessage {
     BOOLEAN_EXPECTED_MSG(BOOLEAN_EXPECTED, "boolean expected, found: %s"),
     NULL_EXPECTED_MSG(NULL_EXPECTED, "null expected, found: %s"),
     
+    UNEVALUATED_BOOLEAN_SCHEMA_MSG(UNEVALUATED_BOOLEAN_SCHEMA, "boolean schema type = false"),
+    
     REFERENCE_UNRESOLVED_MSG(REFERENCE_UNRESOLVED, "unable to resolve reference. '$ref': '%s'."),
     
     OBJECT_REQUIRED_PROPERTY_CONSTRAINT_MSG(OBJECT_REQUIRED_PROPERTY_CONSTRAINT, "object missed required property: %s"),
@@ -62,6 +64,8 @@ public enum ValidationMessage {
     ARRAY_MAX_ITEMS_CONSTRAINT_MSG(ARRAY_MAX_ITEMS_CONSTRAINT, "maxItems = %d < array.items.size = %d"),
     ARRAY_UNIQUE_ITEMS_CONSTRAINT_MSG(ARRAY_MAX_ITEMS_CONSTRAINT, "duplicate values in array %s"),
     ARRAY_LENGTH_MISMATCH_MSG(ARRAY_LENGTH_MISMATCH, "array.length = %d not equals items.length = %d"),
+    
+    ARRAY_CONTAINS_CONSTRAINT_MSG(ARRAY_CONTAINS_CONSTRAINT, "no elements match contains schema"),
 
     STRING_MIN_LENGTH_CONSTRAINT_MSG(STRING_MIN_LENGTH_CONSTRAINT, "string.length %d < minLength = %d"),
     STRING_MAX_LENGTH_CONSTRAINT_MSG(STRING_MAX_LENGTH_CONSTRAINT, "string.length %d > maxLength = %d"),

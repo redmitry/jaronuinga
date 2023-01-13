@@ -93,11 +93,11 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
         
         return nerrors == errors.size();
     }
-    
+
     private void validate(String jsonPointer, BigDecimal dec, List<ValidationError> errors) {
 
         if (minimum != null) {
-            if (exclusiveMinimum != null && exclusiveMinimum) {
+            if (isExclusiveMinimum != null && isExclusiveMinimum) {
                 if (dec.compareTo(minimum) <= 0) {
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                             ValidationMessage.NUMBER_MIN_CONSTRAINT_MSG, dec, "<=", minimum));
@@ -109,7 +109,7 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
         }
         
         if (maximum != null) {
-            if (exclusiveMaximum != null && exclusiveMaximum) {
+            if (isExclusiveMaximum != null && isExclusiveMaximum) {
                 if (dec.compareTo(maximum) >= 0) {
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                             ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, dec.toPlainString(), ">=", maximum));
@@ -120,6 +120,16 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
             }
         }
         
+        if (exclusiveMinimum != null && dec.compareTo(BigDecimal.valueOf(exclusiveMinimum.doubleValue())) <= 0) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.NUMBER_MIN_CONSTRAINT_MSG, dec, "<=", exclusiveMinimum));
+        }
+
+        if (exclusiveMaximum != null && dec.compareTo(BigDecimal.valueOf(exclusiveMaximum.doubleValue())) >= 0) {
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                    ValidationMessage.NUMBER_MAX_CONSTRAINT_MSG, dec, ">=", exclusiveMaximum));
+        }
+
         if (multipleOf != null && dec.divideAndRemainder(multipleOf)[1].compareTo(BigDecimal.ZERO) != 0) {
                 errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                         ValidationMessage.NUMBER_MULTIPLE_OF_CONSTRAINT_MSG, dec, multipleOf));

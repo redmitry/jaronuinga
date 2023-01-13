@@ -29,7 +29,7 @@ import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.io.IOException;
 import java.net.URI;
 import javax.json.JsonException;
-import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
@@ -39,7 +39,7 @@ public abstract class JsonSchemaLocator {
    
     public final URI uri;
     
-    public JsonSchemaLocator(final URI uri) {
+    public JsonSchemaLocator(URI uri) {
         this.uri = uri;
     }
     
@@ -50,7 +50,7 @@ public abstract class JsonSchemaLocator {
      * 
      * @param schema the schema to associate with this locator (URI).
      */
-    public abstract void setSchema(JsonObject schema);
+    public abstract void setSchema(JsonValue schema);
 
     /**
      * Get Json Schema Object associated with this locator.
@@ -61,7 +61,7 @@ public abstract class JsonSchemaLocator {
      * @throws IOException
      * @throws JsonException 
      */
-    public abstract JsonObject getSchema(String jsonPointer)
+    public abstract JsonValue getSchema(String jsonPointer)
             throws IOException, JsonException;
 
     /**
@@ -75,7 +75,7 @@ public abstract class JsonSchemaLocator {
      * @throws IOException
      * @throws JsonException 
      */
-    public abstract JsonObject getSchema(URI uri, String jsonPointer)
+    public abstract JsonValue getSchema(URI uri, String jsonPointer)
             throws IOException, JsonException;
 
     /**

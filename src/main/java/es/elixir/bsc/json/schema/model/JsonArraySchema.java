@@ -42,6 +42,10 @@ public interface JsonArraySchema extends AbstractJsonSchema {
     public final static String MIN_ITEMS = "minItems";
     public final static String MAX_ITEMS = "maxItems";
     
+    public final static String CONTAINS = "contains";
+    public final static String MIN_CONTAINS = "minContains";
+    public final static String MAX_CONTAINS = "maxContains";
+    
     Long getMinItems();
     void setMinItems(Long minItems);
 
@@ -64,4 +68,7 @@ public interface JsonArraySchema extends AbstractJsonSchema {
      *         EmptyJsonSchema if TRUE
      */
     AbstractJsonSchema getAdditionalItems();
+    
+    AbstractJsonSchema getContains();
+    
 }

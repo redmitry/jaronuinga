@@ -27,11 +27,12 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
+import es.elixir.bsc.json.schema.ParsingError;
+import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import static es.elixir.bsc.json.schema.model.NumericSchema.MULTIPLE_OF;
 import java.math.BigDecimal;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -49,9 +50,12 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     protected T minimum;
     protected T maximum;
 
-    protected Boolean exclusiveMinimum;
-    protected Boolean exclusiveMaximum;
+    protected Boolean isExclusiveMinimum;
+    protected Boolean isExclusiveMaximum;
 
+    protected Number exclusiveMinimum;
+    protected Number exclusiveMaximum;
+    
     @Override
     public BigDecimal getMultipleOf() {
         return multipleOf;
@@ -83,25 +87,45 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     }
 
     @Override
-    public Boolean getExclusiveMinimum() {
+    public Boolean isExclusiveMinimum() {
+        return isExclusiveMinimum;
+    }
+
+    @Override
+    public void setExclusiveMinimum(Boolean isExclusiveMinimum) {
+        this.isExclusiveMinimum = isExclusiveMinimum;
+    }
+
+    @Override
+    public Number getExclusiveMinimum() {
         return exclusiveMinimum;
     }
 
     @Override
-    public void setExclusiveMinimum(Boolean exclusiveMinimum) {
+    public void setExclusiveMinimum(Number exclusiveMinimum) {
         this.exclusiveMinimum = exclusiveMinimum;
     }
 
     @Override
-    public Boolean getExclusiveMaximum() {
+    public Boolean isExclusiveMaximum() {
+        return isExclusiveMaximum;
+    }
+
+    @Override
+    public void setExclusiveMaximum(Boolean isExclusiveMaximum) {
+        this.isExclusiveMaximum = isExclusiveMaximum;
+    }
+
+    @Override
+    public Number getExclusiveMaximum() {
         return exclusiveMaximum;
     }
 
     @Override
-    public void setExclusiveMaximum(Boolean exclusiveMaximum) {
+    public void setExclusiveMaximum(Number exclusiveMaximum) {
         this.exclusiveMaximum = exclusiveMaximum;
     }
-
+    
     @Override
     public NumericSchemaImpl read(final JsonSubschemaParser parser, 
                                   final JsonSchemaLocator locator,
@@ -116,13 +140,29 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
         if (mul != null) {
             multipleOf = mul.bigDecimalValue();
         }
-
-        if (object.getBoolean(EXCLUSIVE_MINIMUM, false)) {
-            exclusiveMinimum = true;
+        
+        final JsonValue jexclusiveMinimum = object.get(EXCLUSIVE_MINIMUM);
+        if (jexclusiveMinimum != null) {
+            switch(jexclusiveMinimum.getValueType()) {
+                case NUMBER: exclusiveMinimum = ((JsonNumber)jexclusiveMinimum).doubleValue();
+                             break;
+                case TRUE:   isExclusiveMinimum = true;
+                case FALSE:  break;
+                default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                 new Object[] {EXCLUSIVE_MINIMUM, jexclusiveMinimum.getValueType().name(), "either number or boolean (draft4)"}));
+            }
         }
         
-        if (object.getBoolean(EXCLUSIVE_MAXIMUM, false)) {
-            exclusiveMaximum = true;
+        final JsonValue jexclusiveMaximum = object.get(EXCLUSIVE_MAXIMUM);
+        if (jexclusiveMaximum != null) {
+            switch(jexclusiveMaximum.getValueType()) {
+                case NUMBER: exclusiveMaximum = ((JsonNumber)jexclusiveMaximum).doubleValue();
+                             break;
+                case TRUE:   isExclusiveMaximum = true;
+                case FALSE:  break;
+                default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                 new Object[] {EXCLUSIVE_MAXIMUM, jexclusiveMaximum.getValueType().name(), "either number or boolean (draft4)"}));
+            }
         }
 
         return this;

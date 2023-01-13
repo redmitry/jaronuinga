@@ -28,6 +28,8 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.ParsingError;
+import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import java.util.List;
@@ -134,11 +136,20 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
             locator.putSchema(oneOf);
         }
 
-        final JsonObject jnot = JsonSchemaUtil.check(object.get(NOT), JsonValue.ValueType.OBJECT);
+        final JsonValue jnot = object.get(NOT);
         if (jnot != null) {
-            not = new JsonNotImpl();            
-            not.read(parser, locator, this, jsonPointer + "/" + NOT, jnot);
-            locator.putSchema(not);
+            switch(jnot.getValueType()) {
+                case OBJECT: not = new JsonNotImpl();
+                             not.read(parser, locator, this, jsonPointer + "/" + NOT, jnot.asJsonObject());
+                             break;
+                case TRUE:
+                case FALSE: BooleanJsonSchemaImpl bool = new BooleanJsonSchemaImpl();
+                            not = new JsonNotImpl(bool.read(parser, locator, parent, jsonPointer, jnot, null));
+                            break;
+                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                       new Object[] {NOT, jnot.getValueType().name(), "either object or boolean"}));
+            }
+            locator.putSchema(not);            
         }
 
         return this;

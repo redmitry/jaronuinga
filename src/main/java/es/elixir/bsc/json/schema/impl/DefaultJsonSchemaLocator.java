@@ -29,7 +29,6 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import javax.json.Json;
 import javax.json.JsonException;
-import javax.json.JsonObject;
 import javax.json.JsonPointer;
 import javax.json.JsonReader;
 import javax.json.JsonReaderFactory;
@@ -37,6 +36,7 @@ import javax.json.JsonValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,42 +47,38 @@ import java.util.Map;
     
 public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
-    protected final Map<URI, JsonObject> schemas;
+    protected final Map<URI, JsonValue> schemas;
 
     public DefaultJsonSchemaLocator(URI uri) {
         this(uri, new HashMap<>());
     }
     
-    protected DefaultJsonSchemaLocator(URI uri, Map<URI, JsonObject> schemas) {
+    protected DefaultJsonSchemaLocator(URI uri, Map<URI, JsonValue> schemas) {
         super(uri);
         this.schemas = schemas;
     }
 
     @Override
-    public void setSchema(JsonObject schema) {
+    public void setSchema(JsonValue schema) {
         schemas.put(uri, schema);
     }
 
     @Override
-    public JsonObject getSchema(String jsonPointer) 
+    public JsonValue getSchema(String jsonPointer) 
             throws IOException, JsonException {
         return getSchema(this.uri, jsonPointer);
     }
 
     @Override
-    public JsonObject getSchema(URI uri, String jsonPointer)
+    public JsonValue getSchema(URI uri, String jsonPointer)
             throws IOException, JsonException {
         
-        JsonObject schema = schemas.get(uri);
+        JsonValue schema = schemas.get(uri);
         if (schema == null) {
             final JsonReaderFactory factory = Json.createReaderFactory(Collections.EMPTY_MAP);
             try (InputStream in = uri.toURL().openStream()){
                 final JsonReader reader = factory.createReader(in);
-                final JsonValue val = reader.readValue();
-
-                if (JsonValue.ValueType.OBJECT == val.getValueType()) {
-                    schema = val.asJsonObject();
-                }
+                schema = reader.readValue();
                 setSchema(schema);
             }
         }
@@ -91,13 +87,12 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
             return schema;
         }
         
-        final JsonPointer pointer = Json.createPointer(jsonPointer);
-        
-        // there is a bug as containsValue() rises an exception when not found. 
-        if (pointer.containsValue(schema)) {
-            final JsonValue subschema = pointer.getValue(schema);
-            if (JsonValue.ValueType.OBJECT == subschema.getValueType()) {
-                return subschema.asJsonObject();
+        if (JsonValue.ValueType.OBJECT == schema.getValueType()) {
+            final JsonPointer pointer = Json.createPointer(jsonPointer);
+
+            // there is a bug as containsValue() rises an exception when not found. 
+            if (pointer.containsValue(schema.asJsonObject())) {
+                return pointer.getValue(schema.asJsonObject());
             }
         }
 
@@ -106,6 +101,13 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
 
     @Override
     public JsonSchemaLocator resolve(URI uri) {
+        // fix wrong (?) uri.resove() where base uri is opeque and child has no schema
+        if (super.uri.isOpaque() && uri.getSchemeSpecificPart().isEmpty() && uri.getFragment() != null) {
+            try {
+                return new DefaultJsonSchemaLocator(new URI(super.uri.getScheme(), 
+                        super.uri.getSchemeSpecificPart(), uri.getFragment()), schemas);
+            } catch(URISyntaxException ex) {}
+        }
         return new DefaultJsonSchemaLocator(super.uri.resolve(uri), schemas);
     }
     

@@ -37,6 +37,7 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import java.util.List;
+import javax.json.JsonNumber;
 
 /**
  * @author Dmitry Repchevsky
@@ -70,12 +71,13 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
         
         return this;
     }
+
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
             List<String> evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
-        if (this.value == null || !this.value.equals(value)) {
+        if (this.value == null || !equals(this.value, value)) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.CONST_CONSTRAINT_MSG, value.toString(), 
                     this.value == null ? "" : this.value.toString()));
@@ -83,5 +85,17 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
         }
         
         return super.validate(jsonPointer, value, parent, evaluated, errors, callback);
-    }    
+    }
+    
+    protected static boolean equals(JsonValue v1, JsonValue v2) {
+        if (v1.getValueType() != v2.getValueType()) {
+            return false;
+        }
+
+        switch(v1.getValueType()) {
+            case NUMBER: return ((JsonNumber)v1).doubleValue() == ((JsonNumber)v2).doubleValue();
+        }
+
+        return v1.equals(v2);
+    }
 }
