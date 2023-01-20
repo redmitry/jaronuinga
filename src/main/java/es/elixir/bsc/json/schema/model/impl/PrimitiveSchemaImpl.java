@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -34,6 +34,7 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
 import es.elixir.bsc.json.schema.model.JsonAnyOf;
 import es.elixir.bsc.json.schema.model.JsonNot;
@@ -41,6 +42,7 @@ import es.elixir.bsc.json.schema.model.JsonOneOf;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import java.util.ArrayList;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonString;
@@ -63,6 +65,10 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     private JsonOneOfImpl oneOf;
     private JsonNotImpl not;
     
+    private AbstractJsonSchema _if;
+    private AbstractJsonSchema _then;
+    private AbstractJsonSchema _else;
+
     public String getTitle() {
         return title;
     }
@@ -97,6 +103,21 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     @Override
     public JsonNot getNot() {
         return not;
+    }
+
+    @Override
+    public AbstractJsonSchema getIf() {
+        return _if;
+    }
+
+    @Override
+    public AbstractJsonSchema getThen() {
+        return _then;
+    }
+
+    @Override
+    public AbstractJsonSchema getElse() {
+        return _else;
     }
 
     @Override
@@ -152,6 +173,45 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
             locator.putSchema(not);            
         }
 
+        final JsonValue jif = object.get(IF);
+        if (jif != null) {
+            switch(jif.getValueType()) {
+                case OBJECT: _if = parser.parse(locator, this, jsonPointer + "/" + IF, jif, null);
+                             break;
+                case TRUE:
+                case FALSE:  _if = new BooleanJsonSchemaImpl().read(parser, locator, parent, jsonPointer, jif, null);
+                             break;
+                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                       new Object[] {IF, jif.getValueType().name(), "either object or boolean"}));                             
+            }
+        }
+
+        final JsonValue jelse = object.get(ELSE);
+        if (jelse != null) {
+            switch(jelse.getValueType()) {
+                case OBJECT: _else = parser.parse(locator, this, jsonPointer + "/" + ELSE, jelse, null);
+                             break;
+                case TRUE:
+                case FALSE:  _else = new BooleanJsonSchemaImpl().read(parser, locator, parent, jsonPointer, jelse, null);
+                             break;
+                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                       new Object[] {ELSE, jelse.getValueType().name(), "either object or boolean"}));                             
+            }
+        }
+
+        final JsonValue jthen = object.get(THEN);
+        if (jthen != null) {
+            switch(jthen.getValueType()) {
+                case OBJECT: _then = parser.parse(locator, this, jsonPointer + "/" + THEN, jthen, null);
+                             break;
+                case TRUE:
+                case FALSE:  _then = new BooleanJsonSchemaImpl().read(parser, locator, parent, jsonPointer, jthen, null);
+                             break;
+                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                       new Object[] {THEN, jthen.getValueType().name(), "either object or boolean"}));                             
+            }
+        }
+
         return this;
     }
 
@@ -176,6 +236,15 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
 
         if (not != null) {
             not.validate(jsonPointer, value, parent, evaluated, errors, callback);
+        }
+
+        if (_if != null) {
+            final List<ValidationError> err = new ArrayList<>();
+            _if.validate(value, err);
+            final AbstractJsonSchema choice = err.isEmpty() ? _then : _else;
+            if (choice != null) {
+                choice.validate(jsonPointer, value, parent, evaluated, errors, callback);
+            }
         }
         
         return nerrors == errors.size();

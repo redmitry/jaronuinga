@@ -61,7 +61,7 @@ public class JsonSchemaOrgTest {
         try (InputStream in = url.openStream();
              JsonParser parser = Json.createParser(in)) {
             
-            final StringBuilder out = new StringBuilder("");
+            final StringBuilder out = new StringBuilder();
             
             DefaultJsonSchemaLocator locator = new DefaultJsonSchemaLocator(url.toURI());
             if (parser.hasNext() && parser.next() == JsonParser.Event.START_ARRAY) {
@@ -69,7 +69,7 @@ public class JsonSchemaOrgTest {
                 Iterator<JsonValue> iter = stream.iterator();
                 while (iter.hasNext()) {
                     JsonObject obj = iter.next().asJsonObject();
-                    JsonObject sch = obj.getJsonObject("schema");
+                    JsonValue sch = obj.get("schema");
                     locator.setSchema(sch);
                     JsonSchema schema = JsonSchemaReader.getReader().read(locator);
                     JsonArray tests = obj.getJsonArray("tests");
@@ -82,13 +82,13 @@ public class JsonSchemaOrgTest {
                         schema.validate(data, errors);
                         
                         if (valid != errors.isEmpty()) {
-                            out.append(String.format("%s %s\n", obj.getString("description", ""), 
+                            out.append(String.format("%s : %s\n", obj.getString("description", ""), 
                                 test.getString("description", "")));
                         }
                     }
                 }
                 if (out.length() > 0) {
-                    Assert.fail(out.toString());
+                    Assert.fail("\n" + out.toString());
                 }
             }
         } catch (IOException | JsonSchemaException | URISyntaxException ex) {

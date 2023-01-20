@@ -33,10 +33,22 @@ import org.junit.Test;
 
 public class JsonSchemaRefTest extends JsonSchemaOrgTest {
     
-    private final static String JSON_TEST_FILE = "json-schema-org/draft4/ref.json";
+    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/draft4/ref.json";
+    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/ref.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/ref.json";
     
     @Test
-    public void test_01() {
-        test(JSON_TEST_FILE);
+    public void test_draft4() {
+        test(JSON_DRAFT4_TEST_FILE);
+    }
+
+    @Test
+    public void test_draft6() {
+        test(JSON_DRAFT6_TEST_FILE);
+    }
+
+    @Test
+    public void test_draft7() {
+        test(JSON_DRAFT7_TEST_FILE);
     }
 }

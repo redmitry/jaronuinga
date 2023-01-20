@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -77,9 +77,6 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     private Boolean unevaluatedProperties;
     private AbstractJsonSchema unevaluatedPropertiesSchema;
     private AbstractJsonSchema propertyNames;
-    private AbstractJsonSchema _if;
-    private AbstractJsonSchema _then;
-    private AbstractJsonSchema _else;
     
     @Override
     public JsonDefinitions getDefinitions() {
@@ -159,21 +156,6 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     @Override
     public AbstractJsonSchema getPropertyNames() {
         return propertyNames;
-    }
-
-    @Override
-    public AbstractJsonSchema getIf() {
-        return _if;
-    }
-
-    @Override
-    public AbstractJsonSchema getThen() {
-        return _then;
-    }
-
-    @Override
-    public AbstractJsonSchema getElse() {
-        return _else;
     }
 
     @Override
@@ -281,21 +263,6 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                                        value.getValueType().name(), JsonValue.ValueType.OBJECT.name() + " or " + JsonValue.ValueType.ARRAY.name()}));
                 }
             }
-        }
-        
-        final JsonObject jif = JsonSchemaUtil.check(object.get(IF), ValueType.OBJECT);
-        if (jif != null) {
-            _if = parser.parse(locator, this, jsonPointer + "/" + IF, jif, type);
-        }
-
-        final JsonObject jelse = JsonSchemaUtil.check(object.get(ELSE), ValueType.OBJECT);
-        if (jelse != null) {
-            _else = parser.parse(locator, this, jsonPointer + "/" + ELSE, jelse, type);
-        }
-
-        final JsonObject jthen = JsonSchemaUtil.check(object.get(THEN), ValueType.OBJECT);
-        if (jthen != null) {
-            _then = parser.parse(locator, this, jsonPointer + "/" + THEN, jthen, type);
         }
         
         return this;
@@ -413,15 +380,6 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                         }
                     }
                 }
-            }
-        }
-
-        if (_if != null) {
-            final List<ValidationError> err = new ArrayList<>();
-            _if.validate(object, err);
-            final AbstractJsonSchema choice = err.isEmpty() ? _then : _else;
-            if (choice != null) {
-                choice.validate(jsonPointer, value, parent, evaluated, errors, callback);
             }
         }
 

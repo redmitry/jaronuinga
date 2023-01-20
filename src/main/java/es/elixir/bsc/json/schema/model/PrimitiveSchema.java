@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -43,8 +43,17 @@ public interface PrimitiveSchema extends AbstractJsonSchema {
     public final static String ONE_OF = "oneOf";
     public final static String NOT = "not";
 
-    public JsonAllOf getAllOf();
-    public JsonAnyOf getAnyOf();
-    public JsonOneOf getOneOf();
-    public JsonNot getNot();
+    public final static String IF = "if";
+    public final static String THEN = "then";
+    public final static String ELSE = "else";
+
+    JsonAllOf getAllOf();
+    JsonAnyOf getAnyOf();
+    JsonOneOf getOneOf();
+    JsonNot getNot();
+
+    AbstractJsonSchema getIf();
+    AbstractJsonSchema getThen();
+    AbstractJsonSchema getElse();
+
 }
