@@ -1,0 +1,11 @@
+{
+  "id": "https://www.elixir-europe.org/excelerate/WP2/json-schemas/test#datatime_01",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of string 'date-time' format",
+  "type": "object",
+  "properties": {
+    "A": { "type": "string",
+           "format": "date-time" 
+         }
+   }
+}

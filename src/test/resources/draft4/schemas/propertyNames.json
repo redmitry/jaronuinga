@@ -1,0 +1,7 @@
+{
+  "$comment": "Taken from https://json-schema.org/understanding-json-schema/reference/object.html#property-names",
+  "type": "object",
+  "propertyNames": {
+    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+  }
+}

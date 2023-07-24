@@ -1,0 +1,14 @@
+{
+  "id": "https://www.elixir-europe.org/json-schemas/test/enum",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of complex 'enum' (object / array)",
+  "type": "object",
+  "properties": {
+    "A": { 
+       "enum": [{"Barcelona": 5}, {"Madrid": 0}]
+    },
+    "B": { 
+       "enum": [["Barcelona", "Madrid"],["St.Petersburg", "Moscow"]]
+    }
+  }
+}

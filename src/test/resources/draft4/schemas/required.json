@@ -1,0 +1,12 @@
+{
+  "id": "https://www.elixir-europe.org/excelerate/WP2/json-schemas/test#required_01",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of required properties",
+  "type": "object",
+  "properties": {
+    "A": { "type": "string" },
+    "B": { "type": "string" },
+    "C": { "type": "number" }
+    },
+  "required": [ "A", "B" ]
+}

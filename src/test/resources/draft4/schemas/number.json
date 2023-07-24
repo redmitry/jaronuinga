@@ -1,0 +1,13 @@
+{
+  "id": "https://www.elixir-europe.org/excelerate/WP2/json-schemas/test#number_01",
+  "$schema": "http://json-schema.org/draft-04/hyper-schema#",
+  "title": "validation of number type constraints",
+  "type": "object",
+  "properties": {
+    "A": { "type": "number",
+           "minimum": 10,
+           "maximum": 20.5,
+           "exclusiveMaximum": true
+         }
+   }
+}

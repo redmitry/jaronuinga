@@ -1,0 +1,8 @@
+{
+  "$comment": "Taken from https://json-schema.org/understanding-json-schema/reference/generic.html#constant-values",
+  "properties": {
+    "country": {
+      "const": "United States of America"
+    }
+  }
+}

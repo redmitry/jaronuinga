@@ -1,0 +1,4 @@
+{
+  "$comment": "validates local reference",
+  "$ref": "ref-local.json"
+}

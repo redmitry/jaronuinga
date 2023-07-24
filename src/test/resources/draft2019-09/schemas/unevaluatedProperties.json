@@ -1,0 +1,20 @@
+{
+  "$comment": "Taken from https://json-schema.org/understanding-json-schema/reference/object.html#unevaluated-properties",
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "street_address": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string" }
+      },
+      "required": ["street_address", "city", "state"]
+    }
+  ],
+
+  "properties": {
+    "type": { "enum": ["residential", "business"] }
+  },
+  "required": ["type"],
+  "unevaluatedProperties": false
+}
