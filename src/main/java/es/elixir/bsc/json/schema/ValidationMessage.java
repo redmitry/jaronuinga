@@ -66,6 +66,8 @@ public enum ValidationMessage {
     ARRAY_LENGTH_MISMATCH_MSG(ARRAY_LENGTH_MISMATCH, "array.length = %d not equals items.length = %d"),
     
     ARRAY_CONTAINS_CONSTRAINT_MSG(ARRAY_CONTAINS_CONSTRAINT, "no elements match contains schema"),
+    ARRAY_MIN_CONTAINS_CONSTRAINT_MSG(ARRAY_MIN_CONTAINS_CONSTRAINT, "few elements match contains schema: %d < %d"),
+    ARRAY_MAX_CONTAINS_CONSTRAINT_MSG(ARRAY_MAX_CONTAINS_CONSTRAINT, "too many elements match contains schema: %d > %d"),
 
     STRING_MIN_LENGTH_CONSTRAINT_MSG(STRING_MIN_LENGTH_CONSTRAINT, "string.length %d < minLength = %d"),
     STRING_MAX_LENGTH_CONSTRAINT_MSG(STRING_MAX_LENGTH_CONSTRAINT, "string.length %d > maxLength = %d"),

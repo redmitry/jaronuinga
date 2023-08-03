@@ -31,6 +31,6 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface BooleanJsonSchema extends AbstractJsonSchema {
+public interface BooleanJsonSchema extends JsonSchema {
     
 }

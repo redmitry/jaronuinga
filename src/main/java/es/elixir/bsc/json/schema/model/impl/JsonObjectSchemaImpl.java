@@ -42,7 +42,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonDependentProperties;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -56,6 +55,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jakarta.json.JsonNumber;
+import static jakarta.json.JsonValue.ValueType.FALSE;
 
 /**
  * @author Dmitry Repchevsky
@@ -65,15 +65,15 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                                   implements JsonObjectSchema {
 
     private JsonDefinitions definitions;
-    private JsonProperties properties;
+    private JsonPropertiesImpl properties;
     private Integer minProperties;
     private Integer maxProperties;
     private JsonStringArray required;
-    private JsonProperties dependentSchemas;
+    private JsonPropertiesImpl dependentSchemas;
     private JsonDependentProperties dependentRequired;
     private Boolean additionalProperties;
     private AbstractJsonSchema additionalPropertiesSchema;
-    private JsonProperties patternProperties;
+    private JsonPropertiesImpl patternProperties;
     private Boolean unevaluatedProperties;
     private AbstractJsonSchema unevaluatedPropertiesSchema;
     private AbstractJsonSchema propertyNames;
@@ -87,7 +87,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
     }
 
     @Override
-    public JsonProperties getProperties() {
+    public JsonPropertiesImpl getProperties() {
         if (properties == null) {
             properties = new JsonPropertiesImpl();
         }

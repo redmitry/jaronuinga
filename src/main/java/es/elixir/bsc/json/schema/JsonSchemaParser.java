@@ -33,7 +33,7 @@ import jakarta.json.JsonValue;
  */
 
 public interface JsonSchemaParser {
-    
+
     /**
      * 
      * @param locator current Json Schema locator that holds current ID (URI).

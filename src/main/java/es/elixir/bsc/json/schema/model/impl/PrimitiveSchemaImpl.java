@@ -28,17 +28,14 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
+import es.elixir.bsc.json.schema.JsonSchemaVersion;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
-import es.elixir.bsc.json.schema.model.JsonAllOf;
-import es.elixir.bsc.json.schema.model.JsonAnyOf;
-import es.elixir.bsc.json.schema.model.JsonNot;
-import es.elixir.bsc.json.schema.model.JsonOneOf;
+import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
@@ -55,7 +52,7 @@ import jakarta.json.JsonValue;
  */
 
 public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
-        implements PrimitiveSchema {
+        implements PrimitiveSchema<AbstractJsonSchema> {
 
     private String title;
     private String description;
@@ -68,6 +65,13 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     private AbstractJsonSchema _if;
     private AbstractJsonSchema _then;
     private AbstractJsonSchema _else;
+    
+    /*
+     * Starting from 2019-09 $ref may not substitute the enclosing schema 
+     * ("Other keywords are now allowed alongside of it") and is modeled
+     * as a property.
+     */
+    private JsonReference ref;
 
     public String getTitle() {
         return title;
@@ -86,22 +90,22 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     }
 
     @Override
-    public JsonAllOf getAllOf() {
+    public JsonAllOfImpl getAllOf() {
         return allOf;
     }
     
     @Override
-    public JsonAnyOf getAnyOf() {
+    public JsonAnyOfImpl getAnyOf() {
         return anyOf;
     }
     
     @Override
-    public JsonOneOf getOneOf() {
+    public JsonOneOfImpl getOneOf() {
         return oneOf;
     }
     
     @Override
-    public JsonNot getNot() {
+    public JsonNotImpl getNot() {
         return not;
     }
 
@@ -121,6 +125,11 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     }
 
     @Override
+    public JsonReference getReference() {
+        return ref;
+    }
+    
+    @Override
     public PrimitiveSchemaImpl read(final JsonSubschemaParser parser, 
                                     final JsonSchemaLocator locator,
                                     final JsonSchemaElement parent,
@@ -131,16 +140,25 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         super.read(parser, locator, parent, jsonPointer, object, type);
 
         final JsonString jtitle = JsonSchemaUtil.check(object.get(TITLE), JsonValue.ValueType.STRING);
-        setTitle(jtitle == null ? null : jtitle.getString());
+        if (jtitle != null) {
+            setTitle(jtitle.getString());
+        }
         
         final JsonString jdescription = JsonSchemaUtil.check(object.get(DESCRIPTION), JsonValue.ValueType.STRING);
-        setDescription(jdescription == null ? null : jdescription.getString());
+        if (jdescription != null) {
+            setDescription(jdescription.getString());
+        }
         
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
         if (jallOf != null) {
-            allOf = new JsonAllOfImpl();
-            allOf.read(parser, locator, this, jsonPointer + "/" + ALL_OF, jallOf, type);
-            locator.putSchema(allOf);
+            final JsonAllOfImpl _allOf = new JsonAllOfImpl()
+                    .read(parser, locator, this, jsonPointer + "/" + ALL_OF, jallOf, type);
+            if (allOf == null) {
+                allOf = _allOf;
+                locator.putSchema(allOf);
+            } else {
+                allOf.addAll(_allOf);
+            }
         }
         
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), JsonValue.ValueType.ARRAY);
@@ -211,6 +229,17 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
                                        new Object[] {THEN, jthen.getValueType().name(), "either object or boolean"}));                             
             }
         }
+        
+        final JsonValue jref = object.get(JsonReference.REF);
+        if (jref != null && JsonSchemaVersion.SCHEMA_DRAFT_2019_09.compareTo(
+                parser.getJsonSchemaVersion(object)) <= 0) {
+            if (JsonValue.ValueType.STRING != jref.getValueType()) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                       new Object[] {JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+            }
+
+            ref = new JsonReferenceImpl().read(parser, locator, parent, jsonPointer, object, null);
+        }
 
         return this;
     }
@@ -221,7 +250,7 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
             JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
 
         final int nerrors = errors.size();
-        
+
         if (allOf != null) {
             allOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
         }
@@ -245,6 +274,10 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
             if (choice != null) {
                 choice.validate(jsonPointer, value, parent, evaluated, errors, callback);
             }
+        }
+        
+        if (ref != null) {
+            ref.validate(value, errors, callback);
         }
         
         return nerrors == errors.size();

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -35,6 +35,7 @@ public class JsonSchemaConstTest extends JsonSchemaOrgTest {
 
     private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/const.json";
     private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/const.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/const.json";
     
     @Test
     public void test_draft6() {
@@ -44,5 +45,10 @@ public class JsonSchemaConstTest extends JsonSchemaOrgTest {
     @Test
     public void test_draft7() {
         test(JSON_DRAFT7_TEST_FILE);
+    }
+    
+    @Test
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE);
     }
 }

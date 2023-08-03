@@ -47,9 +47,16 @@ import jakarta.json.JsonValue;
 public class DefaultJsonSchemaReader implements JsonSchemaReader {
     
     private final Map<URI, JsonSchema> schemas;
+    private final Map<String, Object> properties;
     
     public DefaultJsonSchemaReader() {
         schemas = new HashMap<>();
+        properties = new HashMap<>();
+    }
+    
+    @Override
+    public void setJsonSchemaParserProperty(String name, Object property) {
+        properties.put(name, property);
     }
     
     @Override
@@ -76,7 +83,7 @@ public class DefaultJsonSchemaReader implements JsonSchemaReader {
                 throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.JSON_PARSING_ERROR, new Object[] {ex.getMessage()}));
             }
-            schema = new DefaultJsonSchemaParser(locator).parse(null, "", obj);
+            schema = new DefaultJsonSchemaParser(locator, properties).parse(null, "", obj);
             schemas.put(locator.uri, schema);
         }
         return schema;

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -25,6 +25,7 @@
 
 package es.elixir.bsc.json.schema.org.tests;
 
+import es.elixir.bsc.json.schema.JsonSchemaVersion;
 import org.junit.Test;
 
 /**
@@ -36,19 +37,25 @@ public class JsonSchemaRefTest extends JsonSchemaOrgTest {
     private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/draft4/ref.json";
     private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/ref.json";
     private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/ref.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/ref.json";
     
     @Test
     public void test_draft4() {
-        test(JSON_DRAFT4_TEST_FILE);
+        test(JSON_DRAFT4_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_04);
     }
 
     @Test
     public void test_draft6() {
-        test(JSON_DRAFT6_TEST_FILE);
+        test(JSON_DRAFT6_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_06);
     }
 
     @Test
     public void test_draft7() {
-        test(JSON_DRAFT7_TEST_FILE);
+        test(JSON_DRAFT7_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_07);
+    }
+    
+    @Test
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE, JsonSchemaVersion.SCHEMA_DRAFT_2019_09);
     }
 }

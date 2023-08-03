@@ -46,7 +46,7 @@ import jakarta.json.JsonValue;
 /**
  * Json Schema implementation for the Json Integer type.
  * 
- * @author Dmitry Rerpchevsky
+ * @author Dmitry Repchevsky
  */
 
 public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>

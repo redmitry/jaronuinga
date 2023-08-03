@@ -34,7 +34,6 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonNot;
 import java.util.ArrayList;
 import java.util.List;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -44,7 +43,7 @@ import jakarta.json.JsonValue;
  */
 
 public class JsonNotImpl extends PrimitiveSchemaImpl
-                         implements JsonNot {
+                         implements JsonNot<AbstractJsonSchema> {
 
     private AbstractJsonSchema schema;
     
@@ -72,7 +71,7 @@ public class JsonNotImpl extends PrimitiveSchemaImpl
 
         super.read(parser, locator, parent, jsonPointer, object, null);
         
-        this.schema = parser.parse(locator, jsonPointer, object);
+        this.schema = parser.parse(locator, null, jsonPointer, object, null);
         
         return this;
     }

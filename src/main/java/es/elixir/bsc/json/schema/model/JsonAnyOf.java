@@ -27,8 +27,10 @@ package es.elixir.bsc.json.schema.model;
 
 /**
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public interface JsonAnyOf extends SchemaArray {
+public interface JsonAnyOf<T extends JsonSchema> extends SchemaArray<T> {
     
 }

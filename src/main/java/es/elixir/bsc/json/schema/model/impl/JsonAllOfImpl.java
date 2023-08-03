@@ -25,21 +25,33 @@
 
 package es.elixir.bsc.json.schema.model.impl;
 
+import es.elixir.bsc.json.schema.JsonSchemaException;
+import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonAllOf;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonValue;
 import java.util.ArrayList;
+import jakarta.json.JsonArray;
 
 /**
  * @author Dmitry Repchevsky
  */
 
 public class JsonAllOfImpl extends SchemaArrayImpl
-                           implements JsonAllOf {
+                           implements AbstractJsonSchema<JsonArray>,
+                           JsonAllOf<AbstractJsonSchema> {
+
+    @Override
+    public JsonAllOfImpl read(JsonSubschemaParser parser, JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer, JsonArray schema, JsonType type) throws JsonSchemaException {
+        super.read(parser, locator, parent, jsonPointer, schema, type);
+        return this;
+    }
 
     @Override
     public boolean validate(String jsonPointer, JsonValue object, JsonValue parent, 

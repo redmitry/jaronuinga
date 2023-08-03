@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -26,7 +26,9 @@
 package es.elixir.bsc.json.schema.org.tests;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
+import es.elixir.bsc.json.schema.JsonSchemaParserConfig;
 import es.elixir.bsc.json.schema.JsonSchemaReader;
+import es.elixir.bsc.json.schema.JsonSchemaVersion;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonSchema;
@@ -38,14 +40,13 @@ import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import org.junit.Assert;
 
 /**
@@ -55,23 +56,30 @@ import org.junit.Assert;
 public class JsonSchemaOrgTest {
 
     public void test(String file) {
+        test(file, null);
+    }
+
+    public void test(String file, JsonSchemaVersion version) {
         
-        URL url = JsonTest.class.getClassLoader().getResource(file);
+        final JsonSchemaParserConfig config = 
+                new JsonSchemaParserConfig()
+                        .setJsonSchemaVersion(version);
+        
+        final URL url = JsonTest.class.getClassLoader().getResource(file);
         
         try (InputStream in = url.openStream();
              JsonParser parser = Json.createParser(in)) {
-            
+            final URI uri = url.toURI();
             final StringBuilder out = new StringBuilder();
             
-            DefaultJsonSchemaLocator locator = new DefaultJsonSchemaLocator(url.toURI());
             if (parser.hasNext() && parser.next() == JsonParser.Event.START_ARRAY) {
-                Stream<JsonValue> stream = parser.getArrayStream();
-                Iterator<JsonValue> iter = stream.iterator();
-                while (iter.hasNext()) {
-                    JsonObject obj = iter.next().asJsonObject();
+                JsonArray array = parser.getArray();
+                for (int j = 0, n = array.size(); j < n; j++) {
+                    JsonObject obj = array.getJsonObject(j);
                     JsonValue sch = obj.get("schema");
+                    DefaultJsonSchemaLocator locator = new DefaultJsonSchemaLocator(uri.resolve(Integer.toString(j)));
                     locator.setSchema(sch);
-                    JsonSchema schema = JsonSchemaReader.getReader().read(locator);
+                    JsonSchema schema = JsonSchemaReader.getReader(config).read(locator);
                     JsonArray tests = obj.getJsonArray("tests");
                     for (int i = 0; i < tests.size(); i++) {
                         JsonObject test = tests.getJsonObject(i);

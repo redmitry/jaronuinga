@@ -30,7 +30,6 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonDefinitions;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonObject;
@@ -45,7 +44,7 @@ import java.util.Map.Entry;
  */
 
 public class JsonDefinitionsImpl extends LinkedHashMap<String, AbstractJsonSchema>
-                                 implements JsonDefinitions {
+                                 implements JsonDefinitions<AbstractJsonSchema> {
     
     @Override
     public AbstractJsonSchema get(String name) {

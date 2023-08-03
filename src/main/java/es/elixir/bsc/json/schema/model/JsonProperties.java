@@ -29,13 +29,15 @@ import java.util.Map;
 
 /**
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public interface JsonProperties extends JsonSchemaElement, 
-        Iterable<Map.Entry<String, AbstractJsonSchema>> {
+public interface JsonProperties<T extends JsonSchema> extends JsonSchemaElement, 
+        Iterable<Map.Entry<String, T>> {
     
     boolean contains(String name);
-    AbstractJsonSchema get(String name);
-    AbstractJsonSchema put(String name, AbstractJsonSchema schema);
-    AbstractJsonSchema remove(String name);
+    T get(String name);
+    T put(String name, T schema);
+    T remove(String name);
 }

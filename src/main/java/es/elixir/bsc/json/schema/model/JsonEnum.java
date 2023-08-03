@@ -32,7 +32,7 @@ import java.util.List;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonEnum extends AbstractJsonSchema {
+public interface JsonEnum extends JsonSchema {
     
     public final static String ENUM = "enum";
 

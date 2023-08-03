@@ -31,7 +31,7 @@ import jakarta.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonConst extends AbstractJsonSchema {
+public interface JsonConst extends JsonSchema {
 
     public final static String CONST = "const";
     

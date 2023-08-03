@@ -36,11 +36,9 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 
@@ -48,16 +46,25 @@ import jakarta.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public class JsonAnyOfImpl extends SchemaArrayImpl 
-                           implements JsonAnyOf {
+public class JsonAnyOfImpl extends SchemaArrayImpl
+                           implements AbstractJsonSchema<JsonValue>,
+                           JsonAnyOf<AbstractJsonSchema> {
     
-    public SchemaArrayImpl read(final JsonSubschemaParser parser, 
-                                final JsonSchemaLocator locator,
-                                final JsonSchemaElement parent,
-                                final String jsonPointer, 
-                                final JsonObject object,
-                                final JsonArray types) throws JsonSchemaException {
-        
+    private JsonArray types;
+    
+    public JsonAnyOfImpl() {}
+    
+    public JsonAnyOfImpl(JsonArray types) {
+        this.types = types;
+    }
+    
+    @Override
+    public JsonAnyOfImpl read(final JsonSubschemaParser parser, 
+                              final JsonSchemaLocator locator,
+                              final JsonSchemaElement parent,
+                              final String jsonPointer, 
+                              final JsonValue value,
+                              final JsonType type) throws JsonSchemaException {
         this.id = locator.uri;
         this.parent = parent;
         this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
@@ -65,7 +72,7 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
         if (types == null) {
             for (JsonType val : JsonType.values()) {
                 try {
-                    final AbstractJsonSchema s = parser.parse(locator, this, jsonPointer, object, val);
+                    final AbstractJsonSchema s = parser.parse(locator, this, jsonPointer, value, val);
                     if (s != null) {
                         add(s);
                     }
@@ -79,8 +86,8 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
                     
                 }
                 try {
-                     final JsonType type = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(locator, parent, jsonPointer, object, type));
+                     final JsonType t = JsonType.fromValue(((JsonString)val).getString());
+                     add(parser.parse(locator, parent, jsonPointer, value, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, new Object[] {val}));

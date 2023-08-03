@@ -27,7 +27,9 @@ package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
@@ -45,10 +47,23 @@ public interface JsonSchemaReader {
     JsonSchema read(URL url) throws JsonSchemaException;
     JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException;
     
+    void setJsonSchemaParserProperty(String name, Object property);
+    
     public static JsonSchemaReader getReader() {
+        return getReader(Collections.EMPTY_MAP);
+    }
+    
+    public static JsonSchemaReader getReader(Map<String, Object> config) {
         ServiceLoader<JsonSchemaReader> loader = ServiceLoader.load(JsonSchemaReader.class);
         Iterator<JsonSchemaReader> iterator = loader.iterator();
 
-        return iterator.hasNext() ? iterator.next() : null;
+        if (iterator.hasNext()) {
+            final JsonSchemaReader reader = iterator.next();
+            for (Map.Entry<String, Object> p : config.entrySet()) {
+                reader.setJsonSchemaParserProperty(p.getKey(), p.getValue());
+            }
+            return reader;
+        }
+        return null;
     }
 }

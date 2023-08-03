@@ -33,7 +33,7 @@ import java.util.List;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonArraySchema extends AbstractJsonSchema {
+public interface JsonArraySchema extends JsonSchema {
     
     public final static String ITEMS = "items";
     public final static String UNIQUE_ITEMS = "uniqueItems";
@@ -59,7 +59,7 @@ public interface JsonArraySchema extends AbstractJsonSchema {
      * 
      * @return list of schemas
      */
-    List<AbstractJsonSchema> getItems();
+    <T extends JsonSchema> List<T> getItems();
     
     Boolean isUniqueItems();
 
@@ -67,8 +67,10 @@ public interface JsonArraySchema extends AbstractJsonSchema {
      * @return 'additionalSchema' JsonSchema, <b>NULL</b> if FALSE (or not set), 
      *         EmptyJsonSchema if TRUE
      */
-    AbstractJsonSchema getAdditionalItems();
+    <T extends JsonSchema> T getAdditionalItems();
     
-    AbstractJsonSchema getContains();
+    <T extends JsonSchema> T getContains();
     
+    Long getMinContains();
+    Long getMaxContains();
 }

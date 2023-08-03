@@ -29,6 +29,6 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonNullSchema extends AbstractJsonSchema {
+public interface JsonNullSchema extends JsonSchema {
     
 }

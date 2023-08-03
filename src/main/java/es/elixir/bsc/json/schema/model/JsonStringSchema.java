@@ -29,7 +29,7 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonStringSchema extends AbstractJsonSchema {
+public interface JsonStringSchema extends JsonSchema {
     
     public final static String MIN_LENGTH = "minLength";
     public final static String MAX_LENGTH = "maxLength";

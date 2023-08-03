@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.model.SchemaArray;
 import java.net.URI;
 import java.util.HashSet;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonValue;
@@ -42,7 +41,7 @@ import jakarta.json.JsonValue;
  */
 
 public abstract class SchemaArrayImpl extends HashSet<AbstractJsonSchema>
-                                      implements SchemaArray {
+                                      implements SchemaArray<AbstractJsonSchema> {
     
     protected URI id;
     protected JsonSchemaElement parent;

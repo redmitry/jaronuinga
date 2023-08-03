@@ -31,9 +31,9 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonReference extends AbstractJsonSchema {
+public interface JsonReference extends JsonSchema {
     
     public final static String REF = "$ref";
     
-    JsonSchema getSchema() throws JsonSchemaException;
+    <T extends JsonSchema> T getSchema() throws JsonSchemaException;
 }

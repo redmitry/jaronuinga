@@ -27,10 +27,12 @@ package es.elixir.bsc.json.schema.model;
 
 /**
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public interface JsonNot extends AbstractJsonSchema {
+public interface JsonNot<T extends JsonSchema> extends JsonSchema {
     
-    AbstractJsonSchema getJsonSchema();
-    void setJsonSchema(AbstractJsonSchema schema);
+    T getJsonSchema();
+    void setJsonSchema(T schema);
 }

@@ -29,9 +29,11 @@ package es.elixir.bsc.json.schema.model;
  * Primitive empty Json Schema of any type ("object", "array", "string", etc.)
  * 
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public interface PrimitiveSchema extends AbstractJsonSchema {
+public interface PrimitiveSchema<T extends JsonSchema> extends JsonSchema {
 
     public final static String TYPE = "type";
     public final static String TITLE = "title";
@@ -52,8 +54,9 @@ public interface PrimitiveSchema extends AbstractJsonSchema {
     JsonOneOf getOneOf();
     JsonNot getNot();
 
-    AbstractJsonSchema getIf();
-    AbstractJsonSchema getThen();
-    AbstractJsonSchema getElse();
-
+    <T extends JsonSchema> T getIf();
+    <T extends JsonSchema> T getThen();
+    <T extends JsonSchema> T getElse();
+    
+    JsonReference getReference();
 }
