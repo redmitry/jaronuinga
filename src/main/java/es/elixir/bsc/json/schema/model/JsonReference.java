@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,9 +31,9 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonReference extends AbstractJsonSchema {
+public interface JsonReference extends JsonSchema {
     
     public final static String REF = "$ref";
     
-    JsonSchema getSchema() throws JsonSchemaException;
+    <T extends JsonSchema> T getSchema() throws JsonSchemaException;
 }

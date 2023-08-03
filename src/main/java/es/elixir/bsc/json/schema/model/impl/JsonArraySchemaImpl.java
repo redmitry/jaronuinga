@@ -37,7 +37,6 @@ import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.HashSet;
 import java.util.Set;
@@ -64,6 +63,9 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     private Long maxItems;
     
     private AbstractJsonSchema contains;
+
+    private Long minContains;
+    private Long maxContains;
     
     @Override
     public List<AbstractJsonSchema> getItems() {
@@ -110,6 +112,16 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
+    public Long getMinContains() {
+        return minContains;
+    }
+    
+    @Override
+    public Long getMaxContains() {
+        return maxContains;
+    }
+    
+    @Override
     public JsonArraySchemaImpl read(final JsonSubschemaParser parser, 
                                     final JsonSchemaLocator locator,
                                     final JsonSchemaElement parent,
@@ -142,6 +154,16 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         final JsonValue jcontains = object.get(CONTAINS);
         if (jcontains != null) {
             contains = parser.parse(locator, this, jsonPointer + "/" + CONTAINS, jcontains, null);
+        }
+
+        final JsonNumber jminContains = JsonSchemaUtil.check(object.getJsonNumber(MIN_CONTAINS), JsonValue.ValueType.NUMBER);
+        if (jminContains != null) {
+            minContains = jminContains.longValue();
+        }
+
+        final JsonNumber jmaxContains = JsonSchemaUtil.check(object.getJsonNumber(MAX_CONTAINS), JsonValue.ValueType.NUMBER);
+        if (jmaxContains != null) {
+            maxContains = jmaxContains.longValue();
         }
 
         JsonValue jitems = object.get(ITEMS);
@@ -205,6 +227,8 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         }
 
         final int nerrors = errors.size();
+        
+        super.validate(jsonPointer, value, parent, evaluated, errors, callback);
         
         final JsonArray array = value.asJsonArray();
 
@@ -270,16 +294,31 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (contains != null) {
             final List<String> eva = new ArrayList();
             final List<ValidationError> err = new ArrayList<>();
-            int idx = array.size();
-            while (idx-- > 0) {
-                final JsonValue val = array.get(idx);
+            int cnt = 0;
+            for (int i = 0, n = array.size(); i < n; i++) {
+                final JsonValue val = array.get(i);
                 if (contains.validate(jsonPointer, val, parent, eva, err, callback)) {
-                    break;
+                    cnt++;
                 }
             }
-            if (idx < 0) {
-                errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                        ValidationMessage.ARRAY_CONTAINS_CONSTRAINT_MSG));
+            
+            if (cnt == 0) {
+                if (minContains == null) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_CONTAINS_CONSTRAINT_MSG));                    
+                } else if (minContains > 0) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_MIN_CONTAINS_CONSTRAINT_MSG, cnt, minContains));                    
+                }
+            } else {
+                if (minContains != null && cnt < minContains) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_MIN_CONTAINS_CONSTRAINT_MSG, cnt, minContains));                    
+                }
+                if (maxContains != null && cnt > maxContains) {
+                    errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
+                        ValidationMessage.ARRAY_MAX_CONTAINS_CONSTRAINT_MSG, cnt, maxContains));                    
+                }
             }
         }
 

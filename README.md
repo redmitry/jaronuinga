@@ -1,4 +1,4 @@
-The library is based on JSONP v1.1 Json parser.
+Java Json Schema validation library based on JSONP v1.1 Json parser.
 
 import via maven:
 
@@ -7,7 +7,7 @@ import via maven:
   <dependency>
     <groupId>es.elixir.bsc.json.schema</groupId>
     <artifactId>jaronuinga</artifactId>
-    <version>0.4.9</version>
+    <version>0.5.0</version>
   </dependency>
 ...
 <repositories>

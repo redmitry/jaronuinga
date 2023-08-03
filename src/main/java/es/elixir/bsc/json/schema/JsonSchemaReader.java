@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -27,7 +27,9 @@ package es.elixir.bsc.json.schema;
 
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
@@ -45,10 +47,23 @@ public interface JsonSchemaReader {
     JsonSchema read(URL url) throws JsonSchemaException;
     JsonSchema read(JsonSchemaLocator locator) throws JsonSchemaException;
     
+    void setJsonSchemaParserProperty(String name, Object property);
+    
     public static JsonSchemaReader getReader() {
+        return getReader(Collections.EMPTY_MAP);
+    }
+    
+    public static JsonSchemaReader getReader(Map<String, Object> config) {
         ServiceLoader<JsonSchemaReader> loader = ServiceLoader.load(JsonSchemaReader.class);
         Iterator<JsonSchemaReader> iterator = loader.iterator();
 
-        return iterator.hasNext() ? iterator.next() : null;
+        if (iterator.hasNext()) {
+            final JsonSchemaReader reader = iterator.next();
+            for (Map.Entry<String, Object> p : config.entrySet()) {
+                reader.setJsonSchemaParserProperty(p.getKey(), p.getValue());
+            }
+            return reader;
+        }
+        return null;
     }
 }

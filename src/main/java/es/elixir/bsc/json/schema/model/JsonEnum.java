@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,7 +32,7 @@ import java.util.List;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonEnum extends AbstractJsonSchema {
+public interface JsonEnum extends JsonSchema {
     
     public final static String ENUM = "enum";
 

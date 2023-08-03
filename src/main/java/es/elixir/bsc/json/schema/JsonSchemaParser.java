@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -29,11 +29,11 @@ import es.elixir.bsc.json.schema.model.JsonSchema;
 import javax.json.JsonValue;
 
 /**
- * @author Dmitry Rechevsky
+ * @author Dmitry Repchevsky
  */
 
 public interface JsonSchemaParser {
-    
+
     /**
      * 
      * @param locator current Json Schema locator that holds current ID (URI).

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -43,7 +42,7 @@ import javax.json.JsonValue;
  */
 
 public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema>
-                                implements JsonProperties {
+                                implements JsonProperties<AbstractJsonSchema> {
 
     private JsonSchemaElement parent;
     private String jsonPointer;
@@ -83,7 +82,7 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema
         return entrySet().iterator();
     }
     
-    public JsonProperties read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
+    public JsonPropertiesImpl read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
             JsonSchemaElement parent, String jsonPointer, JsonObject object) throws JsonSchemaException {
         
         this.parent = parent;

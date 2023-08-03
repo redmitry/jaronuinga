@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -26,21 +26,22 @@
 package es.elixir.bsc.json.schema.model;
 
 /**
- * The list of JSON schemas.
+ * The list of JSON schemas."schemaArray": {
+     "type": "array",
+     "minItems": 1,
+     "items": { "$ref": "#" }
+ }
  * 
- * "schemaArray": {
- *     "type": "array",
- *     "minItems": 1,
- *     "items": { "$ref": "#" }
- * }
  * 
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public interface SchemaArray extends Iterable<AbstractJsonSchema>, AbstractJsonSchema {
+public interface SchemaArray<T extends JsonSchema> extends Iterable<T>, JsonSchema {
     
-    public abstract boolean add(AbstractJsonSchema schema);
-    public abstract boolean remove(AbstractJsonSchema schema);
-    public abstract boolean contains(AbstractJsonSchema schema);
+    public abstract boolean add(T schema);
+    public abstract boolean remove(T schema);
+    public abstract boolean contains(T schema);
 
 }

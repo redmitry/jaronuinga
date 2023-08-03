@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,9 +32,7 @@ import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
-import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonReference;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
@@ -43,14 +41,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import javax.json.JsonException;
-import javax.json.JsonString;
+import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements JsonReference {
+public class JsonReferenceImpl extends JsonSchemaImpl<JsonObject> implements JsonReference {
 
     private AbstractJsonSchema schema;
 
@@ -63,14 +61,13 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
     public AbstractJsonSchema getSchema() throws JsonSchemaException {
         if (schema == null) {
             try {
-                    JsonValue jsubschema = ref_locator.getSchema(ref_pointer);
+                JsonValue jsubschema = ref_locator.getSchema(ref_pointer);
                 if (jsubschema == null) {
                     throw new JsonSchemaException(
                             new ParsingError(ParsingMessage.UNRESOLVABLE_REFERENCE, new Object[] {ref}));
                 }
 
                 schema = parser.parse(ref_locator, getParent(), ref_pointer, jsubschema, null);
-                ref_locator.putSchema(schema);
             } catch(IOException | JsonException | IllegalArgumentException ex) {
                 throw new JsonSchemaException(
                     new ParsingError(ParsingMessage.INVALID_REFERENCE, new Object[] {ref}));
@@ -84,12 +81,14 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
                                   JsonSchemaLocator locator,
                                   JsonSchemaElement parent,
                                   String jsonPointer,
-                                  JsonString jref, 
+                                  JsonObject object, 
                                   JsonType type) throws JsonSchemaException {
 
+        super.read(parser, locator, parent, jsonPointer, object, type);
+
         this.parser = parser;
-        
-        ref = jref.getString();
+
+        final String ref = object.getString(REF);
         try {
             final URI uri = URI.create(ref);
             final String fragment = uri.getFragment();
@@ -100,7 +99,7 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
                 ref_pointer = "";
                 ref_locator = locator;
             } else if (fragment.startsWith("/")){
-                ref_pointer = fragment.replaceAll("/$", "");
+                ref_pointer = fragment;
                 if (ref.startsWith("#")) {
                     ref_locator = locator;
                 } else {
@@ -128,8 +127,7 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonString> implements Jso
             final AbstractJsonSchema sch = getSchema();
             return sch.validate(jsonPointer, value, parent, evaluated, errors, callback);
         } catch (JsonSchemaException ex) {
-            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
-                    ValidationMessage.REFERENCE_UNRESOLVED_MSG, ref));
+            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer, ex.getMessage()));
         }
         return false;
     }

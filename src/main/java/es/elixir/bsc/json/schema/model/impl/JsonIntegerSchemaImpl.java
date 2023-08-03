@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -46,7 +46,7 @@ import javax.json.JsonValue;
 /**
  * Json Schema implementation for the Json Integer type.
  * 
- * @author Dmitry Rerpchevsky
+ * @author Dmitry Repchevsky
  */
 
 public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -31,7 +31,7 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonConst extends AbstractJsonSchema {
+public interface JsonConst extends JsonSchema {
 
     public final static String CONST = "const";
     

@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -40,6 +40,10 @@ import java.net.URI;
 public interface JsonSchema extends JsonSchemaElement {
     
     public final static String ID = "$id";
+    public final static String SCHEMA = "$schema";
+    public final static String DEFS = "$defs";
+    public final static String ANCHOR = "$anchor";
+    public final static String VOCABULARY = "$vocabulary";
     
     URI getId();
     void setId(URI id);

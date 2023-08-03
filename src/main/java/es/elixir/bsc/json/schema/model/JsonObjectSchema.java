@@ -31,7 +31,7 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonObjectSchema extends AbstractJsonSchema {
+public interface JsonObjectSchema extends JsonSchema {
 
     public final static String DEFINITIONS = "definitions";
     public final static String PROPERTIES = "properties";
@@ -53,10 +53,10 @@ public interface JsonObjectSchema extends AbstractJsonSchema {
     StringArray getRequired();
     JsonProperties getDependentSchemas();
     JsonDependentProperties getDependentRequired();
-    AbstractJsonSchema getPropertyNames();
-    AbstractJsonSchema getAdditionalProperties();
+    JsonSchema getPropertyNames();
+    JsonSchema getAdditionalProperties();
     Boolean isAdditionalProperties();
     JsonProperties getPatternProperties();
-    AbstractJsonSchema getUnevaluatedProperties();
+    JsonSchema getUnevaluatedProperties();
     Boolean isUnevaluatedProperties();
 }

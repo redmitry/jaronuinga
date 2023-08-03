@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -29,6 +29,6 @@ package es.elixir.bsc.json.schema.model;
  * @author Dmitry Repchevsky
  */
 
-public interface JsonBooleanSchema extends AbstractJsonSchema {
+public interface JsonBooleanSchema extends JsonSchema {
     
 }

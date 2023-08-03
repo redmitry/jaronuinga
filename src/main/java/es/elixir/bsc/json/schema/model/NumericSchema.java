@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -36,7 +36,7 @@ import java.math.BigDecimal;
  * @param <T>
  */
 
-public interface NumericSchema<T extends Number> extends AbstractJsonSchema {
+public interface NumericSchema<T extends Number> extends JsonSchema {
     
     public final static String MULTIPLE_OF = "multipleOf";
     

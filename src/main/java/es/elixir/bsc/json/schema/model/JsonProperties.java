@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -29,13 +29,15 @@ import java.util.Map;
 
 /**
  * @author Dmitry Repchevsky
+ * 
+ * @param <T>
  */
 
-public interface JsonProperties extends JsonSchemaElement, 
-        Iterable<Map.Entry<String, AbstractJsonSchema>> {
+public interface JsonProperties<T extends JsonSchema> extends JsonSchemaElement, 
+        Iterable<Map.Entry<String, T>> {
     
     boolean contains(String name);
-    AbstractJsonSchema get(String name);
-    AbstractJsonSchema put(String name, AbstractJsonSchema schema);
-    AbstractJsonSchema remove(String name);
+    T get(String name);
+    T put(String name, T schema);
+    T remove(String name);
 }

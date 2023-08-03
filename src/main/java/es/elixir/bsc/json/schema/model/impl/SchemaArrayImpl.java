@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.model.SchemaArray;
 import java.net.URI;
 import java.util.HashSet;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.AbstractJsonSchema;
 import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonArray;
 import javax.json.JsonValue;
@@ -42,7 +41,7 @@ import javax.json.JsonValue;
  */
 
 public abstract class SchemaArrayImpl extends HashSet<AbstractJsonSchema>
-                                      implements SchemaArray {
+                                      implements SchemaArray<AbstractJsonSchema> {
     
     protected URI id;
     protected JsonSchemaElement parent;
