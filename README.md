@@ -7,13 +7,13 @@ import via maven:
   <dependency>
     <groupId>es.elixir.bsc.json.schema</groupId>
     <artifactId>jaronuinga</artifactId>
-    <version>0.4.6</version>
+    <version>0.4.9</version>
   </dependency>
 ...
 <repositories>
   <repository>
     <id>jaronuinga</id>
-    <url>https://raw.github.com/inab/jaronuinga/maven/</url>
+    <url>https://inb.bsc.es/maven</url>
   </repository>
 ```
 
