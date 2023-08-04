@@ -238,7 +238,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             dependentSchemas = new JsonPropertiesImpl().read(parser, locator, this, jsonPointer + "/" + DEPENDENT_SCHEMAS, jdependentSchemas);
         }
 
-        final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.ARRAY);
+        final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.OBJECT);
         if (jdependentRequired != null) {
             dependentRequired = new JsonDependentPropertiesImpl().read(parser, locator, jsonPointer + "/" + DEPENDENT_REQUIRED, jdependentRequired);
         }
