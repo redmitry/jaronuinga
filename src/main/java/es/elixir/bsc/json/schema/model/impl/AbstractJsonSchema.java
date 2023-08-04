@@ -60,7 +60,7 @@ public interface AbstractJsonSchema<T extends JsonValue> extends JsonSchema {
             throws ValidationException {
         validate("", value, null, new ArrayList(), errors, callback);
     }
-        
+    
     AbstractJsonSchema read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
             JsonSchemaElement parent, String jsonPointer, T schema, JsonType type) 
             throws JsonSchemaException;

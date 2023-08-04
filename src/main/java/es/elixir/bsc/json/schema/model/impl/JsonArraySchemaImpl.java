@@ -44,8 +44,6 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
-import static jakarta.json.JsonValue.ValueType.NUMBER;
-import static jakarta.json.JsonValue.ValueType.TRUE;
 
 /**
  * @author Dmitry Repchevsky

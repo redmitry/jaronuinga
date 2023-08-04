@@ -33,10 +33,10 @@ import org.junit.Test;
 
 public class JsonSchemaUnevaluatedPropertiesTest extends JsonSchemaOrgTest {
     
-    private final static String JSON_TEST_FILE = "json-schema-org/draft2019-09/unevaluatedProperties.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/unevaluatedProperties.json";
     
     @Test
-    public void test_01() {
-        //test(JSON_TEST_FILE);
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE);
     }
 }

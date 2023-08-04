@@ -49,7 +49,6 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.JsonValue.ValueType;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -213,7 +212,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         if (junevaluatedProperties != null) {
             switch(junevaluatedProperties.getValueType()) {
                 case OBJECT: unevaluatedPropertiesSchema = parser.parse(locator, this, jsonPointer + "/" + UNEVALUATED_PROPERTIES, junevaluatedProperties, type); break;
-                case TRUE:   unevaluatedProperties = null; break;
+                case TRUE:   unevaluatedProperties = true; break;
                 case FALSE:  unevaluatedProperties = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                    new Object[] {UNEVALUATED_PROPERTIES, junevaluatedProperties.getValueType().name(), "either object or boolean"}));
@@ -333,7 +332,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             }
         }
         
-        if (Objects.equals(additionalProperties, Boolean.FALSE)) {
+        if (Boolean.FALSE.equals(additionalProperties)) {
             for (String name : object.keySet()) {
                 if (!eva.contains(name)) {
                     errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
@@ -350,6 +349,13 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             }            
         } else {
             // allowed additinal properties
+            if (Boolean.TRUE.equals(additionalProperties)) {
+                for (String name : object.keySet()) {
+                    if (!evaluated.contains(name)) {
+                        evaluated.add(name);
+                    }
+                }
+            }
             req.removeAll(object.keySet());
         }
         
@@ -362,8 +368,16 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             for (Map.Entry<String, AbstractJsonSchema> property : dependentSchemas) {
                 final String name = property.getKey();
                 if (object.containsKey(name)) {
+                    eva.clear();
                     final AbstractJsonSchema dependentSchema = property.getValue();
-                    dependentSchema.validate(jsonPointer + "/" + name, value, parent, new ArrayList(), errors, callback);
+                    if (dependentSchema.validate(jsonPointer + "/" + name, value, parent, eva, errors, callback)) {
+                        for (String e : eva) {
+                            if (!evaluated.contains(e)) {
+                                evaluated.add(e);
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -383,13 +397,19 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             }
         }
 
-        if (unevaluatedProperties != null && !Objects.equals(additionalProperties, Boolean.TRUE)) {
+        if (Boolean.FALSE.equals(unevaluatedProperties)) {
             for (String name : object.keySet()) {
                 if (evaluated.contains(name)) {
                     continue;
                 }
                 errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.OBJECT_UNEVALUATED_PROPERTY_CONSTRAINT_MSG, name));
+            }
+        } else if (Boolean.TRUE.equals(unevaluatedProperties)) {
+            for (String name : object.keySet()) {
+                if (!evaluated.contains(name)) {
+                    evaluated.add(name);
+                }
             }
         } else if (unevaluatedPropertiesSchema != null) {
             for (Map.Entry<String, JsonValue> entry : object.entrySet()) {

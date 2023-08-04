@@ -71,7 +71,7 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
      * ("Other keywords are now allowed alongside of it") and is modeled
      * as a property.
      */
-    private JsonReference ref;
+    private JsonReferenceImpl ref;
 
     public String getTitle() {
         return title;
@@ -269,7 +269,7 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
 
         if (_if != null) {
             final List<ValidationError> err = new ArrayList<>();
-            _if.validate(value, err);
+            _if.validate(jsonPointer, value, parent, evaluated, err, callback);
             final AbstractJsonSchema choice = err.isEmpty() ? _then : _else;
             if (choice != null) {
                 choice.validate(jsonPointer, value, parent, evaluated, errors, callback);
@@ -277,7 +277,14 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         }
         
         if (ref != null) {
-            ref.validate(value, errors, callback);
+            final List<String> eva = new ArrayList();
+            if (ref.validate(jsonPointer, value, parent, eva, errors, callback)) {
+                for (String name : eva) {
+                    if (!evaluated.contains(name)) {
+                        evaluated.add(name);
+                    }
+                }
+            }
         }
         
         return nerrors == errors.size();

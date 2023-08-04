@@ -103,18 +103,23 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
             JsonSchemaValidationCallback<JsonValue> callback) {
         
         List<ValidationError> err = new ArrayList<>();
+        
+        // have to evaluate all schemas to collect evaluated properties
+        boolean match = false;
         for (AbstractJsonSchema schema : this) {
             final List<String> eva = new ArrayList();
             if (schema.validate(jsonPointer, value, parent, eva, err, callback)) {
                 evaluated.addAll(eva);
-                return true; // found the schema that matches
+                match = true; // found the schema that matches
             }
         }
 
-        errors.addAll(err);
-        errors.add(new ValidationError(getId(), getJsonPointer(), 
-                jsonPointer, ValidationMessage.OBJECT_ANY_OF_CONSTRAINT_MSG));
+        if (!match) {
+            errors.addAll(err);
+            errors.add(new ValidationError(getId(), getJsonPointer(), 
+                    jsonPointer, ValidationMessage.OBJECT_ANY_OF_CONSTRAINT_MSG));
+        }
         
-        return false;
+        return match;
     }
 }
