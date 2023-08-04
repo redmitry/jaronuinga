@@ -55,7 +55,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.json.JsonNumber;
-import static javax.json.JsonValue.ValueType.FALSE;
 
 /**
  * @author Dmitry Repchevsky
@@ -238,7 +237,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
             dependentSchemas = new JsonPropertiesImpl().read(parser, locator, this, jsonPointer + "/" + DEPENDENT_SCHEMAS, jdependentSchemas);
         }
 
-        final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.ARRAY);
+        final JsonObject jdependentRequired = JsonSchemaUtil.check(object.get(DEPENDENT_REQUIRED), ValueType.OBJECT);
         if (jdependentRequired != null) {
             dependentRequired = new JsonDependentPropertiesImpl().read(parser, locator, jsonPointer + "/" + DEPENDENT_REQUIRED, jdependentRequired);
         }
