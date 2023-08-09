@@ -55,20 +55,19 @@ public class JsonOneOfImpl extends SchemaArrayImpl
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
 
         int matches = 0;
         
-        final List<String> eva = new ArrayList();
+        final List eva = new ArrayList();
         final List<ValidationError> err = new ArrayList<>();
         for (AbstractJsonSchema schema : this) {
-            final int nevaluated = eva.size();
-            if (schema.validate(jsonPointer, value, parent, eva, err, callback)) {
+            final List e = new ArrayList(evaluated);
+            if (schema.validate(jsonPointer, value, parent, e, err, callback)) {
                 matches++;
-            } else {
-                // if validation fails, remove all evaluated properties
-                eva.subList(nevaluated, eva.size()).clear();
+                eva.clear();
+                eva.addAll(e);
             }
         }
         
@@ -82,6 +81,7 @@ public class JsonOneOfImpl extends SchemaArrayImpl
             return false;
         }
         
+        eva.removeAll(evaluated);
         evaluated.addAll(eva);
         
         return true;

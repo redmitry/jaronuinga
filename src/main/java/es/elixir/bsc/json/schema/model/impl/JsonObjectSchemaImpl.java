@@ -269,7 +269,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
 
         if (value.getValueType() != JsonValue.ValueType.OBJECT) {
@@ -301,7 +301,7 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
         }
         
         final Set req = new TreeSet(getRequired());
-        final ArrayList<String> eva = new ArrayList();
+        final ArrayList eva = new ArrayList();
         
         if (properties != null) {
             for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
@@ -371,12 +371,8 @@ public class JsonObjectSchemaImpl extends PrimitiveSchemaImpl
                     eva.clear();
                     final AbstractJsonSchema dependentSchema = property.getValue();
                     if (dependentSchema.validate(jsonPointer + "/" + name, value, parent, eva, errors, callback)) {
-                        for (String e : eva) {
-                            if (!evaluated.contains(e)) {
-                                evaluated.add(e);
-                            }
-                        }
-
+                        eva.removeAll(evaluated);
+                        evaluated.addAll(eva);
                     }
                 }
             }

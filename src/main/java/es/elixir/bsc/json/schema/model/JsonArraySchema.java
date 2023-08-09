@@ -38,6 +38,7 @@ public interface JsonArraySchema extends JsonSchema {
     public final static String ITEMS = "items";
     public final static String UNIQUE_ITEMS = "uniqueItems";
     public final static String ADDITIONAL_ITEMS = "additionalItems";
+    public final static String UNEVALUATED_ITEMS = "unevaluatedItems";
     
     public final static String MIN_ITEMS = "minItems";
     public final static String MAX_ITEMS = "maxItems";
@@ -53,9 +54,11 @@ public interface JsonArraySchema extends JsonSchema {
     void setMaxItems(Long maxItems);
 
     /**
-     * In a case where there is only one schema in the list it is either {...} or [{...}].
-     * Setting 'additionalItems' to <b>NULL</b> means there is a single schema and 
-     * not an array with only one schema defined.
+     * In a case where there is only one schema in the list it is 
+     * either {...} or [{...}].Setting 'additionalItems' to <b>NULL</b> 
+     * means there is a single schema and not an array with only one schema defined.
+     *
+     * @param <T>
      * 
      * @return list of schemas
      */
@@ -64,10 +67,14 @@ public interface JsonArraySchema extends JsonSchema {
     Boolean isUniqueItems();
 
     /**
+     * @param <T>
+     * 
      * @return 'additionalSchema' JsonSchema, <b>NULL</b> if FALSE (or not set), 
      *         EmptyJsonSchema if TRUE
      */
     <T extends JsonSchema> T getAdditionalItems();
+    
+    <T extends JsonSchema> T getUnevaluatedItems();
     
     <T extends JsonSchema> T getContains();
     

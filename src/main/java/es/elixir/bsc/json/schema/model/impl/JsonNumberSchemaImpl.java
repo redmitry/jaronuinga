@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -72,7 +72,7 @@ public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
 
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {

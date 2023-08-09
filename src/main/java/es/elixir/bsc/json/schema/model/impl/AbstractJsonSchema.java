@@ -50,7 +50,7 @@ import javax.json.JsonValue;
 public interface AbstractJsonSchema<T extends JsonValue> extends JsonSchema {
 
     boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors, 
+            List evaluated, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException;
 

@@ -72,7 +72,7 @@ public class BooleanJsonSchemaImpl extends JsonSchemaImpl<JsonValue>
     }
     
     @Override
-    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, List<String> evaluated, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
+    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, List evaluated, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
         if (!evaluation) {
             errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer,
                     ValidationMessage.UNEVALUATED_BOOLEAN_SCHEMA_MSG));
