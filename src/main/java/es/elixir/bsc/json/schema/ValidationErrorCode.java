@@ -66,28 +66,30 @@ public final class ValidationErrorCode {
     public final static int ARRAY_MIN_CONTAINS_CONSTRAINT = 24;
     public final static int ARRAY_MAX_CONTAINS_CONSTRAINT = 25;
     
-    public final static int STRING_MIN_LENGTH_CONSTRAINT = 26;
-    public final static int STRING_MAX_LENGTH_CONSTRAINT = 27;
+    public final static int ARRAY_UNEVALUATED_ITEM_CONSTRAINT = 16;
     
-    public final static int STRING_PATTERN_CONSTRAINT = 28;
-    public final static int STRING_DATE_TIME_FORMAT_CONSTRAINT = 29;
-    public final static int STRING_EMAIL_FORMAT_CONSTRAINT = 30;
-    public final static int STRING_HOSTNAME_FORMAT_CONSTRAINT = 31;
-    public final static int STRING_IP4_FORMAT_CONSTRAINT = 32;
-    public final static int STRING_IP6_FORMAT_CONSTRAINT = 33;
-    public final static int STRING_URI_FORMAT_CONSTRAINT = 34;
+    public final static int STRING_MIN_LENGTH_CONSTRAINT = 27;
+    public final static int STRING_MAX_LENGTH_CONSTRAINT = 28;
     
-    public final static int NUMBER_NOT_INTEGER = 35;
-    public final static int NUMBER_MIN_CONSTRAINT = 36;
-    public final static int NUMBER_MAX_CONSTRAINT = 37;
-    public final static int NUMBER_MULTIPLE_OF_CONSTRAINT = 38;
+    public final static int STRING_PATTERN_CONSTRAINT = 29;
+    public final static int STRING_DATE_TIME_FORMAT_CONSTRAINT = 30;
+    public final static int STRING_EMAIL_FORMAT_CONSTRAINT = 31;
+    public final static int STRING_HOSTNAME_FORMAT_CONSTRAINT = 32;
+    public final static int STRING_IP4_FORMAT_CONSTRAINT = 33;
+    public final static int STRING_IP6_FORMAT_CONSTRAINT = 34;
+    public final static int STRING_URI_FORMAT_CONSTRAINT = 35;
+    
+    public final static int NUMBER_NOT_INTEGER = 36;
+    public final static int NUMBER_MIN_CONSTRAINT = 37;
+    public final static int NUMBER_MAX_CONSTRAINT = 38;
+    public final static int NUMBER_MULTIPLE_OF_CONSTRAINT = 39;
 
-    public final static int INTEGER_MIN_CONSTRAINT = 39;
-    public final static int INTEGER_MAX_CONSTRAINT = 40;
+    public final static int INTEGER_MIN_CONSTRAINT = 40;
+    public final static int INTEGER_MAX_CONSTRAINT = 41;
     
-    public final static int ENUM_INVALID_VALUE_TYPE = 41;
-    public final static int ENUM_INVALID_VALUE = 42;
+    public final static int ENUM_INVALID_VALUE_TYPE = 42;
+    public final static int ENUM_INVALID_VALUE = 43;
     
-    public final static int CONST_CONSTRAINT = 43;
+    public final static int CONST_CONSTRAINT = 44;
 
 }

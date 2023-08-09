@@ -78,7 +78,7 @@ public class JsonNotImpl extends PrimitiveSchemaImpl
     
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (schema.validate(jsonPointer, value, parent, new ArrayList(), new ArrayList(), callback)) {

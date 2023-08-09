@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -23,17 +23,20 @@
  *****************************************************************************
  */
 
-package es.elixir.bsc.json.schema;
+package es.elixir.bsc.json.schema.org.tests;
+
+import org.junit.Test;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonSchemaException extends Exception {
-
-    public final ParsingError error;
+public class JsonSchemaUnevaluatedItemsTest extends JsonSchemaOrgTest {
     
-    public JsonSchemaException(ParsingError error) {
-        this.error = error;
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/unevaluatedItems.json";
+    
+    @Test
+    public void test_draft201909() {
+        test(JSON_DRAFT201909_TEST_FILE);
     }
 }

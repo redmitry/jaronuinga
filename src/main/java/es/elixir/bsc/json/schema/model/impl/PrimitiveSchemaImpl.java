@@ -246,47 +246,75 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
 
         final int nerrors = errors.size();
-
+        
+        final List eva = new ArrayList();
         if (allOf != null) {
-            allOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
+            final List e = new ArrayList(evaluated);
+            if (allOf.validate(jsonPointer, value, parent, e, errors, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);
+            }
         }
         
         if (anyOf != null) {
-            anyOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
+            final List e = new ArrayList(evaluated);
+            if (anyOf.validate(jsonPointer, value, parent, e, errors, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);
+            }
         }
 
         if (oneOf != null) {
-            oneOf.validate(jsonPointer, value, parent, evaluated, errors, callback);
+            final List e = new ArrayList(evaluated);
+            if (oneOf.validate(jsonPointer, value, parent, e, errors, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);                
+            }
         }
 
         if (not != null) {
-            not.validate(jsonPointer, value, parent, evaluated, errors, callback);
-        }
-
-        if (_if != null) {
-            final List<ValidationError> err = new ArrayList<>();
-            _if.validate(jsonPointer, value, parent, evaluated, err, callback);
-            final AbstractJsonSchema choice = err.isEmpty() ? _then : _else;
-            if (choice != null) {
-                choice.validate(jsonPointer, value, parent, evaluated, errors, callback);
+            final List e = new ArrayList(evaluated);
+            if (not.validate(jsonPointer, value, parent, e, errors, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);                
             }
         }
         
-        if (ref != null) {
-            final List<String> eva = new ArrayList();
-            if (ref.validate(jsonPointer, value, parent, eva, errors, callback)) {
-                for (String name : eva) {
-                    if (!evaluated.contains(name)) {
-                        evaluated.add(name);
-                    }
+        if (_if != null) {
+            final List e = new ArrayList(evaluated);
+            final AbstractJsonSchema choice;
+            if (_if.validate(jsonPointer, value, parent, e, new ArrayList(), callback)) {
+                choice = _then;
+                e.removeAll(eva);
+                eva.addAll(e);
+            } else {
+                choice = _else;
+            }
+            if (choice != null) {
+                if (choice.validate(jsonPointer, value, parent, e, errors, callback)) {
+                    e.removeAll(eva);
+                    eva.addAll(e);
                 }
             }
         }
-        
+
+        if (ref != null) {
+            final List e = new ArrayList(evaluated);
+            if (ref.validate(jsonPointer, value, parent, e, errors, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);
+            }
+        }
+
+        if (nerrors == errors.size()) {
+            eva.removeAll(evaluated);
+            evaluated.addAll(eva);
+        }
+
         return nerrors == errors.size();
     }
 }

@@ -71,10 +71,9 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
         
         return this;
     }
-
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (this.value == null || !equals(this.value, value)) {

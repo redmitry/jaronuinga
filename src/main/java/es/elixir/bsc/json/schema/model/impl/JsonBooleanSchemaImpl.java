@@ -60,7 +60,7 @@ public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
         if (JsonValue.ValueType.TRUE != value.getValueType() &&

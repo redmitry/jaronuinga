@@ -99,22 +99,27 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
         
-        List<ValidationError> err = new ArrayList<>();
+        final List<ValidationError> err = new ArrayList<>();
+        final List eva = new ArrayList();
         
         // have to evaluate all schemas to collect evaluated properties
         boolean match = false;
         for (AbstractJsonSchema schema : this) {
-            final List<String> eva = new ArrayList();
-            if (schema.validate(jsonPointer, value, parent, eva, err, callback)) {
-                evaluated.addAll(eva);
+            final List e = new ArrayList(evaluated);
+            if (schema.validate(jsonPointer, value, parent, e, err, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);
                 match = true; // found the schema that matches
             }
         }
 
-        if (!match) {
+        if (match) {
+            eva.removeAll(evaluated);
+            evaluated.addAll(eva);
+        } else {
             errors.addAll(err);
             errors.add(new ValidationError(getId(), getJsonPointer(), 
                     jsonPointer, ValidationMessage.OBJECT_ANY_OF_CONSTRAINT_MSG));

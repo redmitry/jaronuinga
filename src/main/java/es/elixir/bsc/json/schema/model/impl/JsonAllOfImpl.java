@@ -55,19 +55,24 @@ public class JsonAllOfImpl extends SchemaArrayImpl
 
     @Override
     public boolean validate(String jsonPointer, JsonValue object, JsonValue parent, 
-            List<String> evaluated, List<ValidationError> errors,
+            List evaluated, List<ValidationError> errors,
             JsonSchemaValidationCallback<JsonValue> callback) {
 
         final int nerrors = errors.size();
         
+        final List eva = new ArrayList();
         for (AbstractJsonSchema schema : this) {
-            final List<String> eva = new ArrayList();
-            if (schema.validate(jsonPointer, object, parent, eva, errors, callback)) {
-                evaluated.addAll(eva);
+            final List e = new ArrayList(evaluated);
+            if (schema.validate(jsonPointer, object, parent, e, errors, callback)) {
+                e.removeAll(eva);
+                eva.addAll(e);
             }
         }
         
-        if (nerrors != errors.size()) {
+        if (nerrors == errors.size()) {
+            eva.removeAll(evaluated);
+            evaluated.addAll(eva);
+        } else {
             errors.add(new ValidationError(getId(), getJsonPointer(),
                     jsonPointer, ValidationMessage.OBJECT_ALL_OF_CONSTRAINT_MSG));
         }
