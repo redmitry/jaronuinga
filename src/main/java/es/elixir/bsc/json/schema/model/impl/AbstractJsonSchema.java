@@ -55,10 +55,10 @@ public interface AbstractJsonSchema<T extends JsonValue> extends JsonSchema {
             throws ValidationException;
 
     @Override
-    default void validate(JsonValue value, List<ValidationError> errors, 
+    default boolean validate(JsonValue value, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException {
-        validate("", value, null, new ArrayList(), errors, callback);
+        return validate("", value, null, new ArrayList(), errors, callback);
     }
     
     AbstractJsonSchema read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
