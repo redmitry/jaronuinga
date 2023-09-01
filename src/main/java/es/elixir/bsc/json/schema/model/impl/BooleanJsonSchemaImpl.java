@@ -35,7 +35,6 @@ import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.BooleanJsonSchema;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
@@ -50,15 +49,17 @@ public class BooleanJsonSchemaImpl extends JsonSchemaImpl<JsonValue>
 
     private boolean evaluation;
     
+    public BooleanJsonSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+    
     @Override
-    public BooleanJsonSchemaImpl read(final JsonSubschemaParser parser, 
-                                      final JsonSchemaLocator locator,
-                                      final JsonSchemaElement parent,
-                                      final String jsonPointer, 
+    public BooleanJsonSchemaImpl read(final JsonSubschemaParser parser,
                                       final JsonValue schema,
                                       final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, schema, type);
+        super.read(parser, schema, type);
 
         if (schema.getValueType() != ValueType.TRUE &&
             schema.getValueType() != ValueType.FALSE) {

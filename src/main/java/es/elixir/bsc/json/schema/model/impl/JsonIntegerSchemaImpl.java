@@ -30,14 +30,11 @@ import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonIntegerSchema;
-import static es.elixir.bsc.json.schema.model.NumericSchema.MAXIMUM;
-import static es.elixir.bsc.json.schema.model.NumericSchema.MINIMUM;
 import java.math.BigInteger;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.math.BigDecimal;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -51,16 +48,18 @@ import javax.json.JsonValue;
 
 public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
                                    implements JsonIntegerSchema {
-    
+
+    public JsonIntegerSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
-    public JsonIntegerSchemaImpl read(final JsonSubschemaParser parser, 
-                                      final JsonSchemaLocator locator,
-                                      final JsonSchemaElement parent,
-                                      final String jsonPointer, 
+    public JsonIntegerSchemaImpl read(final JsonSubschemaParser parser,
                                       final JsonObject object,
                                       final JsonType type) throws JsonSchemaException {
         
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
 
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MINIMUM), JsonValue.ValueType.NUMBER);
         if (min != null) {
@@ -108,7 +107,7 @@ public class JsonIntegerSchemaImpl extends NumericSchemaImpl<BigInteger>
         
         return nerrors == errors.size();
     }
-    
+
     public void validate(String jsonPointer, BigInteger num, List<ValidationError> errors) {
         if (minimum != null) {
             if (isExclusiveMinimum != null && isExclusiveMinimum) {

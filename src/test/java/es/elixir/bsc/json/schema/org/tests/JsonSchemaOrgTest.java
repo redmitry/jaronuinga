@@ -25,6 +25,9 @@
 
 package es.elixir.bsc.json.schema.org.tests;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaParserConfig;
 import es.elixir.bsc.json.schema.JsonSchemaReader;
@@ -33,6 +36,7 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.impl.DefaultJsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonTest;
+import java.io.Closeable;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -40,6 +44,7 @@ import javax.json.JsonValue;
 import javax.json.stream.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -48,13 +53,26 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Assert;
-
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
 /**
  * @author Dmitry Repchevsky
  */
 
 public class JsonSchemaOrgTest {
+    
+    private static RemotesServer server;
 
+    @BeforeClass
+    public static void init() throws IOException {
+        server = new RemotesServer();
+    }
+    
+    @AfterClass
+    public static void close() throws IOException {
+        server.close();
+    }
+    
     public void test(String file) {
         test(file, null);
     }
@@ -105,4 +123,39 @@ public class JsonSchemaOrgTest {
         }
     }
 
+    public static class RemotesServer implements HttpHandler, Closeable {
+
+        private HttpServer server;
+
+        public RemotesServer() {
+            try {
+                server = HttpServer.create(new InetSocketAddress(1234), 0);
+                server.createContext("/", this);
+                server.start();
+            } catch (IOException ex) {
+                Logger.getLogger(JsonSchemaOrgTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            final URI uri = exchange.getRequestURI();
+            try (InputStream in = JsonSchemaOrgTest.class.getClassLoader().getResourceAsStream("test/remotes/" + uri.getPath())) {
+                if (in != null) {
+                    final byte[] file = in.readAllBytes();
+                    exchange.sendResponseHeaders(200, file.length);
+                    exchange.getResponseBody().write(file);
+                } else {
+                    exchange.sendResponseHeaders(404, 0);
+                }
+            } catch (IOException ex) {
+                exchange.sendResponseHeaders(500, 0);
+            }
+        }        
+
+        @Override
+        public void close() throws IOException {
+            server.stop(0);
+        }
+    }
 }

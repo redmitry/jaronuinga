@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
@@ -44,18 +43,6 @@ import javax.json.JsonValue;
 public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema>
                                 implements JsonProperties<AbstractJsonSchema> {
 
-    private JsonSchemaElement parent;
-    private String jsonPointer;
-    
-    @Override
-    public JsonSchemaElement getParent() {
-        return parent;
-    }
-
-    @Override
-    public String getJsonPointer() {
-        return jsonPointer;
-    }
 
     @Override
     public boolean contains(String name) {
@@ -82,15 +69,15 @@ public class JsonPropertiesImpl extends LinkedHashMap<String, AbstractJsonSchema
         return entrySet().iterator();
     }
     
-    public JsonPropertiesImpl read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
-            JsonSchemaElement parent, String jsonPointer, JsonObject object) throws JsonSchemaException {
-        
-        this.parent = parent;
-        this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
-        
+    public JsonPropertiesImpl read(final JsonSubschemaParser parser, 
+                                   final JsonSchemaLocator locator, 
+                                   final JsonSchemaImpl parent,
+                                   final String jsonPointer,
+                                   final JsonObject object) throws JsonSchemaException {
+
         for (Map.Entry<String, JsonValue> entry : object.entrySet()) {
             final JsonValue value = entry.getValue();
-            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + entry.getKey(), value, null);
+            final AbstractJsonSchema schema = parser.parse(locator, parent, jsonPointer + "/" + entry.getKey(), value, null);
             put(entry.getKey(), schema);
         }
         

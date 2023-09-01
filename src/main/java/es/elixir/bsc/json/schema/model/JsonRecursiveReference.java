@@ -25,17 +25,11 @@
 
 package es.elixir.bsc.json.schema.model;
 
-import java.util.Map;
-
 /**
  * @author Dmitry Repchevsky
- * 
- * @param <T>
  */
 
-public interface JsonDefinitions<T extends JsonSchema> extends Iterable<Map.Entry<String, T>> {
-
-    JsonSchema get(String name);
-    JsonSchema put(String name, T schema);
-    JsonSchema remove(String name);
+public interface JsonRecursiveReference extends JsonReference {
+    
+    public final static String RECURSIVE_REF = "$recursiveRef";
 }

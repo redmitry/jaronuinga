@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonConst;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -46,7 +45,12 @@ import javax.json.JsonNumber;
 public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
 
     private JsonValue value;
-    
+
+    public JsonConstImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
     public JsonValue getValue() {
         return value;
@@ -58,14 +62,11 @@ public class JsonConstImpl extends PrimitiveSchemaImpl implements JsonConst {
     }
     
     @Override
-    public JsonConstImpl read(final JsonSubschemaParser parser, 
-                              final JsonSchemaLocator locator,
-                              final JsonSchemaElement parent,
-                              final String jsonPointer, 
+    public JsonConstImpl read(final JsonSubschemaParser parser,
                               final JsonObject object,
                               final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
         
         value = object.get(CONST);
         

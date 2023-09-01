@@ -41,7 +41,8 @@ public enum ParsingMessage {
     INVALID_REFERENCE(8, "invalid reference: '$ref': '%s'."),
     UNRESOLVABLE_REFERENCE(9, "unable to resolve reference. '$ref': '%s'."),
     CONSTRAINT_ERROR(10, "%s constraint: '%s' '%s."),
-    EMPTY_ENUM(11, "empty enum.");
+    EMPTY_ENUM(11, "empty enum."),
+    INCOMPATIBLE_KEYWORDS(12, "incompatible keywords [%s]");
     
     public final int CODE;
     public final String VALUE;

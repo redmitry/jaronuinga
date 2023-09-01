@@ -26,7 +26,6 @@
 package es.elixir.bsc.json.schema.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.model.JsonSchema;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonPointer;
@@ -110,10 +109,4 @@ public class DefaultJsonSchemaLocator extends JsonSchemaLocator {
         }
         return new DefaultJsonSchemaLocator(super.uri.resolve(uri), schemas);
     }
-    
-    @Override
-    public void putSchema(JsonSchema schema) {
-        
-    }
-
 }

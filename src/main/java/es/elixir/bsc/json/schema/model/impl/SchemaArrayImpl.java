@@ -29,10 +29,10 @@ import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.SchemaArray;
-import java.net.URI;
 import java.util.HashSet;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import java.util.Iterator;
+import java.util.Set;
 import javax.json.JsonArray;
 import javax.json.JsonValue;
 
@@ -40,57 +40,46 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public abstract class SchemaArrayImpl extends HashSet<AbstractJsonSchema>
-                                      implements SchemaArray<AbstractJsonSchema> {
+public abstract class SchemaArrayImpl extends JsonSchemaImpl
+        implements SchemaArray<AbstractJsonSchema> {
     
-    protected URI id;
-    protected JsonSchemaElement parent;
-    protected String jsonPointer;
+    private final Set<AbstractJsonSchema> schemas;
+    
+    public SchemaArrayImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+
+        schemas = new HashSet();
+    }
 
     @Override
-    public URI getId() {
-        return id;
+    public Iterator<AbstractJsonSchema> iterator() {
+        return schemas.iterator();
     }
 
     @Override
-    public void setId(URI id) {
-        this.id = id;
-    }
-    
-    @Override
-    public JsonSchemaElement getParent() {
-        return parent;
-    }
-    
-    @Override
-    public String getJsonPointer() {
-        return jsonPointer;
+    public boolean add(AbstractJsonSchema schema) {
+        return schemas.add(schema);
     }
 
     @Override
     public boolean remove(AbstractJsonSchema schema) {
-        return super.remove(schema);
+        return schemas.remove(schema);
     }
 
     @Override
     public boolean contains(AbstractJsonSchema schema) {
-        return super.contains(schema);
+        return schemas.contains(schema);
     }
 
-    public SchemaArrayImpl read(final JsonSubschemaParser parser, 
-                                final JsonSchemaLocator locator,
-                                final JsonSchemaElement parent,
-                                final String jsonPointer, 
+    public SchemaArrayImpl read(final JsonSubschemaParser parser,
                                 final JsonArray array,
                                 final JsonType type) throws JsonSchemaException {
 
-        this.id = locator.uri;
-        this.parent = parent;
-        this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
-
         for (int i = 0, n = array.size(); i < n; i++) {
             final JsonValue value = array.get(i);
-            final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + Integer.toString(i), value, type);
+            final AbstractJsonSchema schema = parser.parse(getCurrentScope(), this, 
+                    getJsonPointer() + "/" + Integer.toString(i), value, type);
             add(schema);
         }
         

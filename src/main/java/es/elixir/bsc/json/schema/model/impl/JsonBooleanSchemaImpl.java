@@ -34,7 +34,6 @@ import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
@@ -45,15 +44,17 @@ import javax.json.JsonValue;
 public class JsonBooleanSchemaImpl extends PrimitiveSchemaImpl
                                    implements JsonBooleanSchema {
 
+    public JsonBooleanSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
-    public JsonBooleanSchemaImpl read(final JsonSubschemaParser parser, 
-                                      final JsonSchemaLocator locator,
-                                      final JsonSchemaElement parent,
-                                      final String jsonPointer, 
+    public JsonBooleanSchemaImpl read(final JsonSubschemaParser parser,
                                       final JsonObject object,
                                       final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
 
         return this;
     }

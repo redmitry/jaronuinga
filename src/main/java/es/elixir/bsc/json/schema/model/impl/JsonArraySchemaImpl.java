@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import static es.elixir.bsc.json.schema.model.JsonArraySchema.ADDITIONAL_ITEMS;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -73,7 +72,12 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
 
     private Long minContains;
     private Long maxContains;
-    
+
+    public JsonArraySchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
     public List<AbstractJsonSchema> getItems() {
         if (items == null) {
@@ -134,14 +138,11 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public JsonArraySchemaImpl read(final JsonSubschemaParser parser, 
-                                    final JsonSchemaLocator locator,
-                                    final JsonSchemaElement parent,
-                                    final String jsonPointer, 
+    public JsonArraySchemaImpl read(final JsonSubschemaParser parser,
                                     final JsonObject object,
                                     final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_ITEMS), JsonValue.ValueType.NUMBER);
         if (min != null) {
@@ -165,7 +166,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
 
         final JsonValue jcontains = object.get(CONTAINS);
         if (jcontains != null) {
-            contains = parser.parse(locator, this, jsonPointer + "/" + CONTAINS, jcontains, null);
+            contains = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + CONTAINS, jcontains, null);
         }
 
         final JsonNumber jminContains = JsonSchemaUtil.check(object.getJsonNumber(MIN_CONTAINS), JsonValue.ValueType.NUMBER);
@@ -183,7 +184,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
             switch(jitems.getValueType()) {
                 case OBJECT:
                 case TRUE:
-                case FALSE: final AbstractJsonSchema schema = parser.parse(locator, this, jsonPointer + "/" + ITEMS, jitems, null);
+                case FALSE: final AbstractJsonSchema schema = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + ITEMS, jitems, null);
                             getItems().add(schema);
                             break;
                 case ARRAY: additionalItems = true;
@@ -192,7 +193,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                                 switch(value.getValueType()) {
                                     case OBJECT:
                                     case TRUE:
-                                    case FALSE: final AbstractJsonSchema arr = parser.parse(locator, this, jsonPointer + "/" + ITEMS + "/" + i, value, null);
+                                    case FALSE: final AbstractJsonSchema arr = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + ITEMS + "/" + i, value, null);
                                                 getItems().add(arr);
                                                 break;
                                     default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
@@ -216,7 +217,7 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
                     default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        new Object[] {ADDITIONAL_ITEMS, jadditionalItems.getValueType().name(), "either object or boolean"}));
                 }
-                additionalItemsSchema = parser.parse(locator, this, jsonPointer + "/" + ADDITIONAL_ITEMS, jadditionalItems, null);
+                additionalItemsSchema = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + ADDITIONAL_ITEMS, jadditionalItems, null);
             }
         }
 
@@ -224,12 +225,12 @@ public class JsonArraySchemaImpl extends PrimitiveSchemaImpl
         if (junevaluatedItems != null) {
             switch(junevaluatedItems.getValueType()) {
                 case OBJECT: unevaluatedItems = null;
-                             unevaluatedItemsSchema = parser.parse(locator, this, jsonPointer + "/" + UNEVALUATED_ITEMS, junevaluatedItems, null);
+                             unevaluatedItemsSchema = parser.parse(getCurrentScope(), this, getJsonPointer() + "/" + UNEVALUATED_ITEMS, junevaluatedItems, null);
                              break;
                 case TRUE:   unevaluatedItems = true; break;
                 case FALSE:  unevaluatedItems = false; break;
                 default:     throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
-                                   new Object[] {UNEVALUATED_ITEMS, jitems.getValueType().name(), "either object or boolean"}));
+                                   new Object[] {UNEVALUATED_ITEMS, junevaluatedItems.getValueType().name(), "either object or boolean"}));
             }
         }
 

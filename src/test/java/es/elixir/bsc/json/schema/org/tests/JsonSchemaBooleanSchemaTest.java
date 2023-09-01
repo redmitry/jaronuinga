@@ -33,9 +33,9 @@ import org.junit.Test;
 
 public class JsonSchemaBooleanSchemaTest extends JsonSchemaOrgTest {
 
-    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/boolean_schema.json";
-    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/boolean_schema.json";
-    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/boolean_schema.json";
+    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/boolean_schema.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/boolean_schema.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/boolean_schema.json";
     
     @Test
     public void test_draft6() {

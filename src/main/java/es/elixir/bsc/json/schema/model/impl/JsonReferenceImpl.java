@@ -27,19 +27,14 @@ package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
-import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
-import es.elixir.bsc.json.schema.ValidationError;
-import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonReference;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -48,7 +43,7 @@ import javax.json.JsonValue;
  * @author Dmitry Repchevsky
  */
 
-public class JsonReferenceImpl extends JsonSchemaImpl<JsonObject> implements JsonReference {
+public class JsonReferenceImpl extends AbstractJsonReferenceImpl implements JsonReference {
 
     private AbstractJsonSchema schema;
 
@@ -57,6 +52,11 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonObject> implements Jso
     private JsonSchemaLocator ref_locator;
     private JsonSubschemaParser parser;
     
+    public JsonReferenceImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
     public AbstractJsonSchema getSchema() throws JsonSchemaException {
         if (schema == null) {
@@ -77,14 +77,11 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonObject> implements Jso
     }
 
     @Override
-    public JsonReferenceImpl read(JsonSubschemaParser parser, 
-                                  JsonSchemaLocator locator,
-                                  JsonSchemaElement parent,
-                                  String jsonPointer,
-                                  JsonObject object, 
-                                  JsonType type) throws JsonSchemaException {
+    public JsonReferenceImpl read(final JsonSubschemaParser parser,
+                                  final JsonObject object, 
+                                  final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
 
         this.parser = parser;
 
@@ -94,21 +91,21 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonObject> implements Jso
             final String fragment = uri.getFragment();
             if (fragment == null) {
                 ref_pointer = "";
-                ref_locator = locator.resolve(uri);
+                ref_locator = getCurrentScope().resolve(uri);
             } else if ("#".equals(ref)) {
                 ref_pointer = "";
-                ref_locator = locator;
+                ref_locator = getCurrentScope();
             } else if (fragment.startsWith("/")){
                 ref_pointer = fragment;
                 if (ref.startsWith("#")) {
-                    ref_locator = locator;
+                    ref_locator = getCurrentScope();
                 } else {
-                    ref_locator = locator.resolve(
+                    ref_locator = getCurrentScope().resolve(
                         new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null));                        
                 }
             } else {
                 ref_pointer = "";
-                ref_locator = locator.resolve(uri);
+                ref_locator = getCurrentScope().resolve(uri);
             }
         } catch(JsonException | IllegalArgumentException | URISyntaxException ex) {
             throw new JsonSchemaException(
@@ -116,19 +113,5 @@ public class JsonReferenceImpl extends JsonSchemaImpl<JsonObject> implements Jso
         }
         
         return this;
-    }
-
-    @Override
-    public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List evaluated, List<ValidationError> errors, 
-            JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException {
-
-        try {
-            final AbstractJsonSchema sch = getSchema();
-            return sch.validate(jsonPointer, value, parent, evaluated, errors, callback);
-        } catch (JsonSchemaException ex) {
-            errors.add(new ValidationError(getId(), getJsonPointer(), jsonPointer, ex.getMessage()));
-        }
-        return false;
     }
 }

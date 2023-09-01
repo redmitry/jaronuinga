@@ -35,10 +35,12 @@ import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
+import es.elixir.bsc.json.schema.model.JsonRecursiveReference;
 import es.elixir.bsc.json.schema.model.JsonReference;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.JsonSchema;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.PrimitiveSchema;
+import java.net.URI;
 import java.util.ArrayList;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -53,6 +55,8 @@ import javax.json.JsonValue;
 
 public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         implements PrimitiveSchema<AbstractJsonSchema> {
+
+    private JsonSchemaLocator scope;
 
     private String title;
     private String description;
@@ -71,8 +75,20 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
      * ("Other keywords are now allowed alongside of it") and is modeled
      * as a property.
      */
-    private JsonReferenceImpl ref;
+    private AbstractJsonReferenceImpl ref;
+    
+    private boolean recursiveAnchor;
+    
+    public PrimitiveSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator, 
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
 
+    @Override
+    public JsonSchemaLocator getCurrentScope() {
+        return scope;
+    }
+    
     public String getTitle() {
         return title;
     }
@@ -130,14 +146,37 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
     }
     
     @Override
-    public PrimitiveSchemaImpl read(final JsonSubschemaParser parser, 
-                                    final JsonSchemaLocator locator,
-                                    final JsonSchemaElement parent,
-                                    final String jsonPointer,
+    public boolean isRecursiveAnchor() {
+        return recursiveAnchor;
+    }
+    
+    @Override
+    public PrimitiveSchemaImpl read(final JsonSubschemaParser parser,
                                     final JsonObject object, 
                                     final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
+        
+        JsonValue $id = object.get(JsonSchema.ID);
+        if ($id == null) {
+            $id = object.get("id"); // draft4
+        } 
+
+        if ($id == null) {
+            scope = locator;
+        } else if ($id.getValueType() != JsonValue.ValueType.STRING) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                   new Object[] {"id", $id.getValueType().name(), JsonValue.ValueType.STRING.name()}));
+        } else {
+            final String id = ((JsonString)$id).getString();
+            try {
+                scope = locator.resolve(URI.create(id));
+                scope.setSchema(object);
+            } catch(IllegalArgumentException ex) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_REFERENCE,
+                                              new Object[] {id}));
+            }
+        }
 
         final JsonString jtitle = JsonSchemaUtil.check(object.get(TITLE), JsonValue.ValueType.STRING);
         if (jtitle != null) {
@@ -148,56 +187,68 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         if (jdescription != null) {
             setDescription(jdescription.getString());
         }
+
+        final JsonString $anchor = JsonSchemaUtil.check(object.get(JsonSchema.ANCHOR), JsonValue.ValueType.STRING);
+        if ($anchor != null) {
+            final String anchor = $anchor.getString();
+            scope.resolve(URI.create("#" + anchor)).setSchema(object);
+        }
         
+        final JsonValue jrecursiveAnchor = object.get(RECURSIVE_ANCHOR);
+        if (jrecursiveAnchor != null) {
+            switch(jrecursiveAnchor.getValueType()) {
+                case TRUE: recursiveAnchor = true;
+                case FALSE: break;
+                default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                                       new Object[] {RECURSIVE_ANCHOR, jrecursiveAnchor.getValueType().name(), "only boolean is allowed"}));
+            }
+        }
+
         final JsonArray jallOf = JsonSchemaUtil.check(object.get(ALL_OF), JsonValue.ValueType.ARRAY);
         if (jallOf != null) {
-            final JsonAllOfImpl _allOf = new JsonAllOfImpl()
-                    .read(parser, locator, this, jsonPointer + "/" + ALL_OF, jallOf, type);
+            final JsonAllOfImpl _allOf = new JsonAllOfImpl(this, scope, getJsonPointer() + "/" + ALL_OF)
+                    .read(parser, jallOf, type);
             if (allOf == null) {
                 allOf = _allOf;
-                locator.putSchema(allOf);
             } else {
-                allOf.addAll(_allOf);
+                for (AbstractJsonSchema schema : _allOf) {
+                    allOf.add(schema);
+                }
             }
         }
         
         final JsonArray janyOf = JsonSchemaUtil.check(object.get(ANY_OF), JsonValue.ValueType.ARRAY);
         if (janyOf != null) {
-            anyOf = new JsonAnyOfImpl();
-            anyOf.read(parser, locator, this, jsonPointer + "/" + ANY_OF, janyOf, type);
-            locator.putSchema(anyOf);
+            anyOf = new JsonAnyOfImpl(this, scope, getJsonPointer() + "/" + ANY_OF);
+            anyOf.read(parser, janyOf, type);
         }
         
         final JsonArray joneOf = JsonSchemaUtil.check(object.get(ONE_OF), JsonValue.ValueType.ARRAY);
         if (joneOf != null) {
-            oneOf = new JsonOneOfImpl();
-            oneOf.read(parser, locator, this, jsonPointer + "/" + ONE_OF, joneOf, type);
-            locator.putSchema(oneOf);
+            oneOf = new JsonOneOfImpl(this, scope, getJsonPointer() + "/" + ONE_OF);
+            oneOf.read(parser, joneOf, type);
         }
 
         final JsonValue jnot = object.get(NOT);
         if (jnot != null) {
             switch(jnot.getValueType()) {
-                case OBJECT: not = new JsonNotImpl();
-                             not.read(parser, locator, this, jsonPointer + "/" + NOT, jnot.asJsonObject());
-                             break;
+                case OBJECT:
                 case TRUE:
-                case FALSE: BooleanJsonSchemaImpl bool = new BooleanJsonSchemaImpl();
-                            not = new JsonNotImpl(bool.read(parser, locator, parent, jsonPointer, jnot, null));
+                case FALSE: not = new JsonNotImpl(this, scope, getJsonPointer() + "/" + NOT)
+                                        .read(parser, jnot, null);
                             break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        new Object[] {NOT, jnot.getValueType().name(), "either object or boolean"}));
             }
-            locator.putSchema(not);            
         }
 
         final JsonValue jif = object.get(IF);
         if (jif != null) {
             switch(jif.getValueType()) {
-                case OBJECT: _if = parser.parse(locator, this, jsonPointer + "/" + IF, jif, null);
+                case OBJECT: _if = parser.parse(scope, this, getJsonPointer() + "/" + IF, jif, null);
                              break;
                 case TRUE:
-                case FALSE:  _if = new BooleanJsonSchemaImpl().read(parser, locator, parent, jsonPointer, jif, null);
+                case FALSE:  _if = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jif, null);
                              break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        new Object[] {IF, jif.getValueType().name(), "either object or boolean"}));                             
@@ -207,10 +258,10 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         final JsonValue jelse = object.get(ELSE);
         if (jelse != null) {
             switch(jelse.getValueType()) {
-                case OBJECT: _else = parser.parse(locator, this, jsonPointer + "/" + ELSE, jelse, null);
+                case OBJECT: _else = parser.parse(scope, this, getJsonPointer() + "/" + ELSE, jelse, null);
                              break;
                 case TRUE:
-                case FALSE:  _else = new BooleanJsonSchemaImpl().read(parser, locator, parent, jsonPointer, jelse, null);
+                case FALSE:  _else = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jelse, null);
                              break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        new Object[] {ELSE, jelse.getValueType().name(), "either object or boolean"}));                             
@@ -220,10 +271,10 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
         final JsonValue jthen = object.get(THEN);
         if (jthen != null) {
             switch(jthen.getValueType()) {
-                case OBJECT: _then = parser.parse(locator, this, jsonPointer + "/" + THEN, jthen, null);
+                case OBJECT: _then = parser.parse(scope, this, getJsonPointer() + "/" + THEN, jthen, null);
                              break;
                 case TRUE:
-                case FALSE:  _then = new BooleanJsonSchemaImpl().read(parser, locator, parent, jsonPointer, jthen, null);
+                case FALSE:  _then = new BooleanJsonSchemaImpl(this, scope, getJsonPointer()).read(parser, jthen, null);
                              break;
                 default: throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
                                        new Object[] {THEN, jthen.getValueType().name(), "either object or boolean"}));                             
@@ -238,9 +289,26 @@ public class PrimitiveSchemaImpl extends JsonSchemaImpl<JsonObject>
                        new Object[] {JsonReference.REF, jref.getValueType().name(), JsonValue.ValueType.STRING.name()}));
             }
 
-            ref = new JsonReferenceImpl().read(parser, locator, parent, jsonPointer, object, null);
+            ref = new JsonReferenceImpl(this, scope, getJsonPointer()).read(parser, object, null);
         }
 
+        final JsonValue jrecursive_ref = object.get(JsonRecursiveReference.RECURSIVE_REF);
+        if (jrecursive_ref != null) {
+            if (JsonValue.ValueType.STRING != jrecursive_ref.getValueType()) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INVALID_ATTRIBUTE_TYPE, 
+                       new Object[] {JsonRecursiveReference.RECURSIVE_REF, jrecursive_ref.getValueType().name(), 
+                           JsonValue.ValueType.STRING.name()}));
+            }
+
+            if (jref != null) {
+                throw new JsonSchemaException(new ParsingError(ParsingMessage.INCOMPATIBLE_KEYWORDS, 
+                       new Object[] {String.join(",", 
+                               List.of(JsonRecursiveReference.REF, JsonRecursiveReference.RECURSIVE_REF))}));
+            }
+            
+            ref = new JsonRecursiveReferenceImpl(this, scope, getJsonPointer()).read(parser, object, null);
+        }
+        
         return this;
     }
 

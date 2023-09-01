@@ -33,8 +33,8 @@ import org.junit.Test;
 
 public class JsonSchemaPropertyNamesTest extends JsonSchemaOrgTest {
 
-    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/propertyNames.json";
-    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/propertyNames.json";
+    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/propertyNames.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/propertyNames.json";
 
     @Test
     public void test_draft6() {

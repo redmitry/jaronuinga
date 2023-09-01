@@ -31,7 +31,8 @@ import es.elixir.bsc.json.schema.JsonSchemaParser;
 import es.elixir.bsc.json.schema.JsonSchemaVersion;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
+import es.elixir.bsc.json.schema.model.impl.AbstractJsonSchema;
+import es.elixir.bsc.json.schema.model.impl.JsonSchemaImpl;
 import java.util.Map;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -59,11 +60,11 @@ public interface JsonSubschemaParser extends JsonSchemaParser {
     JsonSchemaVersion getJsonSchemaVersion(JsonObject object);
         
     @Override
-    default JsonSchema parse(JsonSchemaLocator locator,
-            String jsonPointer, JsonValue schema) throws JsonSchemaException {
+    default JsonSchema parse(JsonSchemaLocator locator, JsonValue schema)
+            throws JsonSchemaException {
 
-        return parse(locator, null, jsonPointer, schema, null);
+        return parse(locator, null, "/", schema, null);
     }
     
-    <T extends JsonSchema> T parse(JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer, JsonValue schema, JsonType type) throws JsonSchemaException;
+    <T extends AbstractJsonSchema> T parse(JsonSchemaLocator locator, JsonSchemaImpl parent, String jsonPointer, JsonValue schema, JsonType type) throws JsonSchemaException;
 }

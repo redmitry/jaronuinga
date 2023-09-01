@@ -46,7 +46,6 @@ public interface JsonObjectSchema extends JsonSchema {
     public final static String UNEVALUATED_PROPERTIES = "unevaluatedProperties";
     public final static String PROPERTY_NAMES = "propertyNames";
     
-    JsonDefinitions getDefinitions();
     JsonProperties getProperties();
     Integer getMinProperties();
     Integer getMaxProperties();

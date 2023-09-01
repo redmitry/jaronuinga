@@ -43,14 +43,14 @@ public interface JsonSchema extends JsonSchemaElement {
     public final static String SCHEMA = "$schema";
     public final static String DEFS = "$defs";
     public final static String ANCHOR = "$anchor";
+    public final static String RECURSIVE_ANCHOR = "$recursiveAnchor";
     public final static String VOCABULARY = "$vocabulary";
     
     URI getId();
-    void setId(URI id);
-    
-    boolean validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
 
-    default boolean validate(JsonValue value, List<ValidationError> errors) {
-        return validate(value, errors, null);
+    void validate(JsonValue value, List<ValidationError> errors, JsonSchemaValidationCallback<JsonValue> callback) throws ValidationException;
+
+    default void validate(JsonValue value, List<ValidationError> errors) {
+        validate(value, errors, null);
     }
 }
