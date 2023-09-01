@@ -37,12 +37,11 @@ public interface JsonSchemaParser {
     /**
      * 
      * @param locator current Json Schema locator that holds current ID (URI).
-     * @param jsonPointer Json Pointer to the current object positions.
      * @param schema Json object that represents Json Schema.
      * 
      * @return Json Schema model object.
      * 
      * @throws JsonSchemaException 
      */
-    JsonSchema parse(JsonSchemaLocator locator, String jsonPointer, JsonValue schema) throws JsonSchemaException;
+    JsonSchema parse(JsonSchemaLocator locator, JsonValue schema) throws JsonSchemaException;
 }

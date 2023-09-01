@@ -37,7 +37,6 @@ import es.elixir.bsc.json.schema.impl.DefaultJsonStringFormatValidator;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.regex.Pattern;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
@@ -55,6 +54,11 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     
     private String format;
     private Pattern pattern;
+
+    public JsonStringSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
     
     @Override
     public Long getMinLength() {
@@ -98,14 +102,11 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
     }
     
     @Override
-    public JsonStringSchemaImpl read(final JsonSubschemaParser parser, 
-                                     final JsonSchemaLocator locator,
-                                     final JsonSchemaElement parent,
-                                     final String jsonPointer, 
+    public JsonStringSchemaImpl read(final JsonSubschemaParser parser,
                                      final JsonObject object,
                                      final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MIN_LENGTH), JsonValue.ValueType.NUMBER);
         if (min != null) {
@@ -152,7 +153,7 @@ public class JsonStringSchemaImpl extends PrimitiveSchemaImpl
         
         return nerrors == errors.size();
     }
-
+    
     private void validate(String jsonPointer, String string, List<ValidationError> errors) {
         
         if (minLength != null && string.codePointCount(0, string.length()) < minLength) {

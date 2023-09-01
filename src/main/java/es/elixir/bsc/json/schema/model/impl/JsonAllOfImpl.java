@@ -33,7 +33,6 @@ import es.elixir.bsc.json.schema.model.JsonAllOf;
 import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonValue;
 import java.util.ArrayList;
@@ -44,19 +43,25 @@ import jakarta.json.JsonArray;
  */
 
 public class JsonAllOfImpl extends SchemaArrayImpl
-                           implements AbstractJsonSchema<JsonArray>,
-                           JsonAllOf<AbstractJsonSchema> {
+                           implements AbstractJsonSchema, JsonAllOf<AbstractJsonSchema> {
+
+    public JsonAllOfImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
 
     @Override
-    public JsonAllOfImpl read(JsonSubschemaParser parser, JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer, JsonArray schema, JsonType type) throws JsonSchemaException {
-        super.read(parser, locator, parent, jsonPointer, schema, type);
+    public JsonAllOfImpl read(final JsonSubschemaParser parser,
+                              final JsonArray schema, 
+                              final JsonType type) throws JsonSchemaException {
+
+        super.read(parser, schema, type);
         return this;
     }
 
     @Override
     public boolean validate(String jsonPointer, JsonValue object, JsonValue parent, 
-            List evaluated, List<ValidationError> errors,
-            JsonSchemaValidationCallback<JsonValue> callback) {
+            List evaluated, List errors, JsonSchemaValidationCallback callback) {
 
         final int nerrors = errors.size();
         

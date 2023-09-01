@@ -33,10 +33,10 @@ import org.junit.Test;
 
 public class JsonSchemaAdditionalPropertiesTest extends JsonSchemaOrgTest {
     
-    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/draft4/additionalProperties.json";
-    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/additionalProperties.json";
-    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/additionalProperties.json";
-    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/additionalProperties.json";
+    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/additionalProperties.json";
+    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/additionalProperties.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/additionalProperties.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/additionalProperties.json";
     
     @Test
     public void test_draft4() {

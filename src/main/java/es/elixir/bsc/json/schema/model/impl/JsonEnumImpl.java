@@ -34,7 +34,6 @@ import es.elixir.bsc.json.schema.model.JsonEnum;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.List;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 
@@ -45,6 +44,11 @@ import jakarta.json.JsonValue;
 public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
 
     private List<JsonValue> values;
+
+    public JsonEnumImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
 
     @Override
     public List<JsonValue> getValues() {
@@ -57,14 +61,11 @@ public class JsonEnumImpl extends PrimitiveSchemaImpl implements JsonEnum {
     }
     
     @Override
-    public JsonEnumImpl read(final JsonSubschemaParser parser, 
-                             final JsonSchemaLocator locator,
-                             final JsonSchemaElement parent,
-                             final String jsonPointer, 
+    public JsonEnumImpl read(final JsonSubschemaParser parser,
                              final JsonObject object,
                              final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
         
         values = JsonSchemaUtil.check(object.get(ENUM), JsonValue.ValueType.ARRAY);
         

@@ -35,7 +35,6 @@ import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -47,15 +46,17 @@ import jakarta.json.JsonValue;
 public class JsonNumberSchemaImpl extends NumericSchemaImpl<BigDecimal>
                                   implements JsonNumberSchema {
 
+    public JsonNumberSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
-    public JsonNumberSchemaImpl read(final JsonSubschemaParser parser, 
-                                     final JsonSchemaLocator locator,
-                                     final JsonSchemaElement parent,
-                                     final String jsonPointer, 
+    public JsonNumberSchemaImpl read(final JsonSubschemaParser parser,
                                      final JsonObject object,
                                      final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
         
         final JsonNumber min = JsonSchemaUtil.check(object.getJsonNumber(MINIMUM), JsonValue.ValueType.NUMBER);
         if (min != null) {

@@ -26,13 +26,11 @@
 package es.elixir.bsc.json.schema.model.impl;
 
 import es.elixir.bsc.json.schema.JsonSchemaException;
-import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ValidationError;
 import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonSchema;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,20 +46,19 @@ import jakarta.json.JsonValue;
  */
 
 public interface AbstractJsonSchema<T extends JsonValue> extends JsonSchema {
-
+    
     boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
             List evaluated, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException;
 
     @Override
-    default boolean validate(JsonValue value, List<ValidationError> errors, 
+    default void validate(JsonValue value, List<ValidationError> errors, 
             JsonSchemaValidationCallback<JsonValue> callback) 
             throws ValidationException {
-        return validate("", value, null, new ArrayList(), errors, callback);
+        validate("", value, null, new ArrayList(), errors, callback);
     }
     
-    AbstractJsonSchema read(JsonSubschemaParser parser, JsonSchemaLocator locator, 
-            JsonSchemaElement parent, String jsonPointer, T schema, JsonType type) 
+    AbstractJsonSchema<T> read(JsonSubschemaParser parser, T value, JsonType type) 
             throws JsonSchemaException;
 }

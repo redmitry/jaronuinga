@@ -34,23 +34,21 @@ import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
 import es.elixir.bsc.json.schema.model.JsonNot;
 import java.util.ArrayList;
 import java.util.List;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
-import jakarta.json.JsonObject;
+import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonValue;
 
 /**
  * @author Dmitry Repchevsky
  */
 
-public class JsonNotImpl extends PrimitiveSchemaImpl
+public class JsonNotImpl extends JsonSchemaImpl<JsonValue>
                          implements JsonNot<AbstractJsonSchema> {
 
     private AbstractJsonSchema schema;
     
-    public JsonNotImpl() {}
-    
-    public JsonNotImpl(AbstractJsonSchema schema) {
-        this.schema = schema;
+    public JsonNotImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
     }
     
     @Override
@@ -63,15 +61,14 @@ public class JsonNotImpl extends PrimitiveSchemaImpl
         this.schema = schema;
     }
     
-    public JsonNotImpl read(final JsonSubschemaParser parser, 
-                            final JsonSchemaLocator locator,
-                            final JsonSchemaElement parent,
-                            final String jsonPointer, 
-                            final JsonObject object) throws JsonSchemaException {
+    @Override
+    public JsonNotImpl read(final JsonSubschemaParser parser,
+                            final JsonValue value,
+                            final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, null);
+        super.read(parser, value, null);
         
-        this.schema = parser.parse(locator, null, jsonPointer, object, null);
+        this.schema = parser.parse(getCurrentScope(), null, getJsonPointer(), value, null);
         
         return this;
     }

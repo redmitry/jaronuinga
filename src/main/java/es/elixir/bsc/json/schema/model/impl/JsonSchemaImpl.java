@@ -28,7 +28,6 @@ package es.elixir.bsc.json.schema.model.impl;
 import es.elixir.bsc.json.schema.JsonSchemaException;
 import es.elixir.bsc.json.schema.JsonSchemaLocator;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonValue;
 import java.net.URI;
@@ -41,40 +40,43 @@ import java.net.URI;
 
 public abstract class JsonSchemaImpl<T extends JsonValue> implements AbstractJsonSchema<T> {
     
-    private URI id;
-    private JsonSchemaElement parent;
-    private String jsonPointer;
+    public final JsonSchemaImpl parent;
+    public final JsonSchemaLocator locator;
+    
+    private final String jsonPointer;
+
+    public JsonSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator, 
+            String jsonPointer) {
+
+        this.parent = parent;
+        this.locator = locator;
+        this.jsonPointer = jsonPointer.startsWith("//") ? jsonPointer.substring(1) : jsonPointer;
+    }
 
     @Override
     public URI getId() {
-        return id;
-    }
-    
-    @Override
-    public void setId(URI id) {
-        this.id = id;
+        return getCurrentScope().uri;
     }
 
     @Override
-    public JsonSchemaElement getParent() {
+    public JsonSchemaImpl getParent() {
         return parent;
     }
 
     @Override
     public String getJsonPointer() {
-        return jsonPointer;
+        // when scope != locator (new scope) jsonPointer is 'root'
+        return getCurrentScope() == locator ? jsonPointer : "/";
+    }
+
+    public JsonSchemaLocator getCurrentScope() {
+        return locator;
     }
 
     @Override
-    public JsonSchemaImpl<T> read(JsonSubschemaParser parser, 
-            JsonSchemaLocator locator, JsonSchemaElement parent, String jsonPointer,
-            T schema, JsonType type) 
-            throws JsonSchemaException {
-
-        this.parent = parent;
-        this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
-        
-        id = locator.uri;
+    public JsonSchemaImpl<T> read(final JsonSubschemaParser parser,
+                                  final T value,
+                                  final JsonType type) throws JsonSchemaException {
 
         return this;
     }

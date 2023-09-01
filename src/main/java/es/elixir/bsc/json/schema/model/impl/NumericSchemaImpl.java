@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * Copyright (C) 2022 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
+ * Copyright (C) 2023 ELIXIR ES, Spanish National Bioinformatics Institute (INB)
  * and Barcelona Supercomputing Center (BSC)
  *
  * Modifications to the initial code base are copyright of their respective
@@ -32,7 +32,6 @@ import es.elixir.bsc.json.schema.ParsingMessage;
 import es.elixir.bsc.json.schema.model.JsonType;
 import es.elixir.bsc.json.schema.model.NumericSchema;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import java.math.BigDecimal;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
@@ -56,6 +55,11 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     protected Number exclusiveMinimum;
     protected Number exclusiveMaximum;
     
+    public NumericSchemaImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
+
     @Override
     public BigDecimal getMultipleOf() {
         return multipleOf;
@@ -127,14 +131,11 @@ public abstract class NumericSchemaImpl<T extends Number> extends PrimitiveSchem
     }
     
     @Override
-    public NumericSchemaImpl read(final JsonSubschemaParser parser, 
-                                  final JsonSchemaLocator locator,
-                                  final JsonSchemaElement parent,
-                                  final String jsonPointer, 
+    public NumericSchemaImpl read(final JsonSubschemaParser parser,
                                   final JsonObject object, 
                                   final JsonType type) throws JsonSchemaException {
 
-        super.read(parser, locator, parent, jsonPointer, object, type);
+        super.read(parser, object, type);
         
         final JsonNumber mul = JsonSchemaUtil.check(object.getJsonNumber(MULTIPLE_OF), JsonValue.ValueType.NUMBER);
         if (mul != null) {

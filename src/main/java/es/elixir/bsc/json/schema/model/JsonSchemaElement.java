@@ -38,7 +38,7 @@ public interface JsonSchemaElement {
      * 
      * @return immediate parent node (element) 
      */
-    JsonSchemaElement getParent();
+    <T extends JsonSchemaElement> T getParent();
     
     /**
      * Returns Json Pointer to locate Json Schema object in the Json Schema document.

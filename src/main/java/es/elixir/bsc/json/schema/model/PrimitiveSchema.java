@@ -25,6 +25,7 @@
 
 package es.elixir.bsc.json.schema.model;
 
+
 /**
  * Primitive empty Json Schema of any type ("object", "array", "string", etc.)
  * 
@@ -59,4 +60,12 @@ public interface PrimitiveSchema<T extends JsonSchema> extends JsonSchema {
     <T extends JsonSchema> T getElse();
     
     JsonReference getReference();
+    
+    /**
+     * $RecursiveAnchor property
+     * @see https://json-schema.org/draft/2019-09/json-schema-core.html#recursive-ref
+     * 
+     * @return TRUE when "recursiveAnchor": true
+     */
+    boolean isRecursiveAnchor();
 }

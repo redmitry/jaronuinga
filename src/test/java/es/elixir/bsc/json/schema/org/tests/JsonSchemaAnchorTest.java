@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class JsonSchemaAnchorTest extends JsonSchemaOrgTest {
 
-    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/draft2019-09/anchor.json";
+    private final static String JSON_DRAFT201909_TEST_FILE = "json-schema-org/tests/draft2019-09/anchor.json";
     
     @Test
     public void test_draft201909() {

@@ -35,8 +35,8 @@ import java.util.List;
 import es.elixir.bsc.json.schema.JsonSchemaValidationCallback;
 import es.elixir.bsc.json.schema.ParsingError;
 import es.elixir.bsc.json.schema.ParsingMessage;
+import es.elixir.bsc.json.schema.ValidationException;
 import es.elixir.bsc.json.schema.impl.JsonSubschemaParser;
-import es.elixir.bsc.json.schema.model.JsonSchemaElement;
 import es.elixir.bsc.json.schema.model.JsonType;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonString;
@@ -47,32 +47,31 @@ import jakarta.json.JsonValue;
  */
 
 public class JsonAnyOfImpl extends SchemaArrayImpl
-                           implements AbstractJsonSchema<JsonValue>,
-                           JsonAnyOf<AbstractJsonSchema> {
+                           implements AbstractJsonSchema, JsonAnyOf<AbstractJsonSchema> {
     
     private JsonArray types;
     
-    public JsonAnyOfImpl() {}
+    public JsonAnyOfImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer) {
+        super(parent, locator, jsonPointer);
+    }
     
-    public JsonAnyOfImpl(JsonArray types) {
+    public JsonAnyOfImpl(JsonSchemaImpl parent, JsonSchemaLocator locator,
+            String jsonPointer, JsonArray types) {
+        super(parent, locator, jsonPointer);
+        
         this.types = types;
     }
     
     @Override
-    public JsonAnyOfImpl read(final JsonSubschemaParser parser, 
-                              final JsonSchemaLocator locator,
-                              final JsonSchemaElement parent,
-                              final String jsonPointer, 
+    public JsonAnyOfImpl read(final JsonSubschemaParser parser,
                               final JsonValue value,
                               final JsonType type) throws JsonSchemaException {
-        this.id = locator.uri;
-        this.parent = parent;
-        this.jsonPointer = jsonPointer.isEmpty() ? "/" : jsonPointer;
         
         if (types == null) {
             for (JsonType val : JsonType.values()) {
                 try {
-                    final AbstractJsonSchema s = parser.parse(locator, this, jsonPointer, value, val);
+                    final AbstractJsonSchema s = parser.parse(getCurrentScope(), this, getJsonPointer(), value, val);
                     if (s != null) {
                         add(s);
                     }
@@ -87,7 +86,7 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
                 }
                 try {
                      final JsonType t = JsonType.fromValue(((JsonString)val).getString());
-                     add(parser.parse(locator, parent, jsonPointer, value, t));
+                     add(parser.parse(getCurrentScope(), parent, getJsonPointer(), value, t));
                 } catch(IllegalArgumentException ex) {
                     throw new JsonSchemaException(
                         new ParsingError(ParsingMessage.UNKNOWN_OBJECT_TYPE, new Object[] {val}));
@@ -99,8 +98,8 @@ public class JsonAnyOfImpl extends SchemaArrayImpl
 
     @Override
     public boolean validate(String jsonPointer, JsonValue value, JsonValue parent, 
-            List evaluated, List<ValidationError> errors,
-            JsonSchemaValidationCallback<JsonValue> callback) {
+            List evaluated, List errors, JsonSchemaValidationCallback callback) 
+            throws ValidationException {
         
         final List<ValidationError> err = new ArrayList<>();
         final List eva = new ArrayList();

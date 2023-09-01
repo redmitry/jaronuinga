@@ -33,9 +33,9 @@ import org.junit.Test;
 
 public class JsonSchemaMinPropertiesTest extends JsonSchemaOrgTest {
 
-    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/draft4/minProperties.json";
-    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/draft6/minProperties.json";
-    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/minProperties.json";
+    private final static String JSON_DRAFT4_TEST_FILE = "json-schema-org/tests/draft4/minProperties.json";
+    private final static String JSON_DRAFT6_TEST_FILE = "json-schema-org/tests/draft6/minProperties.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/minProperties.json";
     
     @Test
     public void test_draft4() {

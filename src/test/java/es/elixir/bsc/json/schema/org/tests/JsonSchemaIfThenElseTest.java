@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class JsonSchemaIfThenElseTest extends JsonSchemaOrgTest {
     
-    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/draft7/if-then-else.json";
+    private final static String JSON_DRAFT7_TEST_FILE = "json-schema-org/tests/draft7/if-then-else.json";
     
     @Test
     public void test_draft7() {
