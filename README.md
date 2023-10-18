@@ -1,3 +1,5 @@
+## THE PROJECT HAS BEEN MOVED TO THE [elixir-europe/java-json-schema-validator](https://github.com/elixir-europe/java-json-schema-validator)
+
 Java Json Schema validation library based on JSONP v1.1 Json parser.
 
 import via maven:
